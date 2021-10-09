@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace MscPartApi
 {
-	public class MscPartApi : Mod
+	internal class MscPartApi : Mod
 	{
 		public override string ID => "MscPartApi";
 		public override string Name => "MscPartApi";
@@ -73,7 +73,7 @@ namespace MscPartApi
 			if (screw == null) return;
 
 			if (ShowScrewSize && screw.showSize) {
-				UserInteraction.ShowGuiInteraction(UserInteraction.InteractionType.None, $"Screw size: {screw.size.ToString("#.#").Replace(".00", "")}mm");
+				UserInteraction.ShowGuiInteraction(UserInteraction.Type.None, $"Screw size: {screw.size.ToString("#.#").Replace(".00", "")}mm");
 			}
 
 			if (!tool.CheckScrewFits(screw)) return;

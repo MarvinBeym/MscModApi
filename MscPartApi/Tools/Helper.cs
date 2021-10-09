@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace MscPartApi.Tools
 {
-	public static class Helper
+	internal static class Helper
 	{
 		internal static string CombinePaths(params string[] paths) {
 			if (paths == null) {

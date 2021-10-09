@@ -9,7 +9,7 @@ using UnityEngine;
 
 namespace MscPartApi.Trigger
 {
-	public class Trigger : MonoBehaviour
+	internal class Trigger : MonoBehaviour
 	{
 		private Part part;
 		private GameObject parentGameObject;
@@ -26,11 +26,11 @@ namespace MscPartApi.Trigger
 			{
 				if (!part.IsFixed() && part.gameObject.IsLookingAt() && UserInteraction.EmptyHand() && !Tool.HasToolInHand())
 				{
-					UserInteraction.ShowGuiInteraction(UserInteraction.InteractionType.Disassemble, $"Uninstall {part.gameObject.name}");
+					UserInteraction.ShowGuiInteraction(UserInteraction.Type.Disassemble, $"Uninstall {part.gameObject.name}");
 					
 					if (UserInteraction.RightMouseDown)
 					{
-						UserInteraction.ShowGuiInteraction(UserInteraction.InteractionType.None);
+						UserInteraction.ShowGuiInteraction(UserInteraction.Type.None);
 						part.gameObject.PlayDisassemble();
 						Uninstall();
 					}
@@ -125,7 +125,7 @@ namespace MscPartApi.Trigger
 		{
 			if (!canBeInstalled || !UserInteraction.LeftMouseDown) return;
 
-			UserInteraction.ShowGuiInteraction(UserInteraction.InteractionType.None);
+			UserInteraction.ShowGuiInteraction(UserInteraction.Type.None);
 			collider.gameObject.PlayAssemble();
 			canBeInstalled = false;
 			Install();
@@ -135,16 +135,16 @@ namespace MscPartApi.Trigger
 		{
 			if (!(part.uninstallWhenParentUninstalls && part.ParentInstalled()) || !collider.gameObject.IsHolding() || collider.gameObject != part.gameObject) return;
 
-			UserInteraction.ShowGuiInteraction(UserInteraction.InteractionType.Assemble, $"Install {part.gameObject.name}");
+			UserInteraction.ShowGuiInteraction(UserInteraction.Type.Assemble, $"Install {part.gameObject.name}");
 			canBeInstalled = true;
 		}
-
+		
 		private void OnTriggerExit(Collider collider)
 		{
 			if (!canBeInstalled) return;
 
 			canBeInstalled = false;
-			UserInteraction.ShowGuiInteraction(UserInteraction.InteractionType.None);
+			UserInteraction.ShowGuiInteraction(UserInteraction.Type.None);
 		}
 
 		internal void Init(Part part, GameObject parentGameObject, bool disableCollisionWhenInstalled)

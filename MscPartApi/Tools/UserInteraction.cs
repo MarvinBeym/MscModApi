@@ -7,7 +7,7 @@ namespace MscPartApi.Tools
 {
 	public static class UserInteraction
 	{
-		public enum InteractionType
+		public enum Type
 		{
 			Assemble,
 			Disassemble,
@@ -25,20 +25,20 @@ namespace MscPartApi.Tools
 
 		private static GameObject itemPivot;
 
-		public static void ShowGuiInteraction(InteractionType type, string text = "")
+		public static void ShowGuiInteraction(Type type, string text = "")
 		{
 			if (guiInteraction != null && text != guiInteraction.Value) {
 				guiInteraction.Value = text.Replace("(Clone)", "");
 			}
 
 			switch (type) {
-				case InteractionType.Assemble:
+				case Type.Assemble:
 					ShowAssembleIcon();
 					break;
-				case InteractionType.Disassemble:
+				case Type.Disassemble:
 					ShowDisassembleIcon();
 					break;
-				case InteractionType.Use:
+				case Type.Use:
 					ShowAssembleIcon();
 					break;
 				default:
