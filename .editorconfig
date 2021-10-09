@@ -1,0 +1,7 @@
+﻿[*.cs]
+
+# IDE0002: Memberzugriff vereinfachen
+dotnet_diagnostic.IDE0002.severity = none
+
+# IDE0044: Modifizierer "readonly" hinzufügen
+dotnet_diagnostic.IDE0044.severity = none
