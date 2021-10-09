@@ -19,7 +19,6 @@ namespace MscPartApi
 		private static Settings showBoltSizeSetting = new Settings("showBoltSizeSetting", "Show screw size", false);
 		public static bool ShowScrewSize => (bool) showBoltSizeSetting.Value;
 		private const string AssetsFile = "mscPartApi.unity3d";
-		internal static AudioClip soundClip;
 		internal static GameObject clampModel;
 		private Tool tool;
 
@@ -158,7 +157,7 @@ namespace MscPartApi
 		{
 			var assetBundle = Helper.LoadAssetBundle(this, AssetsFile);
 			Screw.material = assetBundle.LoadAsset<Material>("Screw-Material.mat");
-			soundClip = assetBundle.LoadAsset<AudioClip>("screwable_sound.wav");
+			Screw.soundClip = assetBundle.LoadAsset<AudioClip>("screwable_sound.wav");
 			clampModel = assetBundle.LoadAsset<GameObject>("Tube_Clamp.prefab");
 
 			Screw.nutModel = assetBundle.LoadAsset<GameObject>("screwable_nut.prefab");

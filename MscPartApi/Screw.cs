@@ -41,6 +41,7 @@ namespace MscPartApi
 		internal static GameObject normalModel;
 		internal static GameObject longModel;
 		private static readonly int Color1 = Shader.PropertyToID("_Color");
+		internal static AudioClip soundClip;
 
 		public Screw(Vector3 position, Vector3 rotation, float scale = 1, float size = 10, Type type = Type.Normal,
 			bool allowShowSize = true)
@@ -144,7 +145,7 @@ namespace MscPartApi
 
 			if (useAudio)
 			{
-				AudioSource.PlayClipAtPoint(MscPartApi.soundClip, gameObject.transform.position);
+				AudioSource.PlayClipAtPoint(soundClip, gameObject.transform.position);
 			}
 
 			gameObject.transform.Rotate(0, 0, rotationStep);
@@ -166,7 +167,7 @@ namespace MscPartApi
 
 			if (useAudio)
 			{
-				AudioSource.PlayClipAtPoint(MscPartApi.soundClip, gameObject.transform.position);
+				AudioSource.PlayClipAtPoint(soundClip, gameObject.transform.position);
 			}
 
 			gameObject.transform.Rotate(0, 0, -rotationStep);
