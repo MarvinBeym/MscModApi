@@ -1,8 +1,5 @@
-﻿#region
-
+﻿
 using UnityEngine;
-
-#endregion
 
 namespace MscPartApi.Trigger
 {

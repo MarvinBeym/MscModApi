@@ -1,10 +1,7 @@
-﻿#region
-
+﻿
 using System.Linq;
 using MscPartApi.Tools;
 using UnityEngine;
-
-#endregion
 
 namespace MscPartApi
 {
