@@ -11,202 +11,208 @@ using UnityEngine;
 
 namespace MscPartApi
 {
-	public class Part
-	{
-		private int clampsAdded;
-		private bool partFixed;
+    public class Part
+    {
+        private int clampsAdded;
+        private bool partFixed;
 
-		internal List<Part> childParts = new List<Part>();
-		private PartBaseInfo partBaseInfo;
-		internal GameObject gameObject;
-		internal PartSave partSave;
-		internal Vector3 installPosition;
-		internal bool uninstallWhenParentUninstalls;
-		internal Vector3 installRotation;
-		private GameObject parentGameObject;
-		private Part parentPart;
-		private List<Screw> savedScrews;
-		internal Collider collider;
-		public TriggerWrapper trigger;
+        internal List<Part> childParts = new List<Part>();
+        private PartBaseInfo partBaseInfo;
+        internal GameObject gameObject;
+        internal PartSave partSave;
+        internal Vector3 installPosition;
+        internal bool uninstallWhenParentUninstalls;
+        internal Vector3 installRotation;
+        private GameObject parentGameObject;
+        private Part parentPart;
+        private List<Screw> savedScrews;
+        internal Collider collider;
+        public TriggerWrapper trigger;
 
-		private bool usingPartParent;
-		
-		internal List<Action> preInstallActions = new List<Action>();
-		internal List<Action> postInstallActions = new List<Action>();
+        private bool usingPartParent;
 
-		internal List<Action> preUninstallActions = new List<Action>();
-		internal List<Action> postUninstallActions = new List<Action>();
-		
+        internal List<Action> preInstallActions = new List<Action>();
+        internal List<Action> postInstallActions = new List<Action>();
 
-		private void Setup(string prefabName, string name, GameObject parentGameObject, Vector3 installPosition, Vector3 installRotation, PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls, bool disableCollisionWhenInstalled = true)
-		{
-			this.partBaseInfo = partBaseInfo;
-			this.installPosition = installPosition;
-			this.uninstallWhenParentUninstalls = uninstallWhenParentUninstalls;
-			this.installRotation = installRotation;
-			this.parentGameObject = parentGameObject;
+        internal List<Action> preUninstallActions = new List<Action>();
+        internal List<Action> postUninstallActions = new List<Action>();
 
-			gameObject = Helper.LoadPartAndSetName(partBaseInfo.assetBundle, prefabName, name);
-			if (!partBaseInfo.partsSave.TryGetValue(name, out this.partSave)) {
-				partSave = new PartSave();
-			}
 
-			this.savedScrews = new List<Screw>(partSave.screws);
-			partSave.screws.Clear();
+        private void Setup(string prefabName, string name, GameObject parentGameObject, Vector3 installPosition,
+            Vector3 installRotation, PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls,
+            bool disableCollisionWhenInstalled = true)
+        {
+            this.partBaseInfo = partBaseInfo;
+            this.installPosition = installPosition;
+            this.uninstallWhenParentUninstalls = uninstallWhenParentUninstalls;
+            this.installRotation = installRotation;
+            this.parentGameObject = parentGameObject;
 
-			collider = gameObject.GetComponent<Collider>();
+            gameObject = Helper.LoadPartAndSetName(partBaseInfo.assetBundle, prefabName, name);
+            if (!partBaseInfo.partsSave.TryGetValue(name, out this.partSave))
+            {
+                partSave = new PartSave();
+            }
 
-			trigger = new TriggerWrapper(this, parentGameObject, disableCollisionWhenInstalled);
+            this.savedScrews = new List<Screw>(partSave.screws);
+            partSave.screws.Clear();
 
-			if (partSave.installed) {
-				Install();
-			}
-		}
+            collider = gameObject.GetComponent<Collider>();
 
-		public Part(string prefabName, string name, GameObject parent, Vector3 installPosition, Vector3 installRotation, PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls = true, bool disableCollisionWhenInstalled = true)
-		{
-			Setup(prefabName, name, parent, installPosition, installRotation, partBaseInfo, uninstallWhenParentUninstalls, disableCollisionWhenInstalled);
-		}
+            trigger = new TriggerWrapper(this, parentGameObject, disableCollisionWhenInstalled);
 
-		public Part(string prefabName, string name, Part parentPart, Vector3 installPosition, Vector3 installRotation, PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls = true, bool disableCollisionWhenInstalled = true)
-		{
-			usingPartParent = true;
-			this.parentPart = parentPart;
-			Setup(prefabName, name, parentPart.gameObject, installPosition, installRotation, partBaseInfo, uninstallWhenParentUninstalls, disableCollisionWhenInstalled);
-			parentPart.childParts.Add(this);
-		}
+            if (partSave.installed)
+            {
+                Install();
+            }
+        }
 
-		public void SetPosition(Vector3 position)
-		{
-			gameObject.transform.position = position;
-		}
+        public Part(string prefabName, string name, GameObject parent, Vector3 installPosition, Vector3 installRotation,
+            PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls = true,
+            bool disableCollisionWhenInstalled = true)
+        {
+            Setup(prefabName, name, parent, installPosition, installRotation, partBaseInfo,
+                uninstallWhenParentUninstalls, disableCollisionWhenInstalled);
+        }
 
-		internal void ResetScrews()
-		{
-			foreach (var screw in partSave.screws)
-			{
-				screw.OutBy(screw.tightness);
-			}
-		}
+        public Part(string prefabName, string name, Part parentPart, Vector3 installPosition, Vector3 installRotation,
+            PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls = true,
+            bool disableCollisionWhenInstalled = true)
+        {
+            usingPartParent = true;
+            this.parentPart = parentPart;
+            Setup(prefabName, name, parentPart.gameObject, installPosition, installRotation, partBaseInfo,
+                uninstallWhenParentUninstalls, disableCollisionWhenInstalled);
+            parentPart.childParts.Add(this);
+        }
 
-		public List<Screw> GetScrews()
-		{
-			return partSave.screws;
-		}
+        public void SetPosition(Vector3 position)
+        {
+            gameObject.transform.position = position;
+        }
 
-		internal void SetScrewsActive(bool active)
-		{
-			partSave.screws.ForEach(delegate(Screw screw)
-			{
-				screw.gameObject.SetActive(active);
-			});
-		}
+        internal void ResetScrews()
+        {
+            foreach (var screw in partSave.screws)
+            {
+                screw.OutBy(screw.tightness);
+            }
+        }
 
-		public void SetRotation(Vector3 rotation)
-		{
-			gameObject.transform.rotation = Quaternion.Euler(rotation);
-		}
+        public List<Screw> GetScrews()
+        {
+            return partSave.screws;
+        }
 
-		public void Install() => trigger.Install();
+        internal void SetScrewsActive(bool active)
+        {
+            partSave.screws.ForEach(delegate(Screw screw) { screw.gameObject.SetActive(active); });
+        }
 
-		public bool IsInstalled()
-		{
-			return partSave.installed;
-		}
+        public void SetRotation(Vector3 rotation)
+        {
+            gameObject.transform.rotation = Quaternion.Euler(rotation);
+        }
 
-		public bool IsFixed()
-		{
-			return partFixed;
-		}
+        public void Install() => trigger.Install();
 
-		public void SetFixed(bool partFixed) => this.partFixed = partFixed;
+        public bool IsInstalled()
+        {
+            return partSave.installed;
+        }
 
-		public void Uninstall()
-		{
-			trigger.Uninstall();
-		}
-		/// <summary>
-		/// This function adds a simple clamp model to the parent calling it {parent name}_CLAMP{clampIndex}
-		/// </summary>
-		/// <param name="position">The position on the parent to place this clamp</param>
-		/// <param name="rotation">The rotation on the parent to place this clamp</param>
-		/// <param name="scale">The scale of the model of the clamp</param>
-		public void AddClampModel(Vector3 position, Vector3 rotation, Vector3 scale)
-		{
-			var clamp = GameObject.Instantiate(MscPartApi.clampModel);
-			clamp.name = $"{gameObject.name}_clamp_{clampsAdded}";
-			clampsAdded++;
-			clamp.transform.SetParent(gameObject.transform);
-			clamp.transform.localPosition = position;
-			clamp.transform.localScale = scale;
-			clamp.transform.localRotation = new Quaternion { eulerAngles = rotation };
-		}
+        public bool IsFixed()
+        {
+            return partFixed;
+        }
 
-		internal bool ParentInstalled()
-		{
-			if (usingPartParent) {
-				return parentPart.IsInstalled();
-			} else {
-				//Todo: Implement normal msc parts installed/uninstalled
-				return true;
-			}
-		}
+        public void SetFixed(bool partFixed) => this.partFixed = partFixed;
 
-		public void AddScrew(Screw screw)
-		{
-			screw.Verify();
-			screw.SetPart(this);
-			screw.parentCollider = gameObject.GetComponent<Collider>();
-			partSave.screws.Add(screw);
+        public void Uninstall()
+        {
+            trigger.Uninstall();
+        }
 
-			var index = partSave.screws.IndexOf(screw);
+        public void AddClampModel(Vector3 position, Vector3 rotation, Vector3 scale)
+        {
+            var clamp = GameObject.Instantiate(MscPartApi.clampModel);
+            clamp.name = $"{gameObject.name}_clamp_{clampsAdded}";
+            clampsAdded++;
+            clamp.transform.SetParent(gameObject.transform);
+            clamp.transform.localPosition = position;
+            clamp.transform.localScale = scale;
+            clamp.transform.localRotation = new Quaternion {eulerAngles = rotation};
+        }
 
-			screw.LoadTightness(savedScrews.ElementAtOrDefault(index));
+        internal bool ParentInstalled()
+        {
+            if (usingPartParent)
+            {
+                return parentPart.IsInstalled();
+            }
+            else
+            {
+                //Todo: Implement normal msc parts installed/uninstalled
+                return true;
+            }
+        }
 
-			screw.CreateScrewModel(index);
+        public void AddScrew(Screw screw)
+        {
+            screw.Verify();
+            screw.SetPart(this);
+            screw.parentCollider = gameObject.GetComponent<Collider>();
+            partSave.screws.Add(screw);
 
-			screw.InBy(screw.tightness);
+            var index = partSave.screws.IndexOf(screw);
 
-			screw.gameObject.SetActive(IsInstalled());
+            screw.LoadTightness(savedScrews.ElementAtOrDefault(index));
 
-			MscPartApi.screws.Add(screw.gameObject.name, screw);
-		}
+            screw.CreateScrewModel(index);
 
-		public void AddScrews(Screw[] screws, float overrideScale = 0f, float overrideSize = 0f)
-		{
-			foreach (var screw in screws)
-			{
-				if (overrideScale != 0f)
-				{
-					screw.scale = overrideScale;
-				}
+            screw.InBy(screw.tightness);
 
-				if (overrideSize != 0f)
-				{
-					screw.size = overrideSize;
-				}
-				AddScrew(screw);
-			}
-		}
+            screw.gameObject.SetActive(IsInstalled());
 
-		public void AddPreInstallAction(Action action)
-		{
-			preInstallActions.Add(action);
-		}
+            MscPartApi.screws.Add(screw.gameObject.name, screw);
+        }
 
-		public void AddPostInstallAction(Action action)
-		{
-			postInstallActions.Add(action);
-		}
+        public void AddScrews(Screw[] screws, float overrideScale = 0f, float overrideSize = 0f)
+        {
+            foreach (var screw in screws)
+            {
+                if (overrideScale != 0f)
+                {
+                    screw.scale = overrideScale;
+                }
 
-		public void AddPreUninstallAction(Action action)
-		{
-			preUninstallActions.Add(action);
-		}
+                if (overrideSize != 0f)
+                {
+                    screw.size = overrideSize;
+                }
 
-		public void AddPostUninstallAction(Action action)
-		{
-			postUninstallActions.Add(action);
-		}
-	}
+                AddScrew(screw);
+            }
+        }
+
+        public void AddPreInstallAction(Action action)
+        {
+            preInstallActions.Add(action);
+        }
+
+        public void AddPostInstallAction(Action action)
+        {
+            postInstallActions.Add(action);
+        }
+
+        public void AddPreUninstallAction(Action action)
+        {
+            preUninstallActions.Add(action);
+        }
+
+        public void AddPostUninstallAction(Action action)
+        {
+            postUninstallActions.Add(action);
+        }
+    }
 }

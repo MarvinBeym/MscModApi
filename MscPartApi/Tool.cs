@@ -11,84 +11,87 @@ using UnityEngine;
 
 namespace MscPartApi
 {
-	internal class Tool
-	{
-		public enum ToolType
-		{
-			None,
-			Spanner,
-			Ratchet,
-			RatchetTighten,
-			RatchetLoosen,
-			Screwdriver
-		}
-		private static bool hasToolInHand;
-		private FsmFloat boltingSpeed;
-		private FsmFloat wrenchSize;
+    internal class Tool
+    {
+        public enum ToolType
+        {
+            None,
+            Spanner,
+            Ratchet,
+            RatchetTighten,
+            RatchetLoosen,
+            Screwdriver
+        }
 
-		private Dictionary<ToolType, GameObject> toolGameObjects = new Dictionary<ToolType, GameObject>();
+        private static bool hasToolInHand;
+        private FsmFloat boltingSpeed;
+        private FsmFloat wrenchSize;
 
-		private float timer;
-		private FsmBool ratchetSwitch;
-		private static GameObject selectItem;
+        private Dictionary<ToolType, GameObject> toolGameObjects = new Dictionary<ToolType, GameObject>();
 
-		internal Tool()
-		{
-			var spannerPickFsm = GameObject.Find("PLAYER/Pivot/AnimPivot/Camera/FPSCamera/2Spanner/Pick").FindFsm("PickUp");
+        private float timer;
+        private FsmBool ratchetSwitch;
+        private static GameObject selectItem;
 
-			GameObject ratchet = spannerPickFsm.FsmVariables.FindFsmGameObject("Ratchet").Value;
+        internal Tool()
+        {
+            var spannerPickFsm = GameObject.Find("PLAYER/Pivot/AnimPivot/Camera/FPSCamera/2Spanner/Pick")
+                .FindFsm("PickUp");
 
-			ratchetSwitch = ratchet.FindFsm("Switch").FsmVariables.FindFsmBool("Switch");
+            GameObject ratchet = spannerPickFsm.FsmVariables.FindFsmGameObject("Ratchet").Value;
 
-			toolGameObjects.Add(ToolType.Spanner, spannerPickFsm.FsmVariables.FindFsmGameObject("HandSpanner").Value);
-			toolGameObjects.Add(ToolType.Screwdriver, spannerPickFsm.FsmVariables.FindFsmGameObject("HandScrewdriver").Value);
-			toolGameObjects.Add(ToolType.Ratchet, ratchet);
+            ratchetSwitch = ratchet.FindFsm("Switch").FsmVariables.FindFsmBool("Switch");
 
-			boltingSpeed = PlayMakerGlobals.Instance.Variables.GetFsmFloat("BoltingSpeed");
-			wrenchSize = PlayMakerGlobals.Instance.Variables.GetFsmFloat("ToolWrenchSize");
-		}
+            toolGameObjects.Add(ToolType.Spanner, spannerPickFsm.FsmVariables.FindFsmGameObject("HandSpanner").Value);
+            toolGameObjects.Add(ToolType.Screwdriver,
+                spannerPickFsm.FsmVariables.FindFsmGameObject("HandScrewdriver").Value);
+            toolGameObjects.Add(ToolType.Ratchet, ratchet);
 
-		public ToolType GetToolInHand()
-		{
-			if (!HasToolInHand()) return ToolType.None;
+            boltingSpeed = PlayMakerGlobals.Instance.Variables.GetFsmFloat("BoltingSpeed");
+            wrenchSize = PlayMakerGlobals.Instance.Variables.GetFsmFloat("ToolWrenchSize");
+        }
 
-			var toolGameObject = toolGameObjects.FirstOrDefault(keyValue => keyValue.Value.activeSelf);
+        public ToolType GetToolInHand()
+        {
+            if (!HasToolInHand()) return ToolType.None;
 
-			if (toolGameObject.Key == ToolType.Ratchet) {
-				return ratchetSwitch.Value ? ToolType.RatchetTighten : ToolType.RatchetLoosen;
-			}
+            var toolGameObject = toolGameObjects.FirstOrDefault(keyValue => keyValue.Value.activeSelf);
 
-			return toolGameObject.Value == null ? ToolType.None : toolGameObject.Key;
-		}
+            if (toolGameObject.Key == ToolType.Ratchet)
+            {
+                return ratchetSwitch.Value ? ToolType.RatchetTighten : ToolType.RatchetLoosen;
+            }
 
-		internal static bool HasToolInHand()
-		{
-			if (selectItem != null) return hasToolInHand;
+            return toolGameObject.Value == null ? ToolType.None : toolGameObject.Key;
+        }
 
-			selectItem = GameObject.Find("PLAYER/Pivot/AnimPivot/Camera/FPSCamera/SelectItem").gameObject;
-			if (selectItem == null) return hasToolInHand;
+        internal static bool HasToolInHand()
+        {
+            if (selectItem != null) return hasToolInHand;
 
-			FsmHook.FsmInject(selectItem, "Hand", delegate { hasToolInHand = false; });
-			FsmHook.FsmInject(selectItem, "Tools", delegate { hasToolInHand = true; });
+            selectItem = GameObject.Find("PLAYER/Pivot/AnimPivot/Camera/FPSCamera/SelectItem").gameObject;
+            if (selectItem == null) return hasToolInHand;
 
-			return hasToolInHand;
-		}
+            FsmHook.FsmInject(selectItem, "Hand", delegate { hasToolInHand = false; });
+            FsmHook.FsmInject(selectItem, "Tools", delegate { hasToolInHand = true; });
 
-		public bool CheckScrewFits(Screw screw)
-		{
-			float toolSize = this.wrenchSize.Value * 10f;
+            return hasToolInHand;
+        }
 
-			return screw.size >= toolSize - 0.25f && screw.size <= toolSize + 0.25f;
-		}
+        public bool CheckScrewFits(Screw screw)
+        {
+            float toolSize = this.wrenchSize.Value * 10f;
 
-		internal bool CheckBoltingSpeed()
-		{
-			timer += Time.deltaTime;
-			if (timer < boltingSpeed.Value) return false;
+            return screw.size >= toolSize - 0.25f && screw.size <= toolSize + 0.25f;
+        }
 
-			timer = 0;
-			return true;
+        internal bool CheckBoltingSpeed()
+        {
+            timer += Time.deltaTime;
+            if (timer < boltingSpeed.Value) return false;
 
-		}
-	}
+            timer = 0;
+            return true;
+        }
+    }
 }

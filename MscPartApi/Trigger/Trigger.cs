@@ -10,158 +10,170 @@ using UnityEngine;
 
 namespace MscPartApi.Trigger
 {
-	internal class Trigger : MonoBehaviour
-	{
-		private Part part;
-		private GameObject parentGameObject;
-		private bool disableCollisionWhenInstalled;
-		private Rigidbody rigidBody;
-		private bool canBeInstalled;
-		private Coroutine handleUninstallRoutine;
-		private Coroutine verifyInstalledRoutine;
-		private Coroutine verifyUninstalledRoutine;
+    internal class Trigger : MonoBehaviour
+    {
+        private Part part;
+        private GameObject parentGameObject;
+        private bool disableCollisionWhenInstalled;
+        private Rigidbody rigidBody;
+        private bool canBeInstalled;
+        private Coroutine handleUninstallRoutine;
+        private Coroutine verifyInstalledRoutine;
+        private Coroutine verifyUninstalledRoutine;
 
-		private IEnumerator HandleUninstall()
-		{
-			while (part.IsInstalled())
-			{
-				if (!part.IsFixed() && part.gameObject.IsLookingAt() && UserInteraction.EmptyHand() && !Tool.HasToolInHand())
-				{
-					UserInteraction.ShowGuiInteraction(UserInteraction.Type.Disassemble, $"Uninstall {part.gameObject.name}");
-					
-					if (UserInteraction.RightMouseDown)
-					{
-						UserInteraction.ShowGuiInteraction(UserInteraction.Type.None);
-						part.gameObject.PlayDisassemble();
-						Uninstall();
-					}
-				}
+        private IEnumerator HandleUninstall()
+        {
+            while (part.IsInstalled())
+            {
+                if (!part.IsFixed() && part.gameObject.IsLookingAt() && UserInteraction.EmptyHand() &&
+                    !Tool.HasToolInHand())
+                {
+                    UserInteraction.ShowGuiInteraction(UserInteraction.Type.Disassemble,
+                        $"Uninstall {part.gameObject.name}");
 
-				yield return null;
-			}
+                    if (UserInteraction.RightMouseDown)
+                    {
+                        UserInteraction.ShowGuiInteraction(UserInteraction.Type.None);
+                        part.gameObject.PlayDisassemble();
+                        Uninstall();
+                    }
+                }
 
-			handleUninstallRoutine = null;
-		}
-		
-		private IEnumerator VerifyInstalled()
-		{
-			while (part.IsInstalled() && part.gameObject.transform.parent != parentGameObject.transform)
-			{
-				rigidBody.isKinematic = true;
-				part.gameObject.transform.parent = parentGameObject.transform;
-				part.gameObject.transform.localPosition = part.installPosition;
-				part.gameObject.transform.localRotation = Quaternion.Euler(part.installRotation);
-				yield return null;
-			}
-			verifyInstalledRoutine = null;
-		}
+                yield return null;
+            }
 
-		private IEnumerator VerifyUninstalled()
-		{
-			while (!part.IsInstalled() && part.gameObject.transform.parent == parentGameObject.transform) {
-				rigidBody.isKinematic = false;
-				part.gameObject.transform.parent = null;
-				part.gameObject.transform.Translate(Vector3.up * 0.025f);
-				yield return null;
-			}
-			verifyUninstalledRoutine = null;
-		}
+            handleUninstallRoutine = null;
+        }
 
-		internal void Install()
-		{
-			InvokeActionList(part.preInstallActions);
+        private IEnumerator VerifyInstalled()
+        {
+            while (part.IsInstalled() && part.gameObject.transform.parent != parentGameObject.transform)
+            {
+                rigidBody.isKinematic = true;
+                part.gameObject.transform.parent = parentGameObject.transform;
+                part.gameObject.transform.localPosition = part.installPosition;
+                part.gameObject.transform.localRotation = Quaternion.Euler(part.installRotation);
+                yield return null;
+            }
 
-			part.partSave.installed = true;
-			part.gameObject.tag = "Untagged";
+            verifyInstalledRoutine = null;
+        }
 
-			if (handleUninstallRoutine == null) {
-				handleUninstallRoutine = StartCoroutine(HandleUninstall());
-			}
-			if (verifyInstalledRoutine == null) {
-				verifyInstalledRoutine = StartCoroutine(VerifyInstalled());
-			}
+        private IEnumerator VerifyUninstalled()
+        {
+            while (!part.IsInstalled() && part.gameObject.transform.parent == parentGameObject.transform)
+            {
+                rigidBody.isKinematic = false;
+                part.gameObject.transform.parent = null;
+                part.gameObject.transform.Translate(Vector3.up * 0.025f);
+                yield return null;
+            }
 
-			if (disableCollisionWhenInstalled)
-			{
-				part.collider.isTrigger = true;
-			}
+            verifyUninstalledRoutine = null;
+        }
 
-			part.SetScrewsActive(true);
+        internal void Install()
+        {
+            InvokeActionList(part.preInstallActions);
 
-			canBeInstalled = false;
+            part.partSave.installed = true;
+            part.gameObject.tag = "Untagged";
 
-			InvokeActionList(part.postInstallActions);
-		}
+            if (handleUninstallRoutine == null)
+            {
+                handleUninstallRoutine = StartCoroutine(HandleUninstall());
+            }
 
-		internal void Uninstall()
-		{
-			InvokeActionList(part.preUninstallActions);
+            if (verifyInstalledRoutine == null)
+            {
+                verifyInstalledRoutine = StartCoroutine(VerifyInstalled());
+            }
 
-			part.ResetScrews();
+            if (disableCollisionWhenInstalled)
+            {
+                part.collider.isTrigger = true;
+            }
 
-			part.childParts.ForEach(delegate (Part part) {
-				if (part.uninstallWhenParentUninstalls)
-				{
-					part.Uninstall();
-				}
-			});
+            part.SetScrewsActive(true);
 
-			part.partSave.installed = false;
-			part.gameObject.tag = "PART";
+            canBeInstalled = false;
 
-			if (!part.IsInstalled() && verifyUninstalledRoutine == null) {
-				verifyUninstalledRoutine = StartCoroutine(VerifyUninstalled());
-			}
+            InvokeActionList(part.postInstallActions);
+        }
 
-			if (disableCollisionWhenInstalled) {
-				part.collider.isTrigger = false;
-			}
+        internal void Uninstall()
+        {
+            InvokeActionList(part.preUninstallActions);
 
-			part.SetScrewsActive(false);
+            part.ResetScrews();
 
-			InvokeActionList(part.postUninstallActions);
-		}
+            part.childParts.ForEach(delegate(Part part)
+            {
+                if (part.uninstallWhenParentUninstalls)
+                {
+                    part.Uninstall();
+                }
+            });
 
-		private void OnTriggerStay(Collider collider)
-		{
-			if (!canBeInstalled || !UserInteraction.LeftMouseDown) return;
+            part.partSave.installed = false;
+            part.gameObject.tag = "PART";
 
-			UserInteraction.ShowGuiInteraction(UserInteraction.Type.None);
-			collider.gameObject.PlayAssemble();
-			canBeInstalled = false;
-			Install();
-		}
+            if (!part.IsInstalled() && verifyUninstalledRoutine == null)
+            {
+                verifyUninstalledRoutine = StartCoroutine(VerifyUninstalled());
+            }
 
-		private void OnTriggerEnter(Collider collider)
-		{
-			if (!(part.uninstallWhenParentUninstalls && part.ParentInstalled()) || !collider.gameObject.IsHolding() || collider.gameObject != part.gameObject) return;
+            if (disableCollisionWhenInstalled)
+            {
+                part.collider.isTrigger = false;
+            }
 
-			UserInteraction.ShowGuiInteraction(UserInteraction.Type.Assemble, $"Install {part.gameObject.name}");
-			canBeInstalled = true;
-		}
-		
-		private void OnTriggerExit(Collider collider)
-		{
-			if (!canBeInstalled) return;
+            part.SetScrewsActive(false);
 
-			canBeInstalled = false;
-			UserInteraction.ShowGuiInteraction(UserInteraction.Type.None);
-		}
+            InvokeActionList(part.postUninstallActions);
+        }
 
-		internal void Init(Part part, GameObject parentGameObject, bool disableCollisionWhenInstalled)
-		{
-			this.part = part;
-			this.parentGameObject = parentGameObject;
-			this.disableCollisionWhenInstalled = disableCollisionWhenInstalled;
-			rigidBody = part.gameObject.GetComponent<Rigidbody>();
-		}
+        private void OnTriggerStay(Collider collider)
+        {
+            if (!canBeInstalled || !UserInteraction.LeftMouseDown) return;
 
-		private void InvokeActionList(List<Action> actions)
-		{
-			foreach (var action in actions)
-			{
-				action.Invoke();
-			}
-		}
-	}
+            UserInteraction.ShowGuiInteraction(UserInteraction.Type.None);
+            collider.gameObject.PlayAssemble();
+            canBeInstalled = false;
+            Install();
+        }
+
+        private void OnTriggerEnter(Collider collider)
+        {
+            if (!(part.uninstallWhenParentUninstalls && part.ParentInstalled()) || !collider.gameObject.IsHolding() ||
+                collider.gameObject != part.gameObject) return;
+
+            UserInteraction.ShowGuiInteraction(UserInteraction.Type.Assemble, $"Install {part.gameObject.name}");
+            canBeInstalled = true;
+        }
+
+        private void OnTriggerExit(Collider collider)
+        {
+            if (!canBeInstalled) return;
+
+            canBeInstalled = false;
+            UserInteraction.ShowGuiInteraction(UserInteraction.Type.None);
+        }
+
+        internal void Init(Part part, GameObject parentGameObject, bool disableCollisionWhenInstalled)
+        {
+            this.part = part;
+            this.parentGameObject = parentGameObject;
+            this.disableCollisionWhenInstalled = disableCollisionWhenInstalled;
+            rigidBody = part.gameObject.GetComponent<Rigidbody>();
+        }
+
+        private void InvokeActionList(List<Action> actions)
+        {
+            foreach (var action in actions)
+            {
+                action.Invoke();
+            }
+        }
+    }
 }
