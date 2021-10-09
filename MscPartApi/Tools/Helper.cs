@@ -1,9 +1,13 @@
-﻿using System;
+﻿#region
+
+using System;
 using System.IO;
 using System.Linq;
 using MSCLoader;
 using Newtonsoft.Json;
 using UnityEngine;
+
+#endregion
 
 namespace MscPartApi.Tools
 {
@@ -40,10 +44,7 @@ namespace MscPartApi.Tools
 
 		internal static T LoadSaveOrReturnNew<T>(Mod mod, string saveFilePath) where T : new() {
 			var path = Path.Combine(ModLoader.GetModSettingsFolder(mod), saveFilePath);
-			if (!File.Exists(path)) {
-				return new T();
-			}
-			return JsonConvert.DeserializeObject<T>(File.ReadAllText(path));
+			return !File.Exists(path) ? new T() : JsonConvert.DeserializeObject<T>(File.ReadAllText(path));
 		}
 		internal static GameObject LoadPartAndSetName(AssetBundle assetsBundle, string prefabName, string name)
 		{

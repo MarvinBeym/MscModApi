@@ -1,7 +1,10 @@
-﻿using System;
+﻿#region
+
+using System;
 using HutongGames.PlayMaker;
-using MSCLoader;
 using UnityEngine;
+
+#endregion
 
 namespace MscPartApi.Tools
 {

@@ -1,12 +1,11 @@
-﻿using System;
+﻿#region
+
 using System.Collections.Generic;
 using MSCLoader;
-using System.IO;
-using System.Linq;
-using System.Threading;
 using MscPartApi.Tools;
-using Newtonsoft.Json;
 using UnityEngine;
+
+#endregion
 
 namespace MscPartApi
 {

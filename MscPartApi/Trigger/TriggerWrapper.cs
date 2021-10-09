@@ -1,5 +1,8 @@
-﻿using HutongGames.PlayMaker.Actions;
+﻿#region
+
 using UnityEngine;
+
+#endregion
 
 namespace MscPartApi.Trigger
 {
