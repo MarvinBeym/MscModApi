@@ -93,7 +93,20 @@
       <Link>.editorconfig</Link>
     </None>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Content Include="..\.gitattributes">
+      <Link>Project\.gitattributes</Link>
+    </Content>
+    <Content Include="..\.gitignore">
+      <Link>Project\.gitignore</Link>
+    </Content>
+    <Content Include="..\LICENSE">
+      <Link>Project\LICENSE</Link>
+    </Content>
+    <Content Include="..\README.md">
+      <Link>Project\README.md</Link>
+    </Content>
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>if "$(ConfigurationName)" == "Debug" (
