@@ -15,7 +15,7 @@ namespace MscPartApi.Trigger
 		private GameObject parentGameObject;
 		private bool disableCollisionWhenInstalled;
 		private Rigidbody rigidBody;
-		private bool canBeInstalled = false;
+		private bool canBeInstalled;
 		private Coroutine handleUninstallRoutine;
 		private Coroutine verifyInstalledRoutine;
 		private Coroutine verifyUninstalledRoutine;

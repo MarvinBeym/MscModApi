@@ -10,8 +10,8 @@ namespace MscPartApi
 {
 	public class Part
 	{
-		private int clampsAdded = 0;
-		private bool partFixed = false;
+		private int clampsAdded;
+		private bool partFixed;
 
 		internal List<Part> childParts = new List<Part>();
 		private PartBaseInfo partBaseInfo;
@@ -26,7 +26,7 @@ namespace MscPartApi
 		internal Collider collider;
 		public TriggerWrapper trigger;
 
-		private bool usingPartParent = false;
+		private bool usingPartParent;
 		
 		internal List<Action> preInstallActions = new List<Action>();
 		internal List<Action> postInstallActions = new List<Action>();
@@ -69,7 +69,7 @@ namespace MscPartApi
 		{
 			usingPartParent = true;
 			this.parentPart = parentPart;
-			Setup(prefabName, name, parentPart.gameObject, installPosition, installRotation, partBaseInfo, disableCollisionWhenInstalled);
+			Setup(prefabName, name, parentPart.gameObject, installPosition, installRotation, partBaseInfo, uninstallWhenParentUninstalls, disableCollisionWhenInstalled);
 			parentPart.childParts.Add(this);
 		}
 

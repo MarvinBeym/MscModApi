@@ -19,16 +19,11 @@ namespace MscPartApi
 			RatchetLoosen,
 			Screwdriver
 		}
-		public ToolType toolInHand = ToolType.None;
-
-		private static bool hasToolInHand = false;
+		private static bool hasToolInHand;
 		private FsmFloat boltingSpeed;
 		private FsmFloat wrenchSize;
 
 		private Dictionary<ToolType, GameObject> toolGameObjects = new Dictionary<ToolType, GameObject>();
-		private GameObject spanner;
-		private GameObject screwdriver;
-		private GameObject ratchet;
 
 		private float timer;
 		private FsmBool ratchetSwitch;
@@ -38,7 +33,7 @@ namespace MscPartApi
 		{
 			var spannerPickFsm = GameObject.Find("PLAYER/Pivot/AnimPivot/Camera/FPSCamera/2Spanner/Pick").FindFsm("PickUp");
 
-			ratchet = spannerPickFsm.FsmVariables.FindFsmGameObject("Ratchet").Value;
+			GameObject ratchet = spannerPickFsm.FsmVariables.FindFsmGameObject("Ratchet").Value;
 
 			ratchetSwitch = ratchet.FindFsm("Switch").FsmVariables.FindFsmBool("Switch");
 

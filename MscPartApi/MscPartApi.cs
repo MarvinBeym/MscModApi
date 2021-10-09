@@ -66,7 +66,7 @@ namespace MscPartApi
 					previousScrew = null;
 				}
 				return;
-			};
+			}
 			
 			Screw screw = DetectScrew();
 
@@ -88,7 +88,7 @@ namespace MscPartApi
 						screw.In();
 						break;
 					case Tool.ToolType.RatchetLoosen:
-						screw.Out(true);
+						screw.Out();
 						break;
 					default:
 						screw.In();
@@ -100,7 +100,7 @@ namespace MscPartApi
 						screw.In();
 						break;
 					case Tool.ToolType.RatchetLoosen:
-						screw.Out(true);
+						screw.Out();
 						break;
 					default:
 						screw.Out();
@@ -125,7 +125,12 @@ namespace MscPartApi
 
 			if (!Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out var hit, 1f, 1 << LayerMask.NameToLayer("DontCollide"))) { return null; }
 
-			var hitObject = hit.collider?.gameObject;
+			if (!hit.collider)
+			{
+				return null;
+			}
+			
+			var hitObject = hit.collider.gameObject;
 			if (hitObject == null || !hitObject.name.Contains("_screw_")) return null;
 
 			if (!screws.TryGetValue(hitObject.name, out var screw)) return null;

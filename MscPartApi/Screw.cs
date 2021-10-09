@@ -22,15 +22,15 @@ namespace MscPartApi
         internal Collider parentCollider;
 
 		internal static Material material;
-		internal Vector3 position;
-		internal Vector3 rotation;
+		private Vector3 position;
+		private Vector3 rotation;
 		internal float scale;
 		internal float size;
-		internal Type type;
+		private Type type;
 		internal GameObject gameObject;
-		internal MeshRenderer renderer;
-		internal int tightness = 0;
-		internal bool showSize = false;
+		private MeshRenderer renderer;
+		internal int tightness;
+		internal bool showSize;
 		private Collider collider;
 		internal Part part;
 
@@ -39,6 +39,7 @@ namespace MscPartApi
 		internal static GameObject screwModel;
 		internal static GameObject normalModel;
 		internal static GameObject longModel;
+		private static readonly int Color1 = Shader.PropertyToID("_Color");
 
 		public Screw(Vector3 position, Vector3 rotation, float scale = 1, float size = 10, Type type = Type.Normal, bool allowShowSize = true)
         {
@@ -87,7 +88,6 @@ namespace MscPartApi
 		        case Type.Long:
 			        gameObject = GameObject.Instantiate(longModel);
 			        break;
-		        case Type.Normal:
 		        default:
 			        gameObject = GameObject.Instantiate(normalModel);
 			        break;
@@ -195,7 +195,7 @@ namespace MscPartApi
 			if (highlight)
 			{
 				renderer.material.shader = textShader;
-				renderer.material.SetColor("_Color", Color.green);
+				renderer.material.SetColor(Color1, Color.green);
 			}
 			else
 			{

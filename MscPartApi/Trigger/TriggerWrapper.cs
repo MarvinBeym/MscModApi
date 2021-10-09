@@ -5,9 +5,9 @@ namespace MscPartApi.Trigger
 {
 	public class TriggerWrapper
 	{
-		private readonly Trigger logic;
-		private readonly GameObject triggerGameObject;
-		private readonly Renderer renderer;
+		private Trigger logic;
+		private GameObject triggerGameObject;
+		private Renderer renderer;
 		private static readonly Vector3 defaultScale = new Vector3(0.05f, 0.05f, 0.05f);
 
 		public TriggerWrapper(Part part, GameObject parentGameObject, bool disableCollisionWhenInstalled)

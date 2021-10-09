@@ -140,8 +140,12 @@ namespace MscPartApi.Tools
 				return false;
 			}
 
+			if (!itemPivot)
+			{
+				return false;
+			}
 
-			return itemPivot?.transform.childCount == 0;
+			return itemPivot.transform.childCount == 0;
 
 		}
 
