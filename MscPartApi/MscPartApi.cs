@@ -24,7 +24,7 @@ namespace MscPartApi
 		private Tool tool;
 
 		internal static Dictionary<string, string> modSaveFileMapping = new Dictionary<string, string>();
-		internal static Dictionary<string, Dictionary<string, PartSave>> saves = new Dictionary<string, Dictionary<string, PartSave>>();
+		internal static Dictionary<string, Dictionary<string, Part>> modsParts = new Dictionary<string, Dictionary<string, Part>>();
 		internal static Dictionary<string, Screw> screws = new Dictionary<string, Screw>();
 		private Screw previousScrew;
 
@@ -54,15 +54,29 @@ namespace MscPartApi
 
 		private void Mod_OnSave()
 		{
-			foreach (var save in saves) {
-				var mod = ModLoader.GetMod(save.Key);
+			foreach (var modParts in modsParts) {
+				var mod = ModLoader.GetMod(modParts.Key);
 
 				if (!modSaveFileMapping.TryGetValue(mod.ID, out var saveFileName)) {
 					//save file for mod can't be found, skip the whole mod.
 					continue;
 				}
 
-				SaveLoad.SerializeSaveFile<Dictionary<string, PartSave>>(mod, save.Value, saveFileName);
+				var modPartSaves = new Dictionary<string, PartSave>();
+
+				foreach (var partData in modParts.Value)
+				{
+					var id = partData.Key;
+					var part = partData.Value;
+
+					var partSave = part.partSave;
+					partSave.position = part.gameObject.transform.position;
+					partSave.rotation = part.gameObject.transform.rotation;
+
+					modPartSaves.Add(id, partSave);
+				}
+
+				SaveLoad.SerializeSaveFile<Dictionary<string, PartSave>>(mod, modPartSaves, saveFileName);
 			}
 		}
 
@@ -81,6 +95,11 @@ namespace MscPartApi
 			Screw screw = DetectScrew();
 
 			if (screw == null) return;
+
+			if (screw.part.screwPlacementMode)
+			{
+				return;
+			}
 
 			if (ShowScrewSize && screw.showSize) {
 				UserInteraction.ShowGuiInteraction(UserInteraction.Type.None,

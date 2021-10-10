@@ -76,6 +76,11 @@ namespace MscPartApi.Trigger
 		{
 			InvokeActionList(part.preInstallActions);
 
+			if (part.uninstallWhenParentUninstalls && !part.ParentInstalled())
+			{
+				return;
+			}
+
 			part.partSave.installed = true;
 			part.gameObject.tag = "Untagged";
 

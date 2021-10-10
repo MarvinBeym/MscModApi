@@ -32,6 +32,7 @@ namespace MscPartApi
 
 		internal List<Action> preUninstallActions = new List<Action>();
 		internal List<Action> postUninstallActions = new List<Action>();
+		internal bool screwPlacementMode;
 
 		private void Setup(string id, string name, GameObject parentGameObject, Vector3 installPosition,
 			Vector3 installRotation, PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls,
@@ -62,20 +63,22 @@ namespace MscPartApi
 				Install();
 			}
 
+			LoadPartPositionAndRotation(gameObject, partSave);
+
 			if (!MscPartApi.modSaveFileMapping.ContainsKey(partBaseInfo.mod.ID))
 			{
 				MscPartApi.modSaveFileMapping.Add(partBaseInfo.mod.ID, partBaseInfo.saveFilePath);
 			}
 
-			if (MscPartApi.saves.ContainsKey(partBaseInfo.mod.ID))
+			if (MscPartApi.modsParts.ContainsKey(partBaseInfo.mod.ID))
 			{
-				MscPartApi.saves[partBaseInfo.mod.ID].Add(id, partSave);
+				MscPartApi.modsParts[partBaseInfo.mod.ID].Add(id, this);
 			}
 			else
 			{
-				MscPartApi.saves.Add(partBaseInfo.mod.ID, new Dictionary<string, PartSave>
+				MscPartApi.modsParts.Add(partBaseInfo.mod.ID, new Dictionary<string, Part>
 				{
-					{id, partSave}
+					{id, this}
 				});
 			}
 		}
@@ -98,6 +101,8 @@ namespace MscPartApi
 				uninstallWhenParentUninstalls, disableCollisionWhenInstalled, prefabName);
 			parentPart.childParts.Add(this);
 		}
+
+		public void EnableScrewPlacementMode() => screwPlacementMode = true;
 
 		public void SetPosition(Vector3 position)
 		{
@@ -125,11 +130,11 @@ namespace MscPartApi
 			partSave.screws.ForEach(delegate(Screw screw) { screw.gameObject.SetActive(active); });
 		}
 
-		public void SetRotation(Vector3 rotation)
+		public void SetRotation(Quaternion rotation)
 		{
 			if (!IsInstalled())
 			{
-				gameObject.transform.rotation = Quaternion.Euler(rotation);
+				gameObject.transform.rotation = rotation;
 			}
 		}
 
@@ -176,6 +181,12 @@ namespace MscPartApi
 			}
 		}
 
+		private void LoadPartPositionAndRotation(GameObject gameObject, PartSave partSave)
+		{
+			SetPosition(partSave.position);
+			SetRotation(partSave.rotation);
+		}
+
 		public void AddScrew(Screw screw)
 		{
 			screw.Verify();
@@ -185,11 +196,13 @@ namespace MscPartApi
 
 			var index = partSave.screws.IndexOf(screw);
 
-			screw.LoadTightness(savedScrews.ElementAtOrDefault(index));
-
 			screw.CreateScrewModel(index);
 
-			screw.InBy(screw.tightness, false, true);
+			if (screwPlacementMode)
+			{
+				screw.LoadTightness(savedScrews.ElementAtOrDefault(index));
+				screw.InBy(screw.tightness, false, true);
+			}
 
 			screw.gameObject.SetActive(IsInstalled());
 
