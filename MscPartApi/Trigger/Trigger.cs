@@ -43,7 +43,11 @@ namespace MscPartApi.Trigger
 
 		private IEnumerator VerifyInstalled()
 		{
-			while (part.IsInstalled() && part.gameObject.transform.parent != parentGameObject.transform)
+			var keepVerifying = part.gameObject.transform.parent != parentGameObject.transform
+			                    || part.gameObject.transform.localPosition.CompareVector3(part.installPosition)
+			                    || part.gameObject.transform.localRotation.eulerAngles.CompareVector3(part.installRotation);
+
+			while (part.IsInstalled() && keepVerifying)
 			{
 				rigidBody.isKinematic = true;
 				part.gameObject.transform.parent = parentGameObject.transform;

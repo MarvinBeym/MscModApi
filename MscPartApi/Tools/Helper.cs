@@ -80,5 +80,10 @@ namespace MscPartApi.Tools
 				"\\(Clone\\){1,}", "(Clone)"
 			);
 		}
+
+		internal static bool CompareVector3(this Vector3 vector3, Vector3 other, float tolerance = 0.05f)
+		{
+			return Math.Abs(vector3.x - other.x) < tolerance && Math.Abs(vector3.y - other.y) < tolerance && Math.Abs(vector3.z - other.z) < tolerance;
+		}
 	}
 }

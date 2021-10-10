@@ -101,7 +101,10 @@ namespace MscPartApi
 
 		public void SetPosition(Vector3 position)
 		{
-			gameObject.transform.position = position;
+			if (!IsInstalled())
+			{
+				gameObject.transform.position = position;
+			}
 		}
 
 		internal void ResetScrews()
@@ -124,7 +127,10 @@ namespace MscPartApi
 
 		public void SetRotation(Vector3 rotation)
 		{
-			gameObject.transform.rotation = Quaternion.Euler(rotation);
+			if (!IsInstalled())
+			{
+				gameObject.transform.rotation = Quaternion.Euler(rotation);
+			}
 		}
 
 		public void Install() => trigger.Install();
