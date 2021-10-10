@@ -33,10 +33,9 @@ namespace MscPartApi
 		internal List<Action> preUninstallActions = new List<Action>();
 		internal List<Action> postUninstallActions = new List<Action>();
 
-
-		private void Setup(string prefabName, string name, GameObject parentGameObject, Vector3 installPosition,
+		private void Setup(string id, string name, GameObject parentGameObject, Vector3 installPosition,
 			Vector3 installRotation, PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls,
-			bool disableCollisionWhenInstalled = true)
+			bool disableCollisionWhenInstalled, string prefabName)
 		{
 			this.partBaseInfo = partBaseInfo;
 			this.installPosition = installPosition;
@@ -44,13 +43,14 @@ namespace MscPartApi
 			this.installRotation = installRotation;
 			this.parentGameObject = parentGameObject;
 
-			gameObject = Helper.LoadPartAndSetName(partBaseInfo.assetBundle, prefabName, name);
-			if (!partBaseInfo.partsSave.TryGetValue(name, out this.partSave))
+			gameObject = Helper.LoadPartAndSetName(partBaseInfo.assetBundle, prefabName ?? id, name);
+
+			if (!partBaseInfo.partsSave.TryGetValue(id, out partSave))
 			{
 				partSave = new PartSave();
 			}
-
-			this.savedScrews = new List<Screw>(partSave.screws);
+			
+			savedScrews = new List<Screw>(partSave.screws);
 			partSave.screws.Clear();
 
 			collider = gameObject.GetComponent<Collider>();
@@ -61,24 +61,41 @@ namespace MscPartApi
 			{
 				Install();
 			}
+
+			if (!MscPartApi.modSaveFileMapping.ContainsKey(partBaseInfo.mod.ID))
+			{
+				MscPartApi.modSaveFileMapping.Add(partBaseInfo.mod.ID, partBaseInfo.saveFilePath);
+			}
+
+			if (MscPartApi.saves.ContainsKey(partBaseInfo.mod.ID))
+			{
+				MscPartApi.saves[partBaseInfo.mod.ID].Add(id, partSave);
+			}
+			else
+			{
+				MscPartApi.saves.Add(partBaseInfo.mod.ID, new Dictionary<string, PartSave>
+				{
+					{id, partSave}
+				});
+			}
 		}
 
-		public Part(string prefabName, string name, GameObject parent, Vector3 installPosition, Vector3 installRotation,
+		public Part(string id, string name, GameObject parent, Vector3 installPosition, Vector3 installRotation,
 			PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls = true,
-			bool disableCollisionWhenInstalled = true)
+			bool disableCollisionWhenInstalled = true, string prefabName = null)
 		{
-			Setup(prefabName, name, parent, installPosition, installRotation, partBaseInfo,
-				uninstallWhenParentUninstalls, disableCollisionWhenInstalled);
+			Setup(id, name, parent, installPosition, installRotation, partBaseInfo,
+				uninstallWhenParentUninstalls, disableCollisionWhenInstalled, prefabName);
 		}
 
-		public Part(string prefabName, string name, Part parentPart, Vector3 installPosition, Vector3 installRotation,
+		public Part(string id, string name, Part parentPart, Vector3 installPosition, Vector3 installRotation,
 			PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls = true,
-			bool disableCollisionWhenInstalled = true)
+			bool disableCollisionWhenInstalled = true, string prefabName = null)
 		{
 			usingPartParent = true;
 			this.parentPart = parentPart;
-			Setup(prefabName, name, parentPart.gameObject, installPosition, installRotation, partBaseInfo,
-				uninstallWhenParentUninstalls, disableCollisionWhenInstalled);
+			Setup(id, name, parentPart.gameObject, installPosition, installRotation, partBaseInfo,
+				uninstallWhenParentUninstalls, disableCollisionWhenInstalled, prefabName);
 			parentPart.childParts.Add(this);
 		}
 
@@ -166,7 +183,7 @@ namespace MscPartApi
 
 			screw.CreateScrewModel(index);
 
-			screw.InBy(screw.tightness);
+			screw.InBy(screw.tightness, false, true);
 
 			screw.gameObject.SetActive(IsInstalled());
 

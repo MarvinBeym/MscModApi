@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Linq;
 using MSCLoader;
 using MscPartApi.Tools;
 using UnityEngine;
@@ -22,6 +23,8 @@ namespace MscPartApi
 		internal static GameObject clampModel;
 		private Tool tool;
 
+		internal static Dictionary<string, string> modSaveFileMapping = new Dictionary<string, string>();
+		internal static Dictionary<string, Dictionary<string, PartSave>> saves = new Dictionary<string, Dictionary<string, PartSave>>();
 		internal static Dictionary<string, Screw> screws = new Dictionary<string, Screw>();
 		private Screw previousScrew;
 
@@ -51,15 +54,23 @@ namespace MscPartApi
 
 		private void Mod_OnSave()
 		{
+			foreach (var save in saves) {
+				var mod = ModLoader.GetMod(save.Key);
+
+				if (!modSaveFileMapping.TryGetValue(mod.ID, out var saveFileName)) {
+					//save file for mod can't be found, skip the whole mod.
+					continue;
+				}
+
+				SaveLoad.SerializeSaveFile<Dictionary<string, PartSave>>(mod, save.Value, saveFileName);
+			}
 		}
 
 		private void Mod_Update()
 		{
 			var toolInHand = tool.GetToolInHand();
-			if (toolInHand == Tool.ToolType.None)
-			{
-				if (previousScrew != null)
-				{
+			if (toolInHand == Tool.ToolType.None) {
+				if (previousScrew != null) {
 					previousScrew.Highlight(false);
 					previousScrew = null;
 				}
@@ -71,8 +82,7 @@ namespace MscPartApi
 
 			if (screw == null) return;
 
-			if (ShowScrewSize && screw.showSize)
-			{
+			if (ShowScrewSize && screw.showSize) {
 				UserInteraction.ShowGuiInteraction(UserInteraction.Type.None,
 					$"Screw size: {screw.size.ToString("#.#").Replace(".00", "")}mm");
 			}
@@ -83,10 +93,8 @@ namespace MscPartApi
 
 			if (!tool.CheckBoltingSpeed()) return;
 
-			if (UserInteraction.MouseScrollWheel.Up)
-			{
-				switch (toolInHand)
-				{
+			if (UserInteraction.MouseScrollWheel.Up) {
+				switch (toolInHand) {
 					case Tool.ToolType.RatchetTighten:
 						screw.In();
 						break;
@@ -97,11 +105,8 @@ namespace MscPartApi
 						screw.In();
 						break;
 				}
-			}
-			else if (UserInteraction.MouseScrollWheel.Down)
-			{
-				switch (toolInHand)
-				{
+			} else if (UserInteraction.MouseScrollWheel.Down) {
+				switch (toolInHand) {
 					case Tool.ToolType.RatchetTighten:
 						screw.In();
 						break;
@@ -120,25 +125,21 @@ namespace MscPartApi
 
 		private Screw DetectScrew()
 		{
-			if (previousScrew != null)
-			{
+			if (previousScrew != null) {
 				previousScrew.Highlight(false);
 				previousScrew = null;
 			}
 
-			if (Camera.main == null)
-			{
+			if (Camera.main == null) {
 				return null;
 			}
 
 			if (!Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out var hit, 1f,
-				1 << LayerMask.NameToLayer("DontCollide")))
-			{
+				1 << LayerMask.NameToLayer("DontCollide"))) {
 				return null;
 			}
 
-			if (!hit.collider)
-			{
+			if (!hit.collider) {
 				return null;
 			}
 

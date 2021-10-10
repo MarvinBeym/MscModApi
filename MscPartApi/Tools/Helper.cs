@@ -61,6 +61,7 @@ namespace MscPartApi.Tools
 		{
 			var gameObject = GameObject.Instantiate(assetsBundle.LoadAsset(prefabName) as GameObject);
 			gameObject.SetNameLayerTag(name + "(Clone)", "PART", "Parts");
+
 			return gameObject;
 		}
 

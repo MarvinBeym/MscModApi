@@ -1,9 +1,11 @@
 ﻿using System.Linq;
 using MscPartApi.Tools;
+using Newtonsoft.Json;
 using UnityEngine;
 
 namespace MscPartApi
 {
+	[JsonObject(MemberSerialization.OptIn)]
 	public class Screw
 	{
 		internal const float minSize = 5;
@@ -30,7 +32,10 @@ namespace MscPartApi
 		private Type type;
 		internal GameObject gameObject;
 		private MeshRenderer renderer;
+
+		[JsonProperty]
 		internal int tightness;
+
 		internal bool showSize;
 		private Collider collider;
 		internal Part part;
@@ -180,16 +185,25 @@ namespace MscPartApi
 			}
 		}
 
-		public void InBy(int by, bool useAudio = false)
+		public void InBy(int by, bool useAudio = false, bool setTightnessToZero = false)
 		{
+			if (setTightnessToZero)
+			{
+				tightness = 0;
+			}
+
 			for (var i = 0; i < by; i++)
 			{
 				In(useAudio);
 			}
 		}
 
-		public void OutBy(int by, bool useAudio = false)
+		public void OutBy(int by, bool useAudio = false, bool setTightnessToZero = false)
 		{
+			if (setTightnessToZero) {
+				tightness = 0;
+			}
+
 			for (var i = 0; i < by; i++)
 			{
 				Out(useAudio);
