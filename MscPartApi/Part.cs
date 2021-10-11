@@ -13,6 +13,7 @@ namespace MscPartApi
 		private bool partFixed;
 
 		internal List<Part> childParts = new List<Part>();
+		public string id;
 		public PartBaseInfo partBaseInfo;
 		public GameObject gameObject;
 		internal PartSave partSave;
@@ -27,6 +28,8 @@ namespace MscPartApi
 
 		public Transform transform => gameObject.transform;
 		
+		private bool usingGameObjectInstantiation;
+		private GameObject gameObjectUsedForInstantiation;
 		private bool usingPartParent;
 
 		internal List<Action> preInstallActions = new List<Action>();
@@ -40,13 +43,21 @@ namespace MscPartApi
 			Vector3 installRotation, PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls,
 			bool disableCollisionWhenInstalled, string prefabName)
 		{
+			this.id = id;
 			this.partBaseInfo = partBaseInfo;
 			this.installPosition = installPosition;
 			this.uninstallWhenParentUninstalls = uninstallWhenParentUninstalls;
 			this.installRotation = installRotation;
 			this.parentGameObject = parentGameObject;
 
-			gameObject = Helper.LoadPartAndSetName(partBaseInfo.assetBundle, prefabName ?? id, name);
+			if (usingGameObjectInstantiation)
+			{
+				gameObject = gameObjectUsedForInstantiation;
+			}
+			else
+			{
+				gameObject = Helper.LoadPartAndSetName(partBaseInfo.assetBundle, prefabName ?? id, name);
+			}
 
 			if (!partBaseInfo.partsSave.TryGetValue(id, out partSave)) {
 				partSave = new PartSave();
@@ -77,6 +88,20 @@ namespace MscPartApi
 					{id, this}
 				});
 			}
+		}
+
+		public Part(string id, GameObject part, string name, Part parentPart, Vector3 installPosition, Vector3 installRotation,
+			PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls = true,
+			bool disableCollisionWhenInstalled = true, string prefabName = null)
+		{
+			usingGameObjectInstantiation = true;
+			gameObjectUsedForInstantiation = part;
+
+			usingPartParent = true;
+			this.parentPart = parentPart;
+
+			Setup(id, name, parentPart.gameObject, installPosition, installRotation, partBaseInfo,
+				uninstallWhenParentUninstalls, disableCollisionWhenInstalled, prefabName);
 		}
 
 		public Part(string id, string name, GameObject parent, Vector3 installPosition, Vector3 installRotation,
