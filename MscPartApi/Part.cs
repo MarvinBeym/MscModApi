@@ -13,7 +13,7 @@ namespace MscPartApi
 		private bool partFixed;
 
 		internal List<Part> childParts = new List<Part>();
-		private PartBaseInfo partBaseInfo;
+		public PartBaseInfo partBaseInfo;
 		public GameObject gameObject;
 		internal PartSave partSave;
 		internal Vector3 installPosition;
