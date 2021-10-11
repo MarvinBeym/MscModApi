@@ -54,7 +54,8 @@ namespace MscPartApi
 
 			if (usingGameObjectInstantiation)
 			{
-				gameObject = gameObjectUsedForInstantiation;
+				gameObject = GameObject.Instantiate(gameObjectUsedForInstantiation);
+				gameObject.SetNameLayerTag(name + "(Clone)", "PART", "Parts");
 			}
 			else
 			{
@@ -231,7 +232,7 @@ namespace MscPartApi
 				if (overrideScale != 0f) {
 					screw.scale = overrideScale;
 				}
-
+				
 				if (overrideSize != 0f) {
 					screw.size = overrideSize;
 				}
