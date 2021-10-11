@@ -71,7 +71,10 @@ namespace MscPartApi
 
 			collider = gameObject.GetComponent<Collider>();
 
-			trigger = new TriggerWrapper(this, parentGameObject, disableCollisionWhenInstalled);
+			if (parentGameObject != null)
+			{
+				trigger = new TriggerWrapper(this, parentGameObject, disableCollisionWhenInstalled);
+			}
 
 			if (partSave.installed) {
 				Install();
@@ -115,6 +118,14 @@ namespace MscPartApi
 				uninstallWhenParentUninstalls, disableCollisionWhenInstalled, prefabName);
 		}
 
+		public Part(string id, string name, Vector3 installPosition, Vector3 installRotation,
+			PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls = true,
+			bool disableCollisionWhenInstalled = true, string prefabName = null)
+		{
+			Setup(id, name, null, installPosition, installRotation, partBaseInfo,
+				uninstallWhenParentUninstalls, disableCollisionWhenInstalled, prefabName);
+		}
+
 		public Part(string id, string name, Part parentPart, Vector3 installPosition, Vector3 installRotation,
 			PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls = true,
 			bool disableCollisionWhenInstalled = true, string prefabName = null)
@@ -125,6 +136,7 @@ namespace MscPartApi
 				uninstallWhenParentUninstalls, disableCollisionWhenInstalled, prefabName);
 			parentPart.childParts.Add(this);
 		}
+
 
 		public void EnableScrewPlacementMode() => screwPlacementMode = true;
 
@@ -159,7 +171,10 @@ namespace MscPartApi
 			}
 		}
 
-		public void Install() => trigger.Install();
+		public void Install()
+		{
+			trigger?.Install();
+		}
 
 		public bool IsInstalled()
 		{
@@ -175,7 +190,7 @@ namespace MscPartApi
 
 		public void Uninstall()
 		{
-			trigger.Uninstall();
+			trigger?.Uninstall();
 		}
 
 		public void AddClampModel(Vector3 position, Vector3 rotation, Vector3 scale)

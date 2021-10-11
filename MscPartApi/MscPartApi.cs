@@ -28,6 +28,10 @@ namespace MscPartApi
 		internal static Dictionary<string, Screw> screws;
 		internal static List<string> modsToIgnoreWhenSaving;
 		private Screw previousScrew;
+		
+#if DEBUG
+		private Keybind instantInstallKeybind;
+#endif
 
 		internal static bool ShowScrewSize => (bool) showBoltSizeSetting.Value;
 
@@ -63,8 +67,11 @@ namespace MscPartApi
 		public override void ModSettings()
 		{
 			Settings.AddCheckBox(this, showBoltSizeSetting);
-
+		
 			Keybind.AddHeader(this, "Developer area - Screw placement mode");
+#if DEBUG
+			instantInstallKeybind = Keybind.Add(this, "instant-install", "Instant install part looking at", KeyCode.UpArrow);
+#endif
 			ScrewPlacementAssist.ModSettings(this);
 		}
 
@@ -115,8 +122,12 @@ namespace MscPartApi
 			}
 		}
 
-		private void Update()
+		private new void Update()
 		{
+#if DEBUG
+			InstantInstallDebug();
+#endif
+			
 			var toolInHand = tool.GetToolInHand();
 			if (toolInHand == Tool.ToolType.None) {
 				if (previousScrew != null) {
@@ -174,6 +185,61 @@ namespace MscPartApi
 
 
 			//ModConsole.Print();
+		}
+
+		private void InstantInstallDebug()
+		{
+			if (Camera.main == null) return;
+			Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out RaycastHit hit, 1f,
+					1 << LayerMask.NameToLayer("Parts"));
+			if (hit.collider == null) return;
+			var gameObject = hit.collider.gameObject;
+			Part part = null;
+			foreach (var modParts in modsParts)
+			{
+				foreach (var partData in modParts.Value)
+				{
+					var partName = partData.Value.gameObject.name;
+					if (partName == gameObject.name)
+					{
+						part = partData.Value;
+						break;
+					}
+				}
+
+				if (part != null) break;
+			}
+
+			if (part == null) return;
+
+			if (!part.IsFixed()) {
+				if (part.IsInstalled()) {
+					UserInteraction.ShowGuiInteraction(UserInteraction.Type.None, "Tighten all screws");
+					if (instantInstallKeybind.GetKeybindDown()) {
+						part.partSave.screws.ForEach(delegate(Screw screw)
+						{
+							screw.InBy(Screw.maxTightness - screw.tightness);
+						});
+					}
+				} else {
+					UserInteraction.ShowGuiInteraction(UserInteraction.Type.None, "Fully install part");
+					if (instantInstallKeybind.GetKeybindDown()) {
+						part.Install();
+						part.partSave.screws.ForEach(delegate (Screw screw) {
+							screw.InBy(Screw.maxTightness);
+						});
+					}
+				}
+			} else {
+				UserInteraction.ShowGuiInteraction(UserInteraction.Type.None, "Loosen all screws");
+				if (instantInstallKeybind.GetKeybindDown()) {
+					part.partSave.screws.ForEach(delegate (Screw screw) {
+						screw.OutBy(Screw.maxTightness);
+					});
+				}
+			}
+
+			
 		}
 
 		private Screw DetectScrew()
