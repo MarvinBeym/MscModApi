@@ -6,7 +6,7 @@ using UnityEngine;
 
 namespace MscPartApi
 {
-	internal class MscPartApi : Mod
+	public class MscPartApi : Mod
 	{
 		public override string ID => "MscPartApi";
 		public override string Name => "MscPartApi";
@@ -29,9 +29,9 @@ namespace MscPartApi
 		internal static List<string> modsToIgnoreWhenSaving;
 		private Screw previousScrew;
 
-		public static bool ShowScrewSize => (bool) showBoltSizeSetting.Value;
+		internal static bool ShowScrewSize => (bool) showBoltSizeSetting.Value;
 
-		public static bool loadedAssets = false;
+		private static bool loadedAssets = false;
 
 		public override void ModSetup()
 		{
