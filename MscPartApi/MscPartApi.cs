@@ -29,6 +29,8 @@ namespace MscPartApi
 
 		public static bool ShowScrewSize => (bool) showBoltSizeSetting.Value;
 
+		public static bool loadedAssets = false;
+
 		public override void ModSetup()
 		{
 			SetupFunction(Setup.OnGUI, Mod_OnGui);
@@ -37,7 +39,11 @@ namespace MscPartApi
 			SetupFunction(Setup.OnSave, Mod_OnSave);
 			SetupFunction(Setup.Update, Mod_Update);
 
-			LoadAssets();
+			if (!loadedAssets)
+			{
+				LoadAssets();
+				loadedAssets = true;
+			}
 		}
 
 		public override void ModSettings()
