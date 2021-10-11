@@ -40,6 +40,7 @@ namespace MscPartApi
 		internal bool screwPlacementMode;
 		private Vector3 defaultRotation = Vector3.zero;
 		private Vector3 defaultPosition = Vector3.zero;
+		private bool installBlocked;
 
 		private void Setup(string id, string name, GameObject parentGameObject, Vector3 installPosition,
 			Vector3 installRotation, PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls,
@@ -346,5 +347,15 @@ namespace MscPartApi
 			SetPosition(defaultPosition);
 			SetRotation(Quaternion.Euler(defaultRotation));
 		}
+
+		public void BlockInstall(bool block)
+		{
+			installBlocked = block;
+		}
+
+		public bool IsInstallBlocked()
+		{
+			return installBlocked;
+	}
 	}
 }

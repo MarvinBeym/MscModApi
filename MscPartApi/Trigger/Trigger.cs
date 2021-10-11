@@ -76,6 +76,11 @@ namespace MscPartApi.Trigger
 		{
 			InvokeActionList(part.preInstallActions);
 
+			if (part.IsInstallBlocked())
+			{
+				return;
+			}
+
 			if (part.partSave.bought == PartSave.BoughtState.No)
 			{
 				return;
@@ -147,8 +152,11 @@ namespace MscPartApi.Trigger
 
 		private void OnTriggerEnter(Collider collider)
 		{
-			if (!(part.uninstallWhenParentUninstalls && part.ParentInstalled()) || !collider.gameObject.IsHolding() ||
-				collider.gameObject != part.gameObject) return;
+			if (
+				!(part.uninstallWhenParentUninstalls && part.ParentInstalled()) 
+			    || !collider.gameObject.IsHolding()
+			    || collider.gameObject != part.gameObject
+			    || part.IsInstallBlocked()) return;
 
 			UserInteraction.ShowGuiInteraction(UserInteraction.Type.Assemble, $"Install {part.gameObject.name}");
 			canBeInstalled = true;
