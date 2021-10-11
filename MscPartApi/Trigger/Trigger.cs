@@ -19,19 +19,21 @@ namespace MscPartApi.Trigger
 
 		private IEnumerator HandleUninstall()
 		{
-			while (part.IsInstalled())
-			{
-				if (!part.IsFixed() && part.gameObject.IsLookingAt() && UserInteraction.EmptyHand() &&
-				    !Tool.HasToolInHand())
-				{
-					UserInteraction.ShowGuiInteraction(UserInteraction.Type.Disassemble,
-						$"Uninstall {part.gameObject.name}");
+			while (part.IsInstalled()) {
 
-					if (UserInteraction.RightMouseDown)
-					{
-						UserInteraction.ShowGuiInteraction(UserInteraction.Type.None);
-						part.gameObject.PlayDisassemble();
-						Uninstall();
+				if (!part.IsFixed() && part.gameObject.IsLookingAt() && UserInteraction.EmptyHand() &&
+					!Tool.HasToolInHand()) {
+					if (part.screwPlacementMode) {
+						ScrewPlacementAssist.ShowPartInteraction(part);
+					} else {
+						UserInteraction.ShowGuiInteraction(UserInteraction.Type.Disassemble,
+							$"Uninstall {part.gameObject.name}");
+
+						if (UserInteraction.RightMouseDown) {
+							UserInteraction.ShowGuiInteraction(UserInteraction.Type.None);
+							part.gameObject.PlayDisassemble();
+							Uninstall();
+						}
 					}
 				}
 
@@ -44,11 +46,10 @@ namespace MscPartApi.Trigger
 		private IEnumerator VerifyInstalled()
 		{
 			var keepVerifying = part.gameObject.transform.parent != parentGameObject.transform
-			                    || part.gameObject.transform.localPosition.CompareVector3(part.installPosition)
-			                    || part.gameObject.transform.localRotation.eulerAngles.CompareVector3(part.installRotation);
+								|| part.gameObject.transform.localPosition.CompareVector3(part.installPosition)
+								|| part.gameObject.transform.localRotation.eulerAngles.CompareVector3(part.installRotation);
 
-			while (part.IsInstalled() && keepVerifying)
-			{
+			while (part.IsInstalled() && keepVerifying) {
 				rigidBody.isKinematic = true;
 				part.gameObject.transform.parent = parentGameObject.transform;
 				part.gameObject.transform.localPosition = part.installPosition;
@@ -61,8 +62,7 @@ namespace MscPartApi.Trigger
 
 		private IEnumerator VerifyUninstalled()
 		{
-			while (!part.IsInstalled() && part.gameObject.transform.parent == parentGameObject.transform)
-			{
+			while (!part.IsInstalled() && part.gameObject.transform.parent == parentGameObject.transform) {
 				rigidBody.isKinematic = false;
 				part.gameObject.transform.parent = null;
 				part.gameObject.transform.Translate(Vector3.up * 0.025f);
@@ -76,26 +76,22 @@ namespace MscPartApi.Trigger
 		{
 			InvokeActionList(part.preInstallActions);
 
-			if (part.uninstallWhenParentUninstalls && !part.ParentInstalled())
-			{
+			if (part.uninstallWhenParentUninstalls && !part.ParentInstalled()) {
 				return;
 			}
 
 			part.partSave.installed = true;
 			part.gameObject.tag = "Untagged";
 
-			if (handleUninstallRoutine == null)
-			{
+			if (handleUninstallRoutine == null) {
 				handleUninstallRoutine = StartCoroutine(HandleUninstall());
 			}
 
-			if (verifyInstalledRoutine == null)
-			{
+			if (verifyInstalledRoutine == null) {
 				verifyInstalledRoutine = StartCoroutine(VerifyInstalled());
 			}
 
-			if (disableCollisionWhenInstalled)
-			{
+			if (disableCollisionWhenInstalled) {
 				part.collider.isTrigger = true;
 			}
 
@@ -112,10 +108,8 @@ namespace MscPartApi.Trigger
 
 			part.ResetScrews();
 
-			part.childParts.ForEach(delegate(Part part)
-			{
-				if (part.uninstallWhenParentUninstalls)
-				{
+			part.childParts.ForEach(delegate (Part part) {
+				if (part.uninstallWhenParentUninstalls) {
 					part.Uninstall();
 				}
 			});
@@ -123,13 +117,11 @@ namespace MscPartApi.Trigger
 			part.partSave.installed = false;
 			part.gameObject.tag = "PART";
 
-			if (!part.IsInstalled() && verifyUninstalledRoutine == null)
-			{
+			if (!part.IsInstalled() && verifyUninstalledRoutine == null) {
 				verifyUninstalledRoutine = StartCoroutine(VerifyUninstalled());
 			}
 
-			if (disableCollisionWhenInstalled)
-			{
+			if (disableCollisionWhenInstalled) {
 				part.collider.isTrigger = false;
 			}
 
@@ -151,7 +143,7 @@ namespace MscPartApi.Trigger
 		private void OnTriggerEnter(Collider collider)
 		{
 			if (!(part.uninstallWhenParentUninstalls && part.ParentInstalled()) || !collider.gameObject.IsHolding() ||
-			    collider.gameObject != part.gameObject) return;
+				collider.gameObject != part.gameObject) return;
 
 			UserInteraction.ShowGuiInteraction(UserInteraction.Type.Assemble, $"Install {part.gameObject.name}");
 			canBeInstalled = true;
@@ -175,8 +167,7 @@ namespace MscPartApi.Trigger
 
 		private void InvokeActionList(List<Action> actions)
 		{
-			foreach (var action in actions)
-			{
+			foreach (var action in actions) {
 				action.Invoke();
 			}
 		}

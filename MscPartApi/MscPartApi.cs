@@ -18,7 +18,7 @@ namespace MscPartApi
 
 		public override bool UseAssetsFolder => true;
 		private static Settings showBoltSizeSetting = new Settings("showBoltSizeSetting", "Show screw size", false);
-		public static bool ShowScrewSize => (bool) showBoltSizeSetting.Value;
+		
 		private const string AssetsFile = "mscPartApi.unity3d";
 		internal static GameObject clampModel;
 		private Tool tool;
@@ -28,8 +28,11 @@ namespace MscPartApi
 		internal static Dictionary<string, Screw> screws = new Dictionary<string, Screw>();
 		private Screw previousScrew;
 
+		public static bool ShowScrewSize => (bool) showBoltSizeSetting.Value;
+
 		public override void ModSetup()
 		{
+			SetupFunction(Setup.OnGUI, Mod_OnGui);
 			SetupFunction(Setup.OnNewGame, Mod_OnNewGame);
 			SetupFunction(Setup.OnLoad, Mod_OnLoad);
 			SetupFunction(Setup.OnSave, Mod_OnSave);
@@ -41,12 +44,20 @@ namespace MscPartApi
 		public override void ModSettings()
 		{
 			Settings.AddCheckBox(this, showBoltSizeSetting);
+			
+			Keybind.AddHeader(this, "Developer area - Screw placement mode");
+			ScrewPlacementAssist.ModSettings(this);
+		}
+
+		public void Mod_OnGui()
+		{
+			ScrewPlacementAssist.OnGui();
 		}
 
 		private void Mod_OnNewGame()
 		{
 		}
-
+		
 		private void Mod_OnLoad()
 		{
 			tool = new Tool();
