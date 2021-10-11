@@ -38,6 +38,8 @@ namespace MscPartApi
 		internal List<Action> preUninstallActions = new List<Action>();
 		internal List<Action> postUninstallActions = new List<Action>();
 		internal bool screwPlacementMode;
+		private Vector3 defaultRotation = Vector3.zero;
+		private Vector3 defaultPosition = Vector3.zero;
 
 		private void Setup(string id, string name, GameObject parentGameObject, Vector3 installPosition,
 			Vector3 installRotation, PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls,
@@ -307,6 +309,26 @@ namespace MscPartApi
 		public void SetActive(bool active)
 		{
 			gameObject.SetActive(active);
+		}
+
+		public void SetDefaultPosition(Vector3 defaultPosition)
+		{
+			this.defaultPosition = defaultPosition;
+		}
+
+		public void SetDefaultRotation(Vector3 defaultRotation)
+		{
+			this.defaultRotation = defaultRotation;
+		}
+
+		public void ResetToDefault(bool uninstall = false)
+		{
+			if (uninstall && IsInstalled())
+			{
+				Uninstall();
+			}
+			SetPosition(defaultPosition);
+			SetRotation(Quaternion.Euler(defaultRotation));
 		}
 	}
 }
