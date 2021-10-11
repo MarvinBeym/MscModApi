@@ -48,7 +48,7 @@ namespace MscPartApi
 		private static readonly int Color1 = Shader.PropertyToID("_Color");
 		internal static AudioClip soundClip;
 
-		public Screw(Vector3 position, Vector3 rotation, float scale = 1, float size = 10, Type type = Type.Normal,
+		public Screw(Vector3 position, Vector3 rotation, Type type = Type.Normal, float scale = 1, float size = 10,
 			bool allowShowSize = true)
 		{
 			this.position = position;
