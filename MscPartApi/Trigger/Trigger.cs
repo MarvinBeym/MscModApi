@@ -76,7 +76,7 @@ namespace MscPartApi.Trigger
 		{
 			InvokeActionList(part.preInstallActions);
 
-			if (part.partSave.bought == PartSave.BoughState.No)
+			if (part.partSave.bought == PartSave.BoughtState.No)
 			{
 				return;
 			}
