@@ -47,11 +47,6 @@ namespace MscPartApi.Trigger
 			renderer.enabled = show;
 		}
 
-		public void SetActive(bool active)
-		{
-			triggerGameObject.SetActive(active);
-		}
-
 		internal void Install() => logic.Install();
 		internal void Uninstall() => logic.Uninstall();
 	}
