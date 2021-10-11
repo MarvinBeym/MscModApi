@@ -232,5 +232,41 @@ namespace MscPartApi
 		{
 			postUninstallActions.Add(action);
 		}
+
+
+		public T AddWhenInstalledMono<T>() where T : MonoBehaviour
+		{
+			var mono = AddComponent<T>();
+			mono.enabled = IsInstalled();
+
+			AddPostInstallAction(delegate
+			{
+				mono.enabled = true;
+			});
+
+			AddPostUninstallAction(delegate {
+				mono.enabled = false;
+			});
+			return mono;
+		}
+
+		public T AddWhenUninstalledMono<T>() where T : MonoBehaviour
+		{
+			var mono = AddComponent<T>();
+			mono.enabled = !IsInstalled();
+
+			AddPostInstallAction(delegate {
+				mono.enabled = false;
+			});
+
+			AddPostUninstallAction(delegate {
+				mono.enabled = true;
+			});
+			return mono;
+		}
+		
+		public T AddComponent<T>() where T : Component => gameObject.AddComponent(typeof(T)) as T;
+
+		public T GetComponent<T>() => gameObject.GetComponent<T>();
 	}
 }
