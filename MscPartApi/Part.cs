@@ -25,6 +25,8 @@ namespace MscPartApi
 		internal Collider collider;
 		public TriggerWrapper trigger;
 
+		public Transform transform => gameObject.transform;
+
 		private bool usingPartParent;
 
 		internal List<Action> preInstallActions = new List<Action>();
