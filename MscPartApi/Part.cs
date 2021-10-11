@@ -26,7 +26,7 @@ namespace MscPartApi
 		public TriggerWrapper trigger;
 
 		public Transform transform => gameObject.transform;
-
+		
 		private bool usingPartParent;
 
 		internal List<Action> preInstallActions = new List<Action>();
@@ -268,5 +268,15 @@ namespace MscPartApi
 		public T AddComponent<T>() where T : Component => gameObject.AddComponent(typeof(T)) as T;
 
 		public T GetComponent<T>() => gameObject.GetComponent<T>();
+
+		public void SetBought(bool bought)
+		{
+			partSave.bought = bought;
+		}
+
+		public bool GetBought()
+		{
+			return partSave.bought;
+		}
 	}
 }

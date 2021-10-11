@@ -7,6 +7,7 @@ namespace MscPartApi
 	internal class PartSave
 	{
 		public bool installed = false;
+		public bool bought = false;
 		public List<Screw> screws = new List<Screw>();
 		public SerializableVector3 position = new SerializableVector3();
 		public SerializableQuaternion rotation = new SerializableQuaternion();
