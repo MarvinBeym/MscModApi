@@ -33,11 +33,11 @@ namespace MscPartApi
 
 		public override void ModSetup()
 		{
-			SetupFunction(Setup.OnGUI, Mod_OnGui);
-			SetupFunction(Setup.OnNewGame, Mod_OnNewGame);
-			SetupFunction(Setup.OnLoad, Mod_OnLoad);
-			SetupFunction(Setup.OnSave, Mod_OnSave);
-			SetupFunction(Setup.Update, Mod_Update);
+			SetupFunction(Setup.OnGUI, OnGui);
+			SetupFunction(Setup.OnNewGame, OnNewGame);
+			SetupFunction(Setup.OnLoad, OnLoad);
+			SetupFunction(Setup.OnSave, OnSave);
+			SetupFunction(Setup.Update, Update);
 
 			modSaveFileMapping = new Dictionary<string, string>();
 			modsParts = new Dictionary<string, Dictionary<string, Part>>();
@@ -58,21 +58,21 @@ namespace MscPartApi
 			ScrewPlacementAssist.ModSettings(this);
 		}
 
-		public void Mod_OnGui()
+		public void OnGui()
 		{
 			ScrewPlacementAssist.OnGui();
 		}
 
-		private void Mod_OnNewGame()
+		private void OnNewGame()
 		{
 		}
 
-		private void Mod_OnLoad()
+		private void OnLoad()
 		{
 			tool = new Tool();
 		}
 
-		private void Mod_OnSave()
+		private void OnSave()
 		{
 			foreach (var modParts in modsParts) {
 				var mod = ModLoader.GetMod(modParts.Key);
@@ -99,7 +99,7 @@ namespace MscPartApi
 			}
 		}
 
-		private void Mod_Update()
+		private void Update()
 		{
 			var toolInHand = tool.GetToolInHand();
 			if (toolInHand == Tool.ToolType.None) {
