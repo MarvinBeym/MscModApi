@@ -1,8 +1,8 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-using HutongGames.PlayMaker;
+﻿using HutongGames.PlayMaker;
 using MSCLoader;
 using MscPartApi.Tools;
+using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace MscPartApi
@@ -54,8 +54,7 @@ namespace MscPartApi
 
 			var toolGameObject = toolGameObjects.FirstOrDefault(keyValue => keyValue.Value.activeSelf);
 
-			if (toolGameObject.Key == ToolType.Ratchet)
-			{
+			if (toolGameObject.Key == ToolType.Ratchet) {
 				return ratchetSwitch.Value ? ToolType.RatchetTighten : ToolType.RatchetLoosen;
 			}
 

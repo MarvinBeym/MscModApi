@@ -1,8 +1,8 @@
-﻿using System;
+﻿using MscPartApi.Tools;
+using MscPartApi.Trigger;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using MscPartApi.Tools;
-using MscPartApi.Trigger;
 using UnityEngine;
 
 namespace MscPartApi
@@ -46,11 +46,10 @@ namespace MscPartApi
 
 			gameObject = Helper.LoadPartAndSetName(partBaseInfo.assetBundle, prefabName ?? id, name);
 
-			if (!partBaseInfo.partsSave.TryGetValue(id, out partSave))
-			{
+			if (!partBaseInfo.partsSave.TryGetValue(id, out partSave)) {
 				partSave = new PartSave();
 			}
-			
+
 			savedScrews = new List<Screw>(partSave.screws);
 			partSave.screws.Clear();
 
@@ -58,24 +57,19 @@ namespace MscPartApi
 
 			trigger = new TriggerWrapper(this, parentGameObject, disableCollisionWhenInstalled);
 
-			if (partSave.installed)
-			{
+			if (partSave.installed) {
 				Install();
 			}
 
 			LoadPartPositionAndRotation(gameObject, partSave);
 
-			if (!MscPartApi.modSaveFileMapping.ContainsKey(partBaseInfo.mod.ID))
-			{
+			if (!MscPartApi.modSaveFileMapping.ContainsKey(partBaseInfo.mod.ID)) {
 				MscPartApi.modSaveFileMapping.Add(partBaseInfo.mod.ID, partBaseInfo.saveFilePath);
 			}
 
-			if (MscPartApi.modsParts.ContainsKey(partBaseInfo.mod.ID))
-			{
+			if (MscPartApi.modsParts.ContainsKey(partBaseInfo.mod.ID)) {
 				MscPartApi.modsParts[partBaseInfo.mod.ID].Add(id, this);
-			}
-			else
-			{
+			} else {
 				MscPartApi.modsParts.Add(partBaseInfo.mod.ID, new Dictionary<string, Part>
 				{
 					{id, this}
@@ -106,16 +100,14 @@ namespace MscPartApi
 
 		public void SetPosition(Vector3 position)
 		{
-			if (!IsInstalled())
-			{
+			if (!IsInstalled()) {
 				gameObject.transform.position = position;
 			}
 		}
 
 		internal void ResetScrews()
 		{
-			foreach (var screw in partSave.screws)
-			{
+			foreach (var screw in partSave.screws) {
 				screw.OutBy(screw.tightness);
 			}
 		}
@@ -127,13 +119,12 @@ namespace MscPartApi
 
 		internal void SetScrewsActive(bool active)
 		{
-			partSave.screws.ForEach(delegate(Screw screw) { screw.gameObject.SetActive(active); });
+			partSave.screws.ForEach(delegate (Screw screw) { screw.gameObject.SetActive(active); });
 		}
 
 		public void SetRotation(Quaternion rotation)
 		{
-			if (!IsInstalled())
-			{
+			if (!IsInstalled()) {
 				gameObject.transform.rotation = rotation;
 			}
 		}
@@ -165,17 +156,14 @@ namespace MscPartApi
 			clamp.transform.SetParent(gameObject.transform);
 			clamp.transform.localPosition = position;
 			clamp.transform.localScale = scale;
-			clamp.transform.localRotation = new Quaternion {eulerAngles = rotation};
+			clamp.transform.localRotation = new Quaternion { eulerAngles = rotation };
 		}
 
 		internal bool ParentInstalled()
 		{
-			if (usingPartParent)
-			{
+			if (usingPartParent) {
 				return parentPart.IsInstalled();
-			}
-			else
-			{
+			} else {
 				//Todo: Implement normal msc parts installed/uninstalled
 				return true;
 			}
@@ -198,8 +186,7 @@ namespace MscPartApi
 
 			screw.CreateScrewModel(index);
 
-			if (screwPlacementMode)
-			{
+			if (screwPlacementMode) {
 				screw.LoadTightness(savedScrews.ElementAtOrDefault(index));
 				screw.InBy(screw.tightness, false, true);
 			}
@@ -211,15 +198,12 @@ namespace MscPartApi
 
 		public void AddScrews(Screw[] screws, float overrideScale = 0f, float overrideSize = 0f)
 		{
-			foreach (var screw in screws)
-			{
-				if (overrideScale != 0f)
-				{
+			foreach (var screw in screws) {
+				if (overrideScale != 0f) {
 					screw.scale = overrideScale;
 				}
 
-				if (overrideSize != 0f)
-				{
+				if (overrideSize != 0f) {
 					screw.size = overrideSize;
 				}
 

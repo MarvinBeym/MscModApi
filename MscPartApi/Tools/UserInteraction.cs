@@ -1,5 +1,5 @@
-﻿using System;
-using HutongGames.PlayMaker;
+﻿using HutongGames.PlayMaker;
+using System;
 using UnityEngine;
 
 namespace MscPartApi.Tools
@@ -26,13 +26,11 @@ namespace MscPartApi.Tools
 
 		public static void ShowGuiInteraction(Type type, string text = "")
 		{
-			if (guiInteraction != null && text != guiInteraction.Value)
-			{
+			if (guiInteraction != null && text != guiInteraction.Value) {
 				guiInteraction.Value = text.Replace("(Clone)", "");
 			}
 
-			switch (type)
-			{
+			switch (type) {
 				case Type.Assemble:
 					ShowAssembleIcon();
 					break;
@@ -54,8 +52,7 @@ namespace MscPartApi.Tools
 
 		private static void ShowAssembleIcon(bool show = true)
 		{
-			if (guiAssemble != null)
-			{
+			if (guiAssemble != null) {
 				guiAssemble.Value = show;
 			}
 
@@ -64,8 +61,7 @@ namespace MscPartApi.Tools
 
 		private static void ShowDisassembleIcon(bool show = true)
 		{
-			if (guiDisassemble != null)
-			{
+			if (guiDisassemble != null) {
 				guiDisassemble.Value = show;
 			}
 
@@ -74,8 +70,7 @@ namespace MscPartApi.Tools
 
 		private static void ShowUseIcon(bool show = true)
 		{
-			if (guiUse != null)
-			{
+			if (guiUse != null) {
 				guiUse.Value = show;
 			}
 
@@ -84,38 +79,32 @@ namespace MscPartApi.Tools
 
 		public static void PlayAssemble(this GameObject gameObject)
 		{
-			if (assembleAudio == null)
-			{
+			if (assembleAudio == null) {
 				var audioGameObject = GameObject.Find("MasterAudio/CarBuilding/assemble");
 				if (!audioGameObject) return;
 				var audioSource = audioGameObject.GetComponent<AudioSource>();
-				if (audioSource)
-				{
+				if (audioSource) {
 					assembleAudio = audioSource;
 				}
 			}
 
-			if (assembleAudio != null)
-			{
+			if (assembleAudio != null) {
 				AudioSource.PlayClipAtPoint(assembleAudio.clip, gameObject.transform.position);
 			}
 		}
 
 		public static void PlayDisassemble(this GameObject gameObject)
 		{
-			if (disassembleAudio == null)
-			{
+			if (disassembleAudio == null) {
 				var audioGameObject = GameObject.Find("MasterAudio/CarBuilding/disassemble");
 				if (!audioGameObject) return;
 				var audioSource = audioGameObject.GetComponent<AudioSource>();
-				if (audioSource)
-				{
+				if (audioSource) {
 					disassembleAudio = audioSource;
 				}
 			}
 
-			if (disassembleAudio != null)
-			{
+			if (disassembleAudio != null) {
 				AudioSource.PlayClipAtPoint(disassembleAudio.clip, gameObject.transform.position);
 			}
 		}
@@ -137,20 +126,15 @@ namespace MscPartApi.Tools
 
 		public static bool EmptyHand()
 		{
-			try
-			{
-				if (itemPivot == null)
-				{
+			try {
+				if (itemPivot == null) {
 					itemPivot = PlayMakerGlobals.Instance.Variables.FindFsmGameObject("ItemPivot").Value;
 				}
-			}
-			catch (Exception)
-			{
+			} catch (Exception) {
 				return false;
 			}
 
-			if (!itemPivot)
-			{
+			if (!itemPivot) {
 				return false;
 			}
 

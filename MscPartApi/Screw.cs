@@ -1,6 +1,6 @@
-﻿using System.Linq;
-using MscPartApi.Tools;
+﻿using MscPartApi.Tools;
 using Newtonsoft.Json;
+using System.Linq;
 using UnityEngine;
 
 namespace MscPartApi
@@ -59,26 +59,22 @@ namespace MscPartApi
 
 			showSize = allowShowSize;
 
-			if (textShader == null)
-			{
+			if (textShader == null) {
 				textShader = Shader.Find("GUI/Text Shader");
 			}
 		}
 
 		internal void LoadTightness(Screw savedScrew)
 		{
-			if (savedScrew != null)
-			{
+			if (savedScrew != null) {
 				tightness = savedScrew.tightness;
 			}
 
-			if (tightness >= 8)
-			{
+			if (tightness >= 8) {
 				tightness = 8;
 			}
 
-			if (tightness <= 0)
-			{
+			if (tightness <= 0) {
 				tightness = 0;
 			}
 		}
@@ -86,8 +82,7 @@ namespace MscPartApi
 
 		internal void CreateScrewModel(int index)
 		{
-			switch (type)
-			{
+			switch (type) {
 				case Type.Nut:
 					gameObject = GameObject.Instantiate(nutModel);
 					break;
@@ -106,7 +101,7 @@ namespace MscPartApi
 
 			gameObject.transform.SetParent(parentCollider.transform);
 			gameObject.transform.localPosition = Helper.CopyVector3(position);
-			gameObject.transform.localRotation = new Quaternion {eulerAngles = Helper.CopyVector3(rotation)};
+			gameObject.transform.localRotation = new Quaternion { eulerAngles = Helper.CopyVector3(rotation) };
 			gameObject.transform.localScale = Helper.CopyVector3(new Vector3(scale, scale, scale));
 			gameObject.SetActive(true);
 
@@ -118,23 +113,19 @@ namespace MscPartApi
 
 		internal void Verify()
 		{
-			if (tightness >= maxTightness)
-			{
+			if (tightness >= maxTightness) {
 				tightness = maxTightness;
 			}
 
-			if (tightness <= 0)
-			{
+			if (tightness <= 0) {
 				tightness = 0;
 			}
 
-			if (size >= maxSize)
-			{
+			if (size >= maxSize) {
 				size = maxSize;
 			}
 
-			if (size <= minSize)
-			{
+			if (size <= minSize) {
 				size = minSize;
 			}
 		}
@@ -148,8 +139,7 @@ namespace MscPartApi
 		{
 			if (tightness >= maxTightness || !part.IsInstalled()) return;
 
-			if (useAudio)
-			{
+			if (useAudio) {
 				AudioSource.PlayClipAtPoint(soundClip, gameObject.transform.position);
 			}
 
@@ -157,10 +147,8 @@ namespace MscPartApi
 			gameObject.transform.Translate(0f, 0f, -transformStep);
 			tightness++;
 
-			if (tightness == maxTightness)
-			{
-				if (part.partSave.screws.All(screw => screw.tightness == maxTightness) && !part.IsFixed())
-				{
+			if (tightness == maxTightness) {
+				if (part.partSave.screws.All(screw => screw.tightness == maxTightness) && !part.IsFixed()) {
 					part.SetFixed(true);
 				}
 			}
@@ -170,8 +158,7 @@ namespace MscPartApi
 		{
 			if (!part.IsInstalled() || tightness == 0) return;
 
-			if (useAudio)
-			{
+			if (useAudio) {
 				AudioSource.PlayClipAtPoint(soundClip, gameObject.transform.position);
 			}
 
@@ -179,21 +166,18 @@ namespace MscPartApi
 			gameObject.transform.Translate(0f, 0f, transformStep);
 			tightness--;
 
-			if (tightness < maxTightness)
-			{
+			if (tightness < maxTightness) {
 				part.SetFixed(false);
 			}
 		}
 
 		public void InBy(int by, bool useAudio = false, bool setTightnessToZero = false)
 		{
-			if (setTightnessToZero)
-			{
+			if (setTightnessToZero) {
 				tightness = 0;
 			}
 
-			for (var i = 0; i < by; i++)
-			{
+			for (var i = 0; i < by; i++) {
 				In(useAudio);
 			}
 		}
@@ -204,21 +188,17 @@ namespace MscPartApi
 				tightness = 0;
 			}
 
-			for (var i = 0; i < by; i++)
-			{
+			for (var i = 0; i < by; i++) {
 				Out(useAudio);
 			}
 		}
 
 		internal void Highlight(bool highlight)
 		{
-			if (highlight)
-			{
+			if (highlight) {
 				renderer.material.shader = textShader;
 				renderer.material.SetColor(Color1, Color.green);
-			}
-			else
-			{
+			} else {
 				renderer.material = material;
 			}
 		}

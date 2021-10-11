@@ -1,12 +1,12 @@
-﻿using System.Collections.Generic;
-using MSCLoader;
+﻿using MSCLoader;
 using MscPartApi.Tools;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace MscPartApi
 {
 	public class PartBaseInfo
-	{ 
+	{
 		internal Mod mod;
 		internal AssetBundle assetBundle;
 

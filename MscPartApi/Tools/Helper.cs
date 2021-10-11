@@ -1,9 +1,9 @@
-﻿using System;
+﻿using MSCLoader;
+using Newtonsoft.Json;
+using System;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
-using MSCLoader;
-using Newtonsoft.Json;
 using UnityEngine;
 
 namespace MscPartApi.Tools
@@ -12,8 +12,7 @@ namespace MscPartApi.Tools
 	{
 		internal static string CombinePaths(params string[] paths)
 		{
-			if (paths == null)
-			{
+			if (paths == null) {
 				throw new ArgumentNullException(nameof(paths));
 			}
 
@@ -22,12 +21,9 @@ namespace MscPartApi.Tools
 
 		internal static AssetBundle LoadAssetBundle(Mod mod, string fileName)
 		{
-			try
-			{
+			try {
 				return LoadAssets.LoadBundle(mod, fileName);
-			}
-			catch
-			{
+			} catch {
 				string message = $"AssetBundle file '{fileName}' could not be loaded";
 				ModConsole.Error(message);
 				ModUI.ShowYesNoMessage($"{message}\n\nClose Game? - RECOMMENDED", ExitGame);
