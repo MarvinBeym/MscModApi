@@ -14,7 +14,7 @@ namespace MscPartApi
 
 		internal List<Part> childParts = new List<Part>();
 		private PartBaseInfo partBaseInfo;
-		internal GameObject gameObject;
+		public GameObject gameObject;
 		internal PartSave partSave;
 		internal Vector3 installPosition;
 		internal bool uninstallWhenParentUninstalls;
