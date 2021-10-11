@@ -1,31 +1,23 @@
 ﻿using MSCLoader;
-using MscPartApi.Tools;
-using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text.RegularExpressions;
 using UnityEngine;
 
-namespace MscPartApi
+namespace MscPartApi.Tools
 {
 	internal static class ScrewPlacementAssist
 	{
 		internal static Keybind keySelectPart;
-		internal static Keybind keyNext;
-		internal static Keybind keyPrevious;
 
 		internal static Part selectedPart;
 		internal static Screw[] screws;
-		internal static int selectedScrew = 0;
+		internal static int selectedScrew;
 		private static Rect windowRect = new Rect(20, 20, 200, 50);
 
 
 		internal static void ModSettings(Mod mod)
 		{
 			keySelectPart = Keybind.Add(mod, "screw-placement-select-part", "Select part", KeyCode.RightArrow);
-			keyPrevious = Keybind.Add(mod, "screw-placement-next", "Next screw", KeyCode.UpArrow);
-			keyPrevious = Keybind.Add(mod, "screw-placement-previous", "Previous screw", KeyCode.DownArrow);
 		}
 
 		private static void CreateWindow(int windowID)
@@ -47,8 +39,7 @@ namespace MscPartApi
 			var valueY = "";
 			var valueZ = "";
 
-			for (var i = 0; i < screws.Length; i++)
-			{
+			for (var i = 0; i < screws.Length; i++) {
 				var screw = screws[i];
 				GUILayout.BeginVertical("box", GUILayout.ExpandWidth(true));
 				GUILayout.Label(i.ToString(), selectedScrew == i ? selectedScrewStyle : screwStyle);
@@ -79,8 +70,7 @@ namespace MscPartApi
 
 			GUILayout.EndHorizontal();
 
-			if (valueX != "" && valueY != "" && valueZ != "")
-			{
+			if (valueX != "" && valueY != "" && valueZ != "") {
 				if (GUILayout.Button("Copy to clipboard", GUILayout.ExpandWidth(true))) {
 					$"new Vector3({valueX}f, {valueY}f, {valueZ}f)".CopyToClipBoard();
 				}
@@ -104,32 +94,17 @@ namespace MscPartApi
 			);
 
 			if (keySelectPart.GetKeybindDown()) {
-				if (selectedPart == null)
-				{
+				if (selectedPart == null) {
 					selectedPart = part;
 					screws = selectedPart.partSave.screws.OrderBy(screw => screw.gameObject.name).ToArray();
-				}
-				else
-				{
+				} else {
 					selectedPart = null;
 					screws = new Screw[0];
 				}
 
 
-			}
-			else
-			{
+			} else {
 				windowRect = new Rect(windowRect.xMin, windowRect.yMin, 200, 50);
-			}
-		}
-
-		internal static void Update()
-		{
-			if (selectedPart == null) return;
-
-			if (keyNext.GetKeybindDown())
-			{
-				selectedScrew++;
 			}
 		}
 

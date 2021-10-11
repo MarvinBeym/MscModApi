@@ -76,7 +76,7 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ScrewPlacementAssist.cs" />
+    <Compile Include="Tools\ScrewPlacementAssist.cs" />
     <Compile Include="Tool.cs" />
     <Compile Include="Trigger\TriggerWrapper.cs" />
     <Compile Include="Tools\UserInteraction.cs" />
