@@ -1,6 +1,7 @@
 ﻿using MSCLoader;
 using MscPartApi.Tools;
 using System.Collections.Generic;
+using System.IO;
 using UnityEngine;
 
 namespace MscPartApi
@@ -25,6 +26,7 @@ namespace MscPartApi
 		internal static Dictionary<string, string> modSaveFileMapping;
 		internal static Dictionary<string, Dictionary<string, Part>> modsParts;
 		internal static Dictionary<string, Screw> screws;
+		internal static List<string> modsToIgnoreWhenSaving;
 		private Screw previousScrew;
 
 		public static bool ShowScrewSize => (bool) showBoltSizeSetting.Value;
@@ -34,7 +36,6 @@ namespace MscPartApi
 		public override void ModSetup()
 		{
 			SetupFunction(Setup.OnGUI, OnGui);
-			SetupFunction(Setup.OnNewGame, NewGame);
 			SetupFunction(Setup.OnLoad, Load);
 			SetupFunction(Setup.OnSave, Save);
 			SetupFunction(Setup.Update, Update);
@@ -42,11 +43,20 @@ namespace MscPartApi
 			modSaveFileMapping = new Dictionary<string, string>();
 			modsParts = new Dictionary<string, Dictionary<string, Part>>();
 			screws = new Dictionary<string, Screw>();
+			modsToIgnoreWhenSaving = new List<string>();
 
 			if (!loadedAssets)
 			{
 				LoadAssets();
 				loadedAssets = true;
+			}
+		}
+
+		public static void DontSaveParts(Mod mod)
+		{
+			if (!modsToIgnoreWhenSaving.Contains(mod.ID))
+			{
+				modsToIgnoreWhenSaving.Add(mod.ID);
 			}
 		}
 
@@ -63,8 +73,9 @@ namespace MscPartApi
 			ScrewPlacementAssist.OnGui();
 		}
 
-		private void NewGame()
+		public static void NewGameCleanUp(Mod mod, string saveFileName)
 		{
+			SaveLoad.SerializeSaveFile(mod, new Dictionary<string, PartSave>(), saveFileName);
 		}
 
 		private void Load()
@@ -76,6 +87,11 @@ namespace MscPartApi
 		{
 			foreach (var modParts in modsParts) {
 				var mod = ModLoader.GetMod(modParts.Key);
+
+				if (modsToIgnoreWhenSaving.Contains(mod.ID))
+				{
+					return;
+				}
 
 				if (!modSaveFileMapping.TryGetValue(mod.ID, out var saveFileName)) {
 					//save file for mod can't be found, skip the whole mod.
