@@ -92,7 +92,7 @@ namespace MscPartApi
 			}
 		}
 
-		public Part(string id, GameObject part, string name, Part parentPart, Vector3 installPosition, Vector3 installRotation,
+		public Part(string id, string name, GameObject part, Part parentPart, Vector3 installPosition, Vector3 installRotation,
 			PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls = true,
 			bool disableCollisionWhenInstalled = true, string prefabName = null)
 		{
