@@ -76,6 +76,11 @@ namespace MscPartApi.Trigger
 		{
 			InvokeActionList(part.preInstallActions);
 
+			if (part.partSave.bought == PartSave.BoughState.No)
+			{
+				return;
+			}
+
 			if (part.uninstallWhenParentUninstalls && !part.ParentInstalled()) {
 				return;
 			}

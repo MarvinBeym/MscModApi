@@ -50,7 +50,24 @@ namespace MscPartApi.Tools
 		internal static T LoadSaveOrReturnNew<T>(Mod mod, string saveFilePath) where T : new()
 		{
 			var path = Path.Combine(ModLoader.GetModSettingsFolder(mod), saveFilePath);
-			return !File.Exists(path) ? new T() : JsonConvert.DeserializeObject<T>(File.ReadAllText(path));
+
+			T save;
+
+			if (!File.Exists(path))
+			{
+				save = new T();
+			}
+			else
+			{
+				save = JsonConvert.DeserializeObject<T>(File.ReadAllText(path));
+
+				if (save == null)
+				{
+					save = new T();
+				}
+			}
+
+			return save;
 		}
 
 		internal static GameObject LoadPartAndSetName(AssetBundle assetsBundle, string prefabName, string name)

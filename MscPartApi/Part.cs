@@ -299,12 +299,12 @@ namespace MscPartApi
 
 		public void SetBought(bool bought)
 		{
-			partSave.bought = bought;
+			partSave.bought = bought ? PartSave.BoughState.Yes : PartSave.BoughState.No;
 		}
 
 		public bool GetBought()
 		{
-			return partSave.bought;
+			return partSave.bought == PartSave.BoughState.Yes;
 		}
 
 		public void SetActive(bool active)

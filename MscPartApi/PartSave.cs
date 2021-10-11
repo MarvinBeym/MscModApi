@@ -6,8 +6,15 @@ namespace MscPartApi
 {
 	internal class PartSave
 	{
+		internal enum BoughState
+		{
+			Yes,
+			No,
+			NotConfigured
+		}
+
 		public bool installed = false;
-		public bool bought = false;
+		public BoughState bought = BoughState.NotConfigured;
 		public List<Screw> screws = new List<Screw>();
 		public SerializableVector3 position = new SerializableVector3();
 		public SerializableQuaternion rotation = new SerializableQuaternion();
