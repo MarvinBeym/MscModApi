@@ -22,9 +22,9 @@ namespace MscPartApi
 		internal static GameObject clampModel;
 		private Tool tool;
 
-		internal static Dictionary<string, string> modSaveFileMapping = new Dictionary<string, string>();
-		internal static Dictionary<string, Dictionary<string, Part>> modsParts = new Dictionary<string, Dictionary<string, Part>>();
-		internal static Dictionary<string, Screw> screws = new Dictionary<string, Screw>();
+		internal static Dictionary<string, string> modSaveFileMapping;
+		internal static Dictionary<string, Dictionary<string, Part>> modsParts;
+		internal static Dictionary<string, Screw> screws;
 		private Screw previousScrew;
 
 		public static bool ShowScrewSize => (bool) showBoltSizeSetting.Value;
@@ -38,6 +38,10 @@ namespace MscPartApi
 			SetupFunction(Setup.OnLoad, Mod_OnLoad);
 			SetupFunction(Setup.OnSave, Mod_OnSave);
 			SetupFunction(Setup.Update, Mod_Update);
+
+			modSaveFileMapping = new Dictionary<string, string>();
+			modsParts = new Dictionary<string, Dictionary<string, Part>>();
+			screws = new Dictionary<string, Screw>();
 
 			if (!loadedAssets)
 			{
