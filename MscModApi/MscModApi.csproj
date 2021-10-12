@@ -77,7 +77,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Caching\Cache.cs" />
-    <Compile Include="Caching\Car.cs" />
+    <Compile Include="Caching\CarH.cs" />
     <Compile Include="Parts\ReplacePart\OldPart.cs" />
     <Compile Include="Parts\ReplacePart\ReplacementPart.cs" />
     <Compile Include="Tools\ScrewPlacementAssist.cs" />

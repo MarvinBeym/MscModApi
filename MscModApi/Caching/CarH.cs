@@ -3,7 +3,7 @@ using UnityEngine;
 
 namespace MscModApi.Caching
 {
-	public class Car
+	public class CarH
 	{
 		private static GameObject _satsuma;
 		private static Drivetrain _drivetrain;
