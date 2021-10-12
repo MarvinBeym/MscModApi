@@ -32,11 +32,14 @@ namespace MscModApi.Parts
 		private GameObject gameObjectUsedForInstantiation;
 		private bool usingPartParent;
 
+		internal List<Action> preSaveActions = new List<Action>();
+
 		internal List<Action> preInstallActions = new List<Action>();
 		internal List<Action> postInstallActions = new List<Action>();
 
 		internal List<Action> preUninstallActions = new List<Action>();
 		internal List<Action> postUninstallActions = new List<Action>();
+		
 		internal bool screwPlacementMode;
 		private Vector3 defaultRotation = Vector3.zero;
 		private Vector3 defaultPosition = Vector3.zero;
@@ -257,6 +260,10 @@ namespace MscModApi.Parts
 			}
 		}
 
+		public void AddPreSaveAction(Action action)
+		{
+			preSaveActions.Add(action);
+		}
 		public void AddPreInstallAction(Action action)
 		{
 			preInstallActions.Add(action);

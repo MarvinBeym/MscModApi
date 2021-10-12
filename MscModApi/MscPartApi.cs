@@ -112,6 +112,8 @@ namespace MscModApi
 					var id = partData.Key;
 					var part = partData.Value;
 
+					part.preSaveActions.InvokeAll();
+
 					var partSave = part.partSave;
 					partSave.position = part.gameObject.transform.position;
 					partSave.rotation = part.gameObject.transform.rotation;
