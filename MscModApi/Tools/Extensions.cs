@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using UnityEngine;
@@ -56,6 +57,14 @@ namespace MscModApi.Tools
 		public static GameObject FindChild(this GameObject gameObject, string childName)
 		{
 			return gameObject.transform.FindChild(childName).gameObject;
+		}
+
+		public static void InvokeAll(this List<Action> actions)
+		{
+			foreach (var action in actions)
+			{
+				action.Invoke();
+			}
 		}
 	}
 }
