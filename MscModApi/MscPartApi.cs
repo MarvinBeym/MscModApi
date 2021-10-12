@@ -35,7 +35,6 @@ namespace MscModApi
 #endif
 
 		internal static bool ShowScrewSize => (bool) showBoltSizeSetting.Value;
-
 		private static bool loadedAssets = false;
 
 		public override void ModSetup()
@@ -89,6 +88,7 @@ namespace MscModApi
 		private void Load()
 		{
 			tool = new Tool();
+			Logger.InitLogger(this);
 		}
 
 		private void Save()

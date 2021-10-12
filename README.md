@@ -25,7 +25,8 @@
 - [X] Replacing original parts with own implementation
 - [X] UserInteraction assistant/helper
 - [X] Cached GameObject.Find()
-- [X] A lot of helpers & extensions to make development easier and reduce amount of code
+- [X] A lot of helpers & extensions to make development easier and reduce amount of code 
+- [X] Logger - Central point for logging stuff about your mod
 - [ ] Shop
 
 ## Installation
