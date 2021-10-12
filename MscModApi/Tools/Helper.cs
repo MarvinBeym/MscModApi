@@ -24,7 +24,7 @@ namespace MscModApi.Tools
 			try {
 				return LoadAssets.LoadBundle(mod, fileName);
 			} catch {
-				string message = $"AssetBundle file '{fileName}' could not be loaded";
+				var message = $"AssetBundle file '{fileName}' could not be loaded";
 				ModConsole.Error(message);
 				ModUI.ShowYesNoMessage($"{message}\n\nClose Game? - RECOMMENDED", ExitGame);
 			}
