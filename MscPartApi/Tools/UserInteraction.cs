@@ -24,6 +24,16 @@ namespace MscPartApi.Tools
 
 		private static GameObject itemPivot;
 
+		public static void GuiInteraction(string text = "")
+		{
+			GuiInteraction(Type.None, text);
+		}
+
+		public static void GuiInteraction(Type type)
+		{
+			GuiInteraction(type, "");
+		}
+
 		public static void GuiInteraction(Type type, string text = "")
 		{
 			if (guiInteraction != null && text != guiInteraction.Value) {
