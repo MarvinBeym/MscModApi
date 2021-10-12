@@ -25,6 +25,7 @@
 - [X] Replacing original parts with own implementation
 - [X] UserInteraction assistant/helper
 - [X] Cached GameObject.Find()
+- [X] A lot of helpers & extensions to make development easier and reduce amount of code
 - [ ] Shop
 
 ## Installation
