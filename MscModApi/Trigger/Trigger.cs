@@ -74,7 +74,7 @@ namespace MscModApi.Trigger
 
 		internal void Install()
 		{
-			InvokeActionList(part.preInstallActions);
+			part.preInstallActions.InvokeAll();
 
 			if (part.IsInstallBlocked())
 			{
@@ -109,12 +109,12 @@ namespace MscModApi.Trigger
 
 			canBeInstalled = false;
 
-			InvokeActionList(part.postInstallActions);
+			part.postInstallActions.InvokeAll();
 		}
 
 		internal void Uninstall()
 		{
-			InvokeActionList(part.preUninstallActions);
+			part.preUninstallActions.InvokeAll();
 
 			part.ResetScrews();
 
@@ -137,7 +137,7 @@ namespace MscModApi.Trigger
 
 			part.SetScrewsActive(false);
 
-			InvokeActionList(part.postUninstallActions);
+			part.postUninstallActions.InvokeAll();
 		}
 
 		private void OnTriggerStay(Collider collider)
@@ -176,13 +176,6 @@ namespace MscModApi.Trigger
 			this.parentGameObject = parentGameObject;
 			this.disableCollisionWhenInstalled = disableCollisionWhenInstalled;
 			rigidBody = part.gameObject.GetComponent<Rigidbody>();
-		}
-
-		private void InvokeActionList(List<Action> actions)
-		{
-			foreach (var action in actions) {
-				action.Invoke();
-			}
 		}
 	}
 }
