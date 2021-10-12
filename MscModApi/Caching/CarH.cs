@@ -31,7 +31,7 @@ namespace MscModApi.Caching
 			get
 			{
 				if (_electricity != null) return _electricity;
-				_electricity = _satsuma.transform.FindChild("Electricity").gameObject;
+				_electricity = satsuma.transform.FindChild("Electricity").gameObject;
 
 				return _electricity;
 			}
@@ -51,7 +51,7 @@ namespace MscModApi.Caching
 			get
 			{
 				if (_carController != null) return _carController;
-				_carController = _satsuma.GetComponent<CarController>();
+				_carController = satsuma.GetComponent<CarController>();
 
 				return _carController;
 			}
@@ -61,7 +61,7 @@ namespace MscModApi.Caching
 			get
 			{
 				if (_axisController != null) return _axisController;
-				_axisController = _satsuma.GetComponent<AxisCarController>();
+				_axisController = satsuma.GetComponent<AxisCarController>();
 
 				return _axisController;
 			}
@@ -71,7 +71,7 @@ namespace MscModApi.Caching
 			get
 			{
 				if (_drivetrain != null) return _drivetrain;
-				_drivetrain = _satsuma.GetComponent<Drivetrain>();
+				_drivetrain = satsuma.GetComponent<Drivetrain>();
 
 				return _drivetrain;
 			}

@@ -15,11 +15,11 @@ namespace MscModApi.Tools
 			if (paths == null) {
 				throw new ArgumentNullException(nameof(paths));
 			}
-
+			
 			return paths.Aggregate(Path.Combine);
 		}
 
-		internal static AssetBundle LoadAssetBundle(Mod mod, string fileName)
+		public static AssetBundle LoadAssetBundle(Mod mod, string fileName)
 		{
 			try {
 				return LoadAssets.LoadBundle(mod, fileName);

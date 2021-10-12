@@ -17,6 +17,7 @@ namespace MscModApi.Tools
 
 		private static AudioSource assembleAudio;
 		private static AudioSource disassembleAudio;
+		private static AudioSource touchAudio;
 
 		private static FsmString guiInteraction;
 		private static FsmBool guiAssemble;
@@ -117,6 +118,24 @@ namespace MscModApi.Tools
 
 			if (disassembleAudio != null) {
 				AudioSource.PlayClipAtPoint(disassembleAudio.clip, gameObject.transform.position);
+			}
+		}
+
+		public static void PlayTouch(this GameObject gameObject)
+		{
+			if (touchAudio == null)
+			{
+				var audioGameObject = Cache.Find("MasterAudio/CarFoley/dash_button");
+				if (!audioGameObject) return;
+				var audioSource = audioGameObject.GetComponent<AudioSource>();
+				if (audioSource)
+				{
+					touchAudio = audioSource;
+				}
+			}
+
+			if (touchAudio != null) {
+				AudioSource.PlayClipAtPoint(touchAudio.clip, gameObject.transform.position);
 			}
 		}
 
