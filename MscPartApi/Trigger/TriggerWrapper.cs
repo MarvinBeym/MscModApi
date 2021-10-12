@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using MscPartApi.Parts;
+using UnityEngine;
 
 namespace MscPartApi.Trigger
 {

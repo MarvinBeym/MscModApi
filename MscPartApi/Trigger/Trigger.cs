@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using MscPartApi.Parts;
 using UnityEngine;
 
 namespace MscPartApi.Trigger

@@ -2,6 +2,7 @@
 using MscPartApi.Tools;
 using System.Collections.Generic;
 using System.IO;
+using MscPartApi.Parts;
 using UnityEngine;
 
 namespace MscPartApi
