@@ -27,11 +27,11 @@ namespace MscPartApi.Trigger
 					if (part.screwPlacementMode) {
 						ScrewPlacementAssist.ShowPartInteraction(part);
 					} else {
-						UserInteraction.GUiInteraction(UserInteraction.Type.Disassemble,
+						UserInteraction.GuiInteraction(UserInteraction.Type.Disassemble,
 							$"Uninstall {part.gameObject.name}");
 
 						if (UserInteraction.RightMouseDown) {
-							UserInteraction.GUiInteraction(UserInteraction.Type.None);
+							UserInteraction.GuiInteraction(UserInteraction.Type.None);
 							part.gameObject.PlayDisassemble();
 							Uninstall();
 						}
@@ -145,7 +145,7 @@ namespace MscPartApi.Trigger
 		{
 			if (!canBeInstalled || !UserInteraction.LeftMouseDown) return;
 
-			UserInteraction.GUiInteraction(UserInteraction.Type.None);
+			UserInteraction.GuiInteraction(UserInteraction.Type.None);
 			collider.gameObject.PlayAssemble();
 			canBeInstalled = false;
 			Install();
@@ -159,7 +159,7 @@ namespace MscPartApi.Trigger
 			    || collider.gameObject != part.gameObject
 			    || part.IsInstallBlocked()) return;
 
-			UserInteraction.GUiInteraction(UserInteraction.Type.Assemble, $"Install {part.gameObject.name}");
+			UserInteraction.GuiInteraction(UserInteraction.Type.Assemble, $"Install {part.gameObject.name}");
 			canBeInstalled = true;
 		}
 
@@ -168,7 +168,7 @@ namespace MscPartApi.Trigger
 			if (!canBeInstalled) return;
 
 			canBeInstalled = false;
-			UserInteraction.GUiInteraction(UserInteraction.Type.None);
+			UserInteraction.GuiInteraction(UserInteraction.Type.None);
 		}
 
 		internal void Init(Part part, GameObject parentGameObject, bool disableCollisionWhenInstalled)
