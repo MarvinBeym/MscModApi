@@ -24,7 +24,7 @@ namespace MscPartApi.Tools
 
 		private static GameObject itemPivot;
 
-		public static void ShowGuiInteraction(Type type, string text = "")
+		public static void GUiInteraction(Type type, string text = "")
 		{
 			if (guiInteraction != null && text != guiInteraction.Value) {
 				guiInteraction.Value = text.Replace("(Clone)", "");

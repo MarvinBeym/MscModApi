@@ -148,7 +148,7 @@ namespace MscPartApi
 			}
 
 			if (ShowScrewSize && screw.showSize) {
-				UserInteraction.ShowGuiInteraction(UserInteraction.Type.None,
+				UserInteraction.GUiInteraction(UserInteraction.Type.None,
 					$"Screw size: {screw.size.ToString("#.#").Replace(".00", "")}mm");
 			}
 
@@ -215,7 +215,7 @@ namespace MscPartApi
 
 			if (!part.IsFixed()) {
 				if (part.IsInstalled()) {
-					UserInteraction.ShowGuiInteraction(UserInteraction.Type.None, "Tighten all screws");
+					UserInteraction.GUiInteraction(UserInteraction.Type.None, "Tighten all screws");
 					if (instantInstallKeybind.GetKeybindDown()) {
 						part.partSave.screws.ForEach(delegate(Screw screw)
 						{
@@ -223,7 +223,7 @@ namespace MscPartApi
 						});
 					}
 				} else {
-					UserInteraction.ShowGuiInteraction(UserInteraction.Type.None, "Fully install part");
+					UserInteraction.GUiInteraction(UserInteraction.Type.None, "Fully install part");
 					if (instantInstallKeybind.GetKeybindDown()) {
 						part.Install();
 						part.partSave.screws.ForEach(delegate (Screw screw) {
@@ -232,7 +232,7 @@ namespace MscPartApi
 					}
 				}
 			} else {
-				UserInteraction.ShowGuiInteraction(UserInteraction.Type.None, "Loosen all screws");
+				UserInteraction.GUiInteraction(UserInteraction.Type.None, "Loosen all screws");
 				if (instantInstallKeybind.GetKeybindDown()) {
 					part.partSave.screws.ForEach(delegate (Screw screw) {
 						screw.OutBy(Screw.maxTightness);
