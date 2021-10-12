@@ -9,14 +9,19 @@ namespace MscModApi.Tools
 	public static class Logger
 	{
 		private static Mod mod;
-		public const string fileName = "logs.log";
-		public static string filePath = "";
-		public static int maxLineLength = 62;
+		private const string fileName = "logs.log";
+		private static string filePath = "";
+		private static int maxLineLength = 62;
 		internal static void InitLogger(Mod mod)
 		{
 			Logger.mod = mod;
 			filePath = Helper.CombinePaths(ModLoader.GetModSettingsFolder(mod), fileName);
 			InitFile();
+		}
+
+		public static string GetLogFilePath()
+		{
+			return filePath;
 		}
 
 		public static void New(string message) => New(message, "", null);
