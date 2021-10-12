@@ -5,11 +5,11 @@ using System.Runtime.InteropServices;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("MscPartApi")]
+[assembly: AssemblyTitle("MscModApi")]
 [assembly: AssemblyDescription("My Summer Car Mod file")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("MscPartApi")]
+[assembly: AssemblyProduct("MscModApi")]
 [assembly: AssemblyCopyright("Copyright © 2021 by DonnerPlays")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
