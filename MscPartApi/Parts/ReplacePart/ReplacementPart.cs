@@ -11,7 +11,6 @@ namespace MscPartApi.Parts.ReplacePart
 
 		public List<Part> newParts = new List<Part>();
 		public List<OldPart> oldParts = new List<OldPart>();
-		private List<GameObject> oldGameObjects;
 
 		public ReplacementPart(GameObject oldFsmGameObject, Part newPart) : this(new[] { oldFsmGameObject }, new[] { newPart })
 		{
