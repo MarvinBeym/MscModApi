@@ -20,7 +20,7 @@ namespace MscModApi
 		public override bool UseAssetsFolder => true;
 		private static Settings showBoltSizeSetting = new Settings("showBoltSizeSetting", "Show screw size", false);
 
-		private const string AssetsFile = "mscModApi.unity3d";
+		private const string assetsFile = "msc-mod-api.unity3d";
 		internal static GameObject clampModel;
 		private Tool tool;
 
@@ -283,15 +283,15 @@ namespace MscModApi
 
 		private void LoadAssets()
 		{
-			var assetBundle = Helper.LoadAssetBundle(this, AssetsFile);
-			Screw.material = assetBundle.LoadAsset<Material>("Screw-Material.mat");
-			Screw.soundClip = assetBundle.LoadAsset<AudioClip>("screwable_sound.wav");
-			clampModel = assetBundle.LoadAsset<GameObject>("Tube_Clamp.prefab");
+			var assetBundle = Helper.LoadAssetBundle(this, assetsFile);
+			Screw.material = assetBundle.LoadAsset<Material>("screw_material.mat");
+			Screw.soundClip = assetBundle.LoadAsset<AudioClip>("screw_sound.wav");
+			clampModel = assetBundle.LoadAsset<GameObject>("clamp.prefab");
 
-			Screw.nutModel = assetBundle.LoadAsset<GameObject>("screwable_nut.prefab");
-			Screw.screwModel = assetBundle.LoadAsset<GameObject>("screwable_screw1.prefab");
-			Screw.normalModel = assetBundle.LoadAsset<GameObject>("screwable_screw2.prefab");
-			Screw.longModel = assetBundle.LoadAsset<GameObject>("screwable_screw3.prefab");
+			Screw.nutModel = assetBundle.LoadAsset<GameObject>("nut.prefab");
+			Screw.screwModel = assetBundle.LoadAsset<GameObject>("screw.prefab");
+			Screw.normalModel = assetBundle.LoadAsset<GameObject>("screw_normal.prefab");
+			Screw.longModel = assetBundle.LoadAsset<GameObject>("screw_long.prefab");
 			assetBundle.Unload(false);
 		}
 	}
