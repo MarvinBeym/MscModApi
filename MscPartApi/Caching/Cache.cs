@@ -2,7 +2,7 @@
 using HutongGames.PlayMaker;
 using UnityEngine;
 
-namespace MscPartApi.Caching
+namespace MscModApi.Caching
 {
 	public static class Cache
 	{

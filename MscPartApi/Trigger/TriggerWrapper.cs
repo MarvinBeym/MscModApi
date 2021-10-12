@@ -1,7 +1,7 @@
-﻿using MscPartApi.Parts;
+﻿using MscModApi.Parts;
 using UnityEngine;
 
-namespace MscPartApi.Trigger
+namespace MscModApi.Trigger
 {
 	public class TriggerWrapper
 	{

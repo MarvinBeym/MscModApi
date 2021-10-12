@@ -1,9 +1,9 @@
 ﻿using MSCLoader;
-using MscPartApi.Tools;
+using MscModApi.Tools;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace MscPartApi
+namespace MscModApi
 {
 	public class PartBaseInfo
 	{

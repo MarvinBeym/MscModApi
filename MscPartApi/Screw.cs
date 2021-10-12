@@ -1,10 +1,10 @@
-﻿using MscPartApi.Tools;
+﻿using MscModApi.Tools;
 using Newtonsoft.Json;
 using System.Linq;
-using MscPartApi.Parts;
+using MscModApi.Parts;
 using UnityEngine;
 
-namespace MscPartApi
+namespace MscModApi
 {
 	[JsonObject(MemberSerialization.OptIn)]
 	public class Screw

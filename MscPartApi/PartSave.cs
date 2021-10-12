@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace MscPartApi
+namespace MscModApi
 {
 	internal class PartSave
 	{

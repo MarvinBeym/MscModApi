@@ -1,10 +1,10 @@
 ﻿using MSCLoader;
 using System.Linq;
 using System.Reflection;
-using MscPartApi.Parts;
+using MscModApi.Parts;
 using UnityEngine;
 
-namespace MscPartApi.Tools
+namespace MscModApi.Tools
 {
 	internal static class ScrewPlacementAssist
 	{

@@ -1,11 +1,11 @@
-﻿using MscPartApi.Tools;
-using MscPartApi.Trigger;
+﻿using MscModApi.Tools;
+using MscModApi.Trigger;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace MscPartApi.Parts
+namespace MscModApi.Parts
 {
 	public class Part
 	{
@@ -83,14 +83,14 @@ namespace MscPartApi.Parts
 
 			LoadPartPositionAndRotation(gameObject, partSave);
 
-			if (!MscPartApi.modSaveFileMapping.ContainsKey(partBaseInfo.mod.ID)) {
-				MscPartApi.modSaveFileMapping.Add(partBaseInfo.mod.ID, partBaseInfo.saveFilePath);
+			if (!MscModApi.modSaveFileMapping.ContainsKey(partBaseInfo.mod.ID)) {
+				MscModApi.modSaveFileMapping.Add(partBaseInfo.mod.ID, partBaseInfo.saveFilePath);
 			}
 
-			if (MscPartApi.modsParts.ContainsKey(partBaseInfo.mod.ID)) {
-				MscPartApi.modsParts[partBaseInfo.mod.ID].Add(id, this);
+			if (MscModApi.modsParts.ContainsKey(partBaseInfo.mod.ID)) {
+				MscModApi.modsParts[partBaseInfo.mod.ID].Add(id, this);
 			} else {
-				MscPartApi.modsParts.Add(partBaseInfo.mod.ID, new Dictionary<string, Part>
+				MscModApi.modsParts.Add(partBaseInfo.mod.ID, new Dictionary<string, Part>
 				{
 					{id, this}
 				});
@@ -196,7 +196,7 @@ namespace MscPartApi.Parts
 
 		public void AddClampModel(Vector3 position, Vector3 rotation, Vector3 scale)
 		{
-			var clamp = GameObject.Instantiate(MscPartApi.clampModel);
+			var clamp = GameObject.Instantiate(MscModApi.clampModel);
 			clamp.name = $"{gameObject.name}_clamp_{clampsAdded}";
 			clampsAdded++;
 			clamp.transform.SetParent(gameObject.transform);
@@ -239,7 +239,7 @@ namespace MscPartApi.Parts
 
 			screw.gameObject.SetActive(IsInstalled());
 
-			MscPartApi.screws.Add(screw.gameObject.name, screw);
+			MscModApi.screws.Add(screw.gameObject.name, screw);
 		}
 
 		public void AddScrews(Screw[] screws, float overrideScale = 0f, float overrideSize = 0f)

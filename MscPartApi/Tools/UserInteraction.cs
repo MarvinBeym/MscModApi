@@ -1,9 +1,9 @@
 ﻿using HutongGames.PlayMaker;
 using System;
-using MscPartApi.Caching;
+using MscModApi.Caching;
 using UnityEngine;
 
-namespace MscPartApi.Tools
+namespace MscModApi.Tools
 {
 	public static class UserInteraction
 	{

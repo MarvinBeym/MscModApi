@@ -1,10 +1,10 @@
-﻿using MscPartApi.Parts.ReplacementPart;
+﻿using MscModApi.Parts.ReplacementPart;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 
-namespace MscPartApi.Parts.ReplacePart
+namespace MscModApi.Parts.ReplacePart
 {
 	public class ReplacementPart
 	{

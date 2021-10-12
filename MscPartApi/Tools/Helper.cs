@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text.RegularExpressions;
 using UnityEngine;
 
-namespace MscPartApi.Tools
+namespace MscModApi.Tools
 {
 	internal static class Helper
 	{

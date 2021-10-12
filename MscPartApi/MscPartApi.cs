@@ -1,16 +1,16 @@
 ﻿using MSCLoader;
-using MscPartApi.Tools;
+using MscModApi.Tools;
 using System.Collections.Generic;
 using System.IO;
-using MscPartApi.Parts;
+using MscModApi.Parts;
 using UnityEngine;
 
-namespace MscPartApi
+namespace MscModApi
 {
-	public class MscPartApi : Mod
+	public class MscModApi : Mod
 	{
-		public override string ID => "MscPartApi";
-		public override string Name => "MscPartApi";
+		public override string ID => "MscModApi";
+		public override string Name => "MscModApi";
 		public override string Author => "DonnerPlays";
 		public override string Version => "1.0";
 
@@ -20,7 +20,7 @@ namespace MscPartApi
 		public override bool UseAssetsFolder => true;
 		private static Settings showBoltSizeSetting = new Settings("showBoltSizeSetting", "Show screw size", false);
 
-		private const string AssetsFile = "mscPartApi.unity3d";
+		private const string AssetsFile = "mscModApi.unity3d";
 		internal static GameObject clampModel;
 		private Tool tool;
 

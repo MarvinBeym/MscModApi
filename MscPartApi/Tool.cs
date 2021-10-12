@@ -1,12 +1,12 @@
 ﻿using HutongGames.PlayMaker;
 using MSCLoader;
-using MscPartApi.Tools;
+using MscModApi.Tools;
 using System.Collections.Generic;
 using System.Linq;
-using MscPartApi.Caching;
+using MscModApi.Caching;
 using UnityEngine;
 
-namespace MscPartApi
+namespace MscModApi
 {
 	internal class Tool
 	{

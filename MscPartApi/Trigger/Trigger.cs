@@ -1,11 +1,11 @@
-﻿using MscPartApi.Tools;
+﻿using MscModApi.Tools;
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using MscPartApi.Parts;
+using MscModApi.Parts;
 using UnityEngine;
 
-namespace MscPartApi.Trigger
+namespace MscModApi.Trigger
 {
 	internal class Trigger : MonoBehaviour
 	{

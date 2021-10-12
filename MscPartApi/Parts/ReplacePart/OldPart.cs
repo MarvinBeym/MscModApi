@@ -4,7 +4,7 @@ using MSCLoader;
 using System.Linq;
 using UnityEngine;
 
-namespace MscPartApi.Parts.ReplacementPart
+namespace MscModApi.Parts.ReplacementPart
 {
 	public class OldPart
 	{
