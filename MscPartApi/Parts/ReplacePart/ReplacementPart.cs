@@ -1,31 +1,40 @@
-﻿using System;
+﻿using MscPartApi.Parts.ReplacementPart;
+using System;
 using System.Collections.Generic;
 using System.Linq;
-using HutongGames.PlayMaker;
-using MSCLoader;
-using MscPartApi.Parts.ReplacementPart;
 using UnityEngine;
-using UnityEngine.Events;
 
 namespace MscPartApi.Parts.ReplacePart
 {
 	public class ReplacementPart
 	{
 
-		public List<Part> newParts;
+		public List<Part> newParts = new List<Part>();
 		public List<OldPart> oldParts = new List<OldPart>();
 		private List<GameObject> oldGameObjects;
 
-		public ReplacementPart(GameObject[] oldFsmGameObjects, List<Part> newParts)
+		public ReplacementPart(GameObject oldFsmGameObject, Part newPart) : this(new[] { oldFsmGameObject }, new[] { newPart })
 		{
-			this.newParts = newParts;
+		}
 
-			foreach (var oldFsmGameObject in oldFsmGameObjects)
-			{
+		public ReplacementPart(GameObject[] oldFsmGameObjects, Part newPart) : this(oldFsmGameObjects, new[] { newPart })
+		{
+		}
+
+		public ReplacementPart(GameObject oldFsmGameObject, Part[] newParts) : this(new[] { oldFsmGameObject }, newParts)
+		{
+		}
+
+		public ReplacementPart(GameObject[] oldFsmGameObjects, Part[] newParts)
+		{
+			foreach (var newPart in newParts) {
+				this.newParts.Add(newPart);
+			}
+
+			foreach (var oldFsmGameObject in oldFsmGameObjects) {
 				oldParts.Add(new OldPart(oldFsmGameObject, new Action(OldPartInstalled), new Action(OldPartUninstalled)));
 			}
-			foreach (var newPart in newParts)
-			{
+			foreach (var newPart in newParts) {
 				newPart.AddPostInstallAction(NewPartInstalled);
 				newPart.AddPostUninstallAction(NewPartUninstalled);
 			}
@@ -34,8 +43,7 @@ namespace MscPartApi.Parts.ReplacePart
 		internal void NewPartInstalled()
 		{
 			var anyNewInstalled = newParts.Any(part => part.IsInstalled());
-			foreach (var oldPart in oldParts)
-			{
+			foreach (var oldPart in oldParts) {
 				oldPart.BlockInstall(anyNewInstalled);
 			}
 		}
