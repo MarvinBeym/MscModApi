@@ -11,8 +11,21 @@ namespace MscModApi.Caching
 		private static CarController _carController;
 		private static FsmBool _electricsOk;
 		private static GameObject _electricity;
+		private static FsmString _playerCurrentVehicle;
 
 		public static bool running => drivetrain.rpm > 0;
+		public static bool playerInCar => playerCurrentVehicle == "Satsuma";
+
+		public static string playerCurrentVehicle
+		{
+			get
+			{
+				if (_playerCurrentVehicle != null) return _playerCurrentVehicle.Value;
+				_playerCurrentVehicle = FsmVariables.GlobalVariables.FindFsmString("PlayerCurrentVehicle");
+
+				return _playerCurrentVehicle.Value;
+			}
+		}
 
 		public static GameObject electricity {
 			get
