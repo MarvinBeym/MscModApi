@@ -28,6 +28,8 @@
 - [X] A lot of helpers & extensions to make development easier and reduce amount of code 
 - [X] Logger - Central point for logging stuff about your mod
 - [ ] Shop
+- [ ] Ability to pack multiple parts (same objects) into a **box** that you can **unpack**
+- [ ] Ability to pack multiple parts (different objects) into a **kit** that you can **unpack** 
 
 ## Installation
 
