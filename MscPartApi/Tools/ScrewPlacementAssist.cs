@@ -89,9 +89,7 @@ namespace MscPartApi.Tools
 
 		internal static void ShowPartInteraction(Part part)
 		{
-			UserInteraction.GuiInteraction(
-				UserInteraction.Type.None,
-				$"Press [{keySelectPart.Key}] to {(selectedPart == null ? "select" : "deselect")} part"
+			UserInteraction.GuiInteraction($"Press [{keySelectPart.Key}] to {(selectedPart == null ? "select" : "deselect")} part"
 			);
 
 			if (keySelectPart.GetKeybindDown()) {

@@ -27,8 +27,7 @@ namespace MscPartApi.Trigger
 					if (part.screwPlacementMode) {
 						ScrewPlacementAssist.ShowPartInteraction(part);
 					} else {
-						UserInteraction.GuiInteraction(UserInteraction.Type.Disassemble,
-							$"Uninstall {part.gameObject.name}");
+						UserInteraction.GuiInteraction(UserInteraction.Type.Disassemble, $"Uninstall {part.gameObject.name}");
 
 						if (UserInteraction.RightMouseDown) {
 							UserInteraction.GuiInteraction(UserInteraction.Type.None);
