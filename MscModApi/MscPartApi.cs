@@ -212,6 +212,12 @@ namespace MscModApi
 
 			if (part == null) return;
 
+			if (part.IsInstallBlocked())
+			{
+				UserInteraction.GuiInteraction("Installation is blocked");
+				return;
+			}
+
 			if (!part.IsFixed()) {
 				if (part.IsInstalled()) {
 					UserInteraction.GuiInteraction("Tighten all screws");
