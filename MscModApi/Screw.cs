@@ -101,9 +101,9 @@ namespace MscModApi
 			gameObject.SetNameLayerTag($"{parentCollider.gameObject.name}_screw_{index}", "PART", "DontCollide");
 
 			gameObject.transform.SetParent(parentCollider.transform);
-			gameObject.transform.localPosition = Helper.CopyVector3(position);
-			gameObject.transform.localRotation = new Quaternion { eulerAngles = Helper.CopyVector3(rotation) };
-			gameObject.transform.localScale = Helper.CopyVector3(new Vector3(scale, scale, scale));
+			gameObject.transform.localPosition = position.CopyVector3();
+			gameObject.transform.localRotation = new Quaternion { eulerAngles = rotation.CopyVector3() };
+			gameObject.transform.localScale = new Vector3(scale, scale, scale);
 			gameObject.SetActive(true);
 
 			collider = gameObject.GetComponent<Collider>();

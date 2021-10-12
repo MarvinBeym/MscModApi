@@ -80,6 +80,7 @@
     <Compile Include="Caching\CarH.cs" />
     <Compile Include="Parts\ReplacePart\OldPart.cs" />
     <Compile Include="Parts\ReplacePart\ReplacementPart.cs" />
+    <Compile Include="Tools\Extensions.cs" />
     <Compile Include="Tools\ScrewPlacementAssist.cs" />
     <Compile Include="Tool.cs" />
     <Compile Include="Trigger\TriggerWrapper.cs" />

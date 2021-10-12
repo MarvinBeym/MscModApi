@@ -48,21 +48,11 @@ namespace MscModApi.Tools
 			Application.Quit();
 		}
 
-		public static PlayMakerFSM FindFsm(this GameObject gameObject, string fsmName)
-		{
-			return gameObject.GetComponents<PlayMakerFSM>().FirstOrDefault(fsm => fsm.FsmName == fsmName);
-		}
-
-		internal static Vector3 CopyVector3(Vector3 old)
-		{
-			return new Vector3(old.x, old.y, old.z);
-		}
-
-		public static bool CheckCloseToPosition(Vector3 positionOfPartTocheck, Vector3 position, float minimumDistance)
+		public static bool CheckCloseToPosition(Vector3 positionToCheck, Vector3 position, float minimumDistance)
 		{
 			try
 			{
-				return Vector3.Distance(positionOfPartTocheck, position) <= minimumDistance;
+				return Vector3.Distance(positionToCheck, position) <= minimumDistance;
 			} catch {
 				return false;
 			}
@@ -99,27 +89,6 @@ namespace MscModApi.Tools
 			return gameObject;
 		}
 
-		public static void SetNameLayerTag(this GameObject gameObject, string name, string tag = "PART", string layer = "Parts")
-		{
-			gameObject.name = name;
-			gameObject.tag = tag;
-			gameObject.layer = LayerMask.NameToLayer(layer);
-			gameObject.FixName();
-		}
-
-		public static void FixName(this GameObject gameObject)
-		{
-			gameObject.name = Regex.Replace(
-				gameObject.name,
-				"\\(Clone\\){1,}", "(Clone)"
-			);
-		}
-
-		public static bool CompareVector3(this Vector3 vector3, Vector3 other, float tolerance = 0.05f)
-		{
-			return Math.Abs(vector3.x - other.x) < tolerance && Math.Abs(vector3.y - other.y) < tolerance && Math.Abs(vector3.z - other.z) < tolerance;
-		}
-
 		public static Sprite LoadNewSprite(Sprite sprite, string FilePath, float pivotX = 0.5f, float pivotY = 0.5f,
 			float PixelsPerUnit = 100.0f)
 		{
@@ -134,11 +103,6 @@ namespace MscModApi.Tools
 			return sprite;
 		}
 
-		public static bool CompareQuaternion(this Quaternion a, Quaternion b, float tolerance = 0)
-		{
-			return 1 - Mathf.Abs(Quaternion.Dot(a, b)) < tolerance;
-		}
-
 		public static Texture2D LoadTexture(string FilePath)
 		{
 			if (File.Exists(FilePath)) {
@@ -149,16 +113,6 @@ namespace MscModApi.Tools
 			}
 
 			return null;
-		}
-
-		public static string ToOnOff(this bool value)
-		{
-			return value.ToXY("On", "Off");
-		}
-
-		public static string ToXY(this bool value, string trueText, string falseText)
-		{
-			return value ? trueText : falseText;
 		}
 
 		public static void WorkAroundAction()

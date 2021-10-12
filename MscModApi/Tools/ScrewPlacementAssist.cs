@@ -127,8 +127,8 @@ namespace MscModApi.Tools
 
 		private static Vector3 CalculateVector(Transform transform)
 		{
-			var vector = Helper.CopyVector3(transform.localPosition);
-			var quaternion = Quaternion.Euler(Helper.CopyVector3(transform.localRotation.eulerAngles));
+			var vector = transform.localPosition.CopyVector3();
+			var quaternion = Quaternion.Euler(transform.localRotation.eulerAngles.CopyVector3());
 			vector += (quaternion * Vector3.forward) * (Screw.maxTightness * Screw.transformStep);
 			return vector;
 		}
