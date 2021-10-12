@@ -18,7 +18,18 @@ namespace MscModApi.Tools
 			
 			return paths.Aggregate(Path.Combine);
 		}
-		
+
+
+		public static string CombinePathsAndCreateIfNotExists(params string[] paths)
+		{
+			string path = CombinePaths(paths);
+			if (!Directory.Exists(path)) {
+				Directory.CreateDirectory(path);
+			}
+
+			return path;
+		}
+
 		public static AssetBundle LoadAssetBundle(Mod mod, string fileName)
 		{
 			try {
