@@ -39,6 +39,26 @@ namespace MscModApi.Parts.ReplacePart
 			}
 		}
 
+		public bool IsNewInstalled()
+		{
+			return newParts.Any(part => !part.IsInstalled());
+		}
+
+		public bool IsNewFixed()
+		{
+			return newParts.Any(part => !part.IsFixed());
+		}
+
+		public bool IsOldInstalled()
+		{
+			return oldParts.Any(part => !part.IsInstalled());
+		}
+
+		public bool IsOldFixed()
+		{
+			return oldParts.Any(part => !part.IsFixed());
+		}
+
 		internal void NewPartInstalled()
 		{
 			var anyNewInstalled = newParts.Any(part => part.IsInstalled());
@@ -49,7 +69,7 @@ namespace MscModApi.Parts.ReplacePart
 
 		internal void NewPartUninstalled()
 		{
-			var allNewUninstalled = newParts.All(part => !part.IsInstalled());
+			var allNewUninstalled = !IsNewInstalled();
 			foreach (var oldPart in oldParts) {
 				oldPart.BlockInstall(!allNewUninstalled);
 			}
@@ -65,7 +85,7 @@ namespace MscModApi.Parts.ReplacePart
 
 		internal void OldPartUninstalled()
 		{
-			var allOldUninstalled = oldParts.All(part => !part.IsInstalled());
+			var allOldUninstalled = !IsOldInstalled();
 			foreach (var newPart in newParts) {
 				newPart.BlockInstall(!allOldUninstalled);
 			}
