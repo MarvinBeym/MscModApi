@@ -18,7 +18,7 @@ namespace MscModApi.Tools
 			
 			return paths.Aggregate(Path.Combine);
 		}
-
+		
 		public static AssetBundle LoadAssetBundle(Mod mod, string fileName)
 		{
 			try {
@@ -138,6 +138,10 @@ namespace MscModApi.Tools
 			}
 
 			return null;
+		}
+
+		public static void WorkAroundAction()
+		{
 		}
 	}
 }
