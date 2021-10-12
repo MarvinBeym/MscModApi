@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace MscPartApi.Caching
 {
-	public class Cache
+	public static class Cache
 	{
 		public static Dictionary<string, GameObject> cachedGameObjects = new Dictionary<string, GameObject>();
 

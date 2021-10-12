@@ -3,6 +3,7 @@ using MSCLoader;
 using MscPartApi.Tools;
 using System.Collections.Generic;
 using System.Linq;
+using MscPartApi.Caching;
 using UnityEngine;
 
 namespace MscPartApi
@@ -65,7 +66,7 @@ namespace MscPartApi
 		{
 			if (selectItem != null) return hasToolInHand;
 
-			selectItem = GameObject.Find("PLAYER/Pivot/AnimPivot/Camera/FPSCamera/SelectItem").gameObject;
+			selectItem = Cache.Find("PLAYER/Pivot/AnimPivot/Camera/FPSCamera/SelectItem").gameObject;
 			if (selectItem == null) return hasToolInHand;
 
 			FsmHook.FsmInject(selectItem, "Hand", delegate { hasToolInHand = false; });

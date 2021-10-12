@@ -1,5 +1,6 @@
 ﻿using HutongGames.PlayMaker;
 using System;
+using MscPartApi.Caching;
 using UnityEngine;
 
 namespace MscPartApi.Tools
@@ -90,7 +91,7 @@ namespace MscPartApi.Tools
 		public static void PlayAssemble(this GameObject gameObject)
 		{
 			if (assembleAudio == null) {
-				var audioGameObject = GameObject.Find("MasterAudio/CarBuilding/assemble");
+				var audioGameObject = Cache.Find("MasterAudio/CarBuilding/assemble");
 				if (!audioGameObject) return;
 				var audioSource = audioGameObject.GetComponent<AudioSource>();
 				if (audioSource) {
@@ -106,7 +107,7 @@ namespace MscPartApi.Tools
 		public static void PlayDisassemble(this GameObject gameObject)
 		{
 			if (disassembleAudio == null) {
-				var audioGameObject = GameObject.Find("MasterAudio/CarBuilding/disassemble");
+				var audioGameObject = Cache.Find("MasterAudio/CarBuilding/disassemble");
 				if (!audioGameObject) return;
 				var audioSource = audioGameObject.GetComponent<AudioSource>();
 				if (audioSource) {
