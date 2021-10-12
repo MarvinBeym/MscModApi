@@ -9,36 +9,25 @@ namespace MscModApi.Parts.ReplacePart
 {
 	internal class Actions
 	{
-		internal struct NewPartActions
-		{
-			internal List<Action> any;
-			internal List<Action> all;
-		}
+		internal List<Action> allInstalled = new List<Action>();
+		internal List<Action> allUninstalled = new List<Action>();
+		internal List<Action> allFixed = new List<Action>();
 
-		internal struct OldPartActions
-		{
-			internal List<Action> any;
-			internal List<Action> all;
-		}
-
-		internal NewPartActions newPart;
-		internal OldPartActions oldPart;
-
-		internal Actions()
-		{
-			newPart.any = new List<Action>();
-			newPart.all = new List<Action>();
-
-			oldPart.any = new List<Action>();
-			oldPart.all = new List<Action>();
-		}
+		internal List<Action> anyInstalled = new List<Action>();
+		internal List<Action> anyUninstalled = new List<Action>();
+		internal List<Action> anyFixed = new List<Action>();
 	}
 	public class ReplacementPart
 	{
 		public enum ActionType
 		{
 			AnyInstalled,
-			AllInstalled
+			AnyFixed,
+			AnyUninstalled,
+
+			AllInstalled,
+			AllFixed,
+			AllUninstalled
 		}
 		public enum PartType
 		{
@@ -50,7 +39,8 @@ namespace MscModApi.Parts.ReplacePart
 		public List<Part> newParts = new List<Part>();
 		public List<OldPart> oldParts = new List<OldPart>();
 
-		internal Actions actions = new Actions();
+		internal Actions newPartActions = new Actions();
+		internal Actions oldPartActions = new Actions();
 
 		public ReplacementPart(GameObject oldFsmGameObject, Part newPart) : this(new[] { oldFsmGameObject }, new[] { newPart })
 		{
@@ -79,15 +69,6 @@ namespace MscModApi.Parts.ReplacePart
 			}
 		}
 
-		public bool IsNewFixed()
-		{
-			return newParts.Any(part => !part.IsFixed());
-		}
-		public bool IsOldFixed()
-		{
-			return oldParts.Any(part => !part.IsFixed());
-		}
-
 		public bool AreAllNewInstalled()
 		{
 			return newParts.All(part => part.IsInstalled());
@@ -96,6 +77,26 @@ namespace MscModApi.Parts.ReplacePart
 		public bool AreAllNewUninstalled()
 		{
 			return !AreAllNewInstalled();
+		}
+
+		public bool AreAnyNewFixed()
+		{
+			return newParts.Any(part => part.IsFixed());
+		}
+
+		public bool AreAllNewFixed()
+		{
+			return newParts.All(part => part.IsFixed());
+		}
+
+		public bool AreAnyOldFixed()
+		{
+			return oldParts.Any(part => part.IsFixed());
+		}
+
+		public bool AreAllOldFixed()
+		{
+			return oldParts.All(part => part.IsFixed());
 		}
 
 		public bool AreAnyNewInstalled()
@@ -130,42 +131,54 @@ namespace MscModApi.Parts.ReplacePart
 
 		public void AddInstalledAction(ActionType actionType, PartType partType, Action action)
 		{
+			var actions = new Actions();
+			var actionList = new List<Action>();
+			switch (partType)
+			{
+				case PartType.NewPart:
+					actions = newPartActions;
+					break;
+				case PartType.OldPart:
+					actions = oldPartActions;
+					break;
+			}
+
 			switch (actionType)
 			{
 				case ActionType.AllInstalled:
-					switch (partType)
-					{
-						case PartType.NewPart:
-							actions.newPart.all.Add(action);
-							break;
-						case PartType.OldPart:
-							actions.oldPart.all.Add(action);
-							break;
-					}
+					actionList = actions.allInstalled;
+					break;
+				case ActionType.AllUninstalled:
+					actionList = actions.allUninstalled;
+					break;
+				case ActionType.AllFixed:
+					actionList = actions.allFixed;
 					break;
 				case ActionType.AnyInstalled:
-					switch (partType) {
-						case PartType.NewPart:
-							actions.newPart.any.Add(action);
-							break;
-						case PartType.OldPart:
-							actions.oldPart.any.Add(action);
-							break;
-					}
+					actionList = actions.anyInstalled;
+					break;
+				case ActionType.AnyUninstalled:
+					actionList = actions.anyUninstalled;
+					break;
+				case ActionType.AnyFixed:
+					actionList = actions.anyFixed;
 					break;
 			}
+
+			actionList.Add(action);
 		}
 
 		internal void NewPartInstalled()
 		{
-			var anyNewInstalled = AreAnyNewInstalled();
-			var allNewInstalled = AreAllNewInstalled();
 			foreach (var oldPart in oldParts) {
-				oldPart.BlockInstall(anyNewInstalled);
+				oldPart.BlockInstall(true);
 			}
 
-			if(anyNewInstalled) actions.newPart.any.InvokeAll();
-			if(allNewInstalled) actions.newPart.all.InvokeAll();
+			if(newPartActions.anyInstalled.Count > 0) newPartActions.anyInstalled.InvokeAll();
+			if(newPartActions.allInstalled.Count > 0 && AreAllNewInstalled()) newPartActions.allInstalled.InvokeAll();
+
+			// => wont work => if(newPartActions.anyFixed.Count > 0 && AreAnyNewFixed()) newPartActions.anyFixed.InvokeAll();
+			// => wont work => if (newPartActions.allFixed.Count > 0 && AreAllNewFixed()) newPartActions.allFixed.InvokeAll();
 		}
 
 		internal void NewPartUninstalled()
@@ -174,18 +187,22 @@ namespace MscModApi.Parts.ReplacePart
 			foreach (var oldPart in oldParts) {
 				oldPart.BlockInstall(!allNewUninstalled);
 			}
+
+			if (newPartActions.anyUninstalled.Count > 0 && AreAnyNewUninstalled()) newPartActions.anyUninstalled.InvokeAll();
+			if (newPartActions.allUninstalled.Count > 0 && allNewUninstalled) newPartActions.allUninstalled.InvokeAll();
 		}
 
 		internal void OldPartInstalled()
 		{
-			var anyOldInstalled = AreAnyOldInstalled();
-			var allOldInstalled = AreAllOldInstalled();
-			foreach (var oldPart in oldParts) {
-				oldPart.BlockInstall(anyOldInstalled);
+			foreach (var newPart in newParts) {
+				newPart.BlockInstall(true);
 			}
 
-			if (anyOldInstalled) actions.oldPart.any.InvokeAll();
-			if (allOldInstalled) actions.oldPart.all.InvokeAll();
+			if (oldPartActions.anyInstalled.Count > 0) oldPartActions.anyInstalled.InvokeAll();
+			if (oldPartActions.allInstalled.Count > 0 && AreAllOldInstalled()) oldPartActions.allInstalled.InvokeAll();
+
+			// => wont work => if (oldPartActions.anyFixed.Count > 0 && AreAnyOldFixed()) oldPartActions.anyFixed.InvokeAll();
+			// => wont work => if (oldPartActions.allFixed.Count > 0 && AreAllOldFixed()) oldPartActions.allFixed.InvokeAll();
 		}
 
 		internal void OldPartUninstalled()
@@ -194,6 +211,9 @@ namespace MscModApi.Parts.ReplacePart
 			foreach (var newPart in newParts) {
 				newPart.BlockInstall(!allOldUninstalled);
 			}
+
+			if (oldPartActions.anyUninstalled.Count > 0 && AreAnyOldUninstalled()) oldPartActions.anyUninstalled.InvokeAll();
+			if (oldPartActions.allUninstalled.Count > 0 && allOldUninstalled) oldPartActions.allUninstalled.InvokeAll();
 		}
 	}
 }
