@@ -151,6 +151,16 @@ namespace MscModApi.Tools
 			return null;
 		}
 
+		public static string ToOnOff(this bool value)
+		{
+			return value.ToXY("On", "Off");
+		}
+
+		public static string ToXY(this bool value, string trueText, string falseText)
+		{
+			return value ? trueText : falseText;
+		}
+
 		public static void WorkAroundAction()
 		{
 		}
