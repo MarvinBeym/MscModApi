@@ -7,8 +7,8 @@
     <ProjectGuid>{F2181548-7561-46A0-A3FE-5B76571E543D}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>MscPartApi</RootNamespace>
-    <AssemblyName>MscPartApi</AssemblyName>
+    <RootNamespace>MscModApi</RootNamespace>
+    <AssemblyName>MscModApi</AssemblyName>
     <TargetFrameworkVersion>v3.5</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <TargetFrameworkProfile>Unity Full v3.5</TargetFrameworkProfile>
