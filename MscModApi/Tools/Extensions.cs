@@ -48,9 +48,14 @@ namespace MscModApi.Tools
 			return gameObject.GetComponents<PlayMakerFSM>().FirstOrDefault(fsm => fsm.FsmName == fsmName);
 		}
 
-		internal static Vector3 CopyVector3(this Vector3 old)
+		public static Vector3 CopyVector3(this Vector3 old)
 		{
 			return new Vector3(old.x, old.y, old.z);
+		}
+
+		public static GameObject FindChild(this GameObject gameObject, string childName)
+		{
+			return gameObject.transform.FindChild(childName).gameObject;
 		}
 	}
 }

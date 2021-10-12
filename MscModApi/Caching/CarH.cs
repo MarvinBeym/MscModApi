@@ -1,4 +1,5 @@
 ﻿using HutongGames.PlayMaker;
+using MscModApi.Tools;
 using UnityEngine;
 
 namespace MscModApi.Caching
@@ -31,7 +32,7 @@ namespace MscModApi.Caching
 			get
 			{
 				if (_electricity != null) return _electricity;
-				_electricity = satsuma.transform.FindChild("Electricity").gameObject;
+				_electricity = satsuma.FindChild("Electricity").gameObject;
 
 				return _electricity;
 			}
