@@ -20,6 +20,8 @@
 ### Features
 
 - [X] Creating parts
+  - [X] Installable
+  - [X] Screws 
 - [X] Replacing original parts with own implementation
 - [X] UserInteraction assistant/helper
 - [X] Cached GameObject.Find()
