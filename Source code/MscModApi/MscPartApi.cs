@@ -21,7 +21,6 @@ namespace MscModApi
 		private static Settings showBoltSizeSetting = new Settings("showBoltSizeSetting", "Show screw size", false);
 
 		private const string assetsFile = "msc-mod-api.unity3d";
-		internal static GameObject clampModel;
 		private Tool tool;
 
 		internal static Dictionary<string, string> modSaveFileMapping;
@@ -283,15 +282,12 @@ namespace MscModApi
 
 		private void LoadAssets()
 		{
+			
 			var assetBundle = Helper.LoadAssetBundle(this, assetsFile);
-			Screw.material = assetBundle.LoadAsset<Material>("screw_material.mat");
-			Screw.soundClip = assetBundle.LoadAsset<AudioClip>("screw_sound.wav");
-			clampModel = assetBundle.LoadAsset<GameObject>("clamp.prefab");
+			Screw.LoadAssets(assetBundle);
+			Part.LoadAssets(assetBundle);
 
-			Screw.nutModel = assetBundle.LoadAsset<GameObject>("nut.prefab");
-			Screw.screwModel = assetBundle.LoadAsset<GameObject>("screw.prefab");
-			Screw.normalModel = assetBundle.LoadAsset<GameObject>("screw_normal.prefab");
-			Screw.longModel = assetBundle.LoadAsset<GameObject>("screw_long.prefab");
+
 			assetBundle.Unload(false);
 		}
 	}

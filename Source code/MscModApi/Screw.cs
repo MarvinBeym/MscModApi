@@ -203,5 +203,15 @@ namespace MscModApi
 				renderer.material = material;
 			}
 		}
+
+		internal static void LoadAssets(AssetBundle assetBundle)
+		{
+			material = assetBundle.LoadAsset<Material>("screw_material.mat");
+			soundClip = assetBundle.LoadAsset<AudioClip>("screw_sound.wav");
+			nutModel = assetBundle.LoadAsset<GameObject>("nut.prefab");
+			screwModel = assetBundle.LoadAsset<GameObject>("screw.prefab");
+			normalModel = assetBundle.LoadAsset<GameObject>("screw_normal.prefab");
+			longModel = assetBundle.LoadAsset<GameObject>("screw_long.prefab");
+		}
 	}
 }

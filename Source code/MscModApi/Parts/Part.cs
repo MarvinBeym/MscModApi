@@ -44,6 +44,7 @@ namespace MscModApi.Parts
 		private Vector3 defaultRotation = Vector3.zero;
 		private Vector3 defaultPosition = Vector3.zero;
 		private bool installBlocked;
+		private static GameObject clampModel;
 
 		private void Setup(string id, string name, GameObject parentGameObject, Vector3 installPosition,
 			Vector3 installRotation, PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls,
@@ -199,7 +200,7 @@ namespace MscModApi.Parts
 
 		public void AddClampModel(Vector3 position, Vector3 rotation, Vector3 scale)
 		{
-			var clamp = GameObject.Instantiate(MscModApi.clampModel);
+			var clamp = GameObject.Instantiate(clampModel);
 			clamp.name = $"{gameObject.name}_clamp_{clampsAdded}";
 			clampsAdded++;
 			clamp.transform.SetParent(gameObject.transform);
@@ -243,6 +244,11 @@ namespace MscModApi.Parts
 			screw.gameObject.SetActive(IsInstalled());
 
 			MscModApi.screws.Add(screw.gameObject.name, screw);
+		}
+
+		internal static void LoadAssets(AssetBundle assetBundle)
+		{
+			clampModel = assetBundle.LoadAsset<GameObject>("clamp.prefab");
 		}
 
 		public void AddScrews(Screw[] screws, float overrideScale = 0f, float overrideSize = 0f)
@@ -363,6 +369,6 @@ namespace MscModApi.Parts
 		public bool IsInstallBlocked()
 		{
 			return installBlocked;
-	}
+		}
 	}
 }
