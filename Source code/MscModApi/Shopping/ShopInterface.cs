@@ -100,7 +100,7 @@ namespace MscModApi.Shopping
 					foreach (var modPanel in modPanels) {
 						var countVisible = 0;
 						foreach (var partPanel in modPanel.teimoPanels) {
-							partPanel.SetVisible(partPanel.shopLocation == shopLocation);
+							partPanel.SetVisible(partPanel.shopLocation == shopLocation && !partPanel.IsBought());
 							countVisible += partPanel.GetVisible() ? 1 : 0;
 						}
 
@@ -114,7 +114,7 @@ namespace MscModApi.Shopping
 						var countVisible = 0;
 						foreach (var partPanel in modPanel.fleetariPanels)
 						{
-							partPanel.SetVisible(partPanel.shopLocation == shopLocation);
+							partPanel.SetVisible(partPanel.shopLocation == shopLocation && !partPanel.IsBought());
 							countVisible += partPanel.GetVisible() ? 1 : 0;
 						}
 

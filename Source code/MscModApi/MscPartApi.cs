@@ -2,9 +2,11 @@
 using MscModApi.Tools;
 using System.Collections.Generic;
 using System.IO;
+using MscModApi.Caching;
 using MscModApi.Parts;
 using MscModApi.Shopping;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace MscModApi
 {
@@ -42,8 +44,8 @@ namespace MscModApi
 			SetupFunction(Setup.OnGUI, OnGui);
 			SetupFunction(Setup.OnLoad, Load);
 			SetupFunction(Setup.OnSave, Save);
-			SetupFunction(Setup.Update, Update);
-
+			SetupFunction(Setup.Update, Update);			
+			
 			modSaveFileMapping = new Dictionary<string, string>();
 			modsParts = new Dictionary<string, Dictionary<string, Part>>();
 			screws = new Dictionary<string, Screw>();

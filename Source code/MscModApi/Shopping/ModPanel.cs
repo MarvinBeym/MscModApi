@@ -34,17 +34,18 @@ namespace MscModApi.Shopping
 			this.shopInterface = shopInterface;
 			this.mod = mod;
 			modPanel = GameObject.Instantiate(prefab);
-			var modImage = modPanel.FindChild("mod_image").GetComponent<Image>();
+			var modImage = modPanel.FindChild("panel/mod_image").GetComponent<Image>();
+			modImage.enabled = false; //Tmp until solution is found
 			//modImage.sprite = Helper.LoadNewSprite(modImage.sprite, mod.Icon);
-			var btnOpenShop = modPanel.FindChild("mod_open_shop").GetComponent<Button>();
+			var btnOpenShop = modPanel.FindChild("panel/mod_open_shop").GetComponent<Button>();
 			btnOpenShop.onClick.AddListener(delegate
 			{
 				shopInterface.ChangeModPanel(this);
 			});
-			var modName = modPanel.FindChild("mod_name").GetComponent<Text>();
+			var modName = modPanel.FindChild("panel/mod_name").GetComponent<Text>();
 			modName.text = mod.Name;
 
-			modPartsCount = modPanel.FindChild("mod_parts_panel/mod_parts_count").GetComponent<Text>();
+			modPartsCount = modPanel.FindChild("panel/mod_parts_panel/mod_parts_count").GetComponent<Text>();
 			modPanel.transform.SetParent(list.transform);
 			modPanel.transform.localScale = new Vector3(1, 1, 1);
 		}

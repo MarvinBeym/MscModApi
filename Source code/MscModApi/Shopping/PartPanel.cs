@@ -28,17 +28,33 @@ namespace MscModApi.Shopping
 			{
 				part.partSave.bought = PartSave.BoughtState.No;
 			}
+
+			if (!part.GetBought())
+			{
+				part.SetActive(false);
+			}
+
 			this.shopInterface = shopInterface;
 			this.part = part;
 			partPanel = GameObject.Instantiate(prefab);
-			var partImage = partPanel.FindChild("part_image").GetComponent<Image>();
-			partImage.sprite = part.partBaseInfo.assetBundle.LoadAsset<Sprite>(iconName) ?? partImage.sprite;
-			var btnBuyPart = partPanel.FindChild("part_buy").GetComponent<Button>();
-			btnBuyPart.onClick.AddListener(OnPartBought);
+			var partImage = partPanel.FindChild("panel/part_image").GetComponent<Image>();
+			if (iconName == "")
+			{
+				partImage.enabled = false;
+			}
+			else
+			{
+				partImage.sprite = part.partBaseInfo.assetBundle.LoadAsset<Sprite>(iconName) ?? partImage.sprite;
+			}
 
-			var partName = partPanel.FindChild("part_name").GetComponent<Text>();
+
+			
+			var btnBuyPart = partPanel.FindChild("panel/part_buy").GetComponent<Button>();
+			btnBuyPart.onClick.AddListener(OnPartAddedToCard);
+
+			var partName = partPanel.FindChild("panel/part_name").GetComponent<Text>();
 			partName.text = name;
-			var partPrize = partPanel.FindChild("part_prize_panel/part_prize").GetComponent<Text>();
+			var partPrize = partPanel.FindChild("panel/part_prize_panel/part_prize").GetComponent<Text>();
 			partPrize.text = prize.ToString();
 
 			partPanel.transform.SetParent(list.transform);
@@ -51,10 +67,17 @@ namespace MscModApi.Shopping
 			list = panel.FindChild("parts_list/list/grid");
 		}
 
-		internal void OnPartBought()
+		internal void OnPartAddedToCard()
 		{
-
+			/*
+			   part.SetBought(true);
+			   part.SetActive(true);
+			   part.ResetToDefault();
+			   SetVisible(false);
+			 */
 		}
+
+		internal bool IsBought() => part.GetBought();
 
 		internal string GetName()
 		{
