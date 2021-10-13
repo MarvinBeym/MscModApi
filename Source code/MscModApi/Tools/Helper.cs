@@ -89,30 +89,33 @@ namespace MscModApi.Tools
 			return gameObject;
 		}
 
-		public static Sprite LoadNewSprite(Sprite sprite, string FilePath, float pivotX = 0.5f, float pivotY = 0.5f,
-			float PixelsPerUnit = 100.0f)
+		public static Sprite LoadNewSprite(Sprite current, byte[] data, float pivotX = 0.5f, float pivotY = 0.5f,
+			float pixelsPerUnit = 100.0f)
 		{
-			if (File.Exists(FilePath) && Path.GetExtension(FilePath) == ".png") {
-				var spriteTexture = LoadTexture(FilePath);
-				var newSprite = Sprite.Create(spriteTexture, new Rect(0, 0, spriteTexture.width, spriteTexture.height),
-					new Vector2(pivotX, pivotY), PixelsPerUnit);
 
-				return newSprite;
+			var spriteTexture = LoadTexture(data);
+			if (!spriteTexture)
+			{
+				return current;
+			}
+			return Sprite.Create(spriteTexture, new Rect(0, 0, spriteTexture.width, spriteTexture.height),
+				new Vector2(pivotX, pivotY), pixelsPerUnit);
+		}
+		public static Sprite LoadNewSprite(Sprite current, string filePath, float pivotX = 0.5f, float pivotY = 0.5f,
+			float pixelsPerUnit = 100.0f)
+		{
+			if (File.Exists(filePath) && Path.GetExtension(filePath) == ".png")
+			{
+				return LoadNewSprite(current, File.ReadAllBytes(filePath), pivotX, pivotY, pixelsPerUnit);
 			}
 
-			return sprite;
+			return current;
 		}
 
-		public static Texture2D LoadTexture(string FilePath)
+		public static Texture2D LoadTexture(byte[] data)
 		{
-			if (File.Exists(FilePath)) {
-				var FileData = File.ReadAllBytes(FilePath);
-				var Tex2D = new Texture2D(2, 2);
-				if (Tex2D.LoadImage(FileData))
-					return Tex2D;
-			}
-
-			return null;
+			var Tex2D = new Texture2D(2, 2);
+			return Tex2D.LoadImage(data) ? Tex2D : null;
 		}
 
 		public static void WorkAroundAction()

@@ -80,6 +80,10 @@
     <Compile Include="Caching\CarH.cs" />
     <Compile Include="Parts\ReplacePart\OldPart.cs" />
     <Compile Include="Parts\ReplacePart\ReplacementPart.cs" />
+    <Compile Include="Shopping\ModPanel.cs" />
+    <Compile Include="Shopping\PartPanel.cs" />
+    <Compile Include="Shopping\Shop.cs" />
+    <Compile Include="Shopping\ShopInterface.cs" />
     <Compile Include="Tools\Extensions.cs" />
     <Compile Include="Tools\Logger.cs" />
     <Compile Include="Tools\ScrewPlacementAssist.cs" />

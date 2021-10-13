@@ -3,6 +3,7 @@ using MscModApi.Tools;
 using System.Collections.Generic;
 using System.IO;
 using MscModApi.Parts;
+using MscModApi.Shopping;
 using UnityEngine;
 
 namespace MscModApi
@@ -86,8 +87,9 @@ namespace MscModApi
 
 		private void Load()
 		{
-			tool = new Tool();
 			Logger.InitLogger(this);
+			tool = new Tool();
+			Shop.Init();
 		}
 
 		private void Save()
@@ -286,7 +288,7 @@ namespace MscModApi
 			var assetBundle = Helper.LoadAssetBundle(this, assetsFile);
 			Screw.LoadAssets(assetBundle);
 			Part.LoadAssets(assetBundle);
-
+			Shop.LoadAssets(assetBundle);
 
 			assetBundle.Unload(false);
 		}
