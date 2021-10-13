@@ -6,6 +6,7 @@ using MscModApi.Parts;
 using MscModApi.Tools;
 using UnityEngine;
 using UnityEngine.UI;
+using static MscModApi.Shopping.Shop;
 
 namespace MscModApi.Shopping
 {
@@ -32,13 +33,41 @@ namespace MscModApi.Shopping
 			cardList = shopInterface.FindChild("panel/cart/cart_list/list/grid");
 		}
 
-		internal void AddPartPanel(ModPanel modPanel, string name, float prize, Part part, string iconName)
+		internal void AddPartPanel(ModPanel modPanel, string name, float prize, Part part, string iconName, ShopLocation shopLocation, SpawnLocation spawnLocation)
 		{
-			modPanel.partPanels.Add(new PartPanel(this, name, prize, part, iconName));
-			modPanel.UpdatePartCounter();
+
+			List<PartPanel> partPanels = new List<PartPanel>();
+			switch (shopLocation)
+			{
+				case ShopLocation.Teimo:
+					partPanels = modPanel.teimoPanels;
+					
+					break;
+				case ShopLocation.Fleetari:
+					partPanels = modPanel.fleetariPanels;
+					break;
+			}
+
+			bool partPanelAlreadyExists = false;
+			foreach (var panel in modPanel.partPanels)
+			{
+				if (panel.GetName() == name || panel.GetPart() == part || panel.GetPart().id == part.id)
+				{
+					partPanelAlreadyExists = true;
+				}
+			}
+
+			if (!partPanelAlreadyExists)
+			{
+				var partPanel = new PartPanel(this, name, prize, part, iconName, shopLocation, spawnLocation);
+				partPanels.Add(partPanel);
+				modPanel.partPanels.Add(partPanel);
+				modPanel.UpdatePartCounter(shopLocation);
+			}
+
 		}
 
-		internal ModPanel AddModPanel(Mod mod)
+		internal ModPanel AddModPanel(Mod mod, Shop.ShopLocation shopLocation)
 		{
 			ModPanel modPanel = null;
 			modPanels.ForEach(delegate(ModPanel panel)
@@ -63,8 +92,38 @@ namespace MscModApi.Shopping
 			btnBack.enabled = true;
 		}
 
-		internal void Open()
+		internal void Open(Shop.ShopLocation shopLocation)
 		{
+			switch (shopLocation)
+			{
+				case ShopLocation.Teimo:
+					foreach (var modPanel in modPanels) {
+						var countVisible = 0;
+						foreach (var partPanel in modPanel.teimoPanels) {
+							partPanel.SetVisible(partPanel.shopLocation == shopLocation);
+							countVisible += partPanel.GetVisible() ? 1 : 0;
+						}
+
+						modPanel.SetVisible(countVisible > 0);
+
+					}
+					break;
+				case ShopLocation.Fleetari:
+					foreach (var modPanel in modPanels)
+					{
+						var countVisible = 0;
+						foreach (var partPanel in modPanel.fleetariPanels)
+						{
+							partPanel.SetVisible(partPanel.shopLocation == shopLocation);
+							countVisible += partPanel.GetVisible() ? 1 : 0;
+						}
+
+						modPanel.SetVisible(countVisible > 0);
+
+					}
+					break;
+			}
+
 			shopInterface.SetActive(true);
 		}
 
