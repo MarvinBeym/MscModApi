@@ -49,6 +49,23 @@ namespace MscModApi.Shopping
 		{
 			moneyComp.text = Game.money.ToString();
 			gameObject.SetActive(true);
+
+			foreach (var keyValuePair in shopItems[shopLocation])
+			{
+				keyValuePair.Key.SetActive(true);
+			}
+
+			foreach (var keyValuePair in shopItems)
+			{
+				if (keyValuePair.Key != shopLocation)
+				{
+					foreach (var valuePair in keyValuePair.Value)
+					{
+						valuePair.Key.SetActive(false);
+					}
+				}
+			}
+
 		}
 
 		internal void Close()
@@ -74,23 +91,33 @@ namespace MscModApi.Shopping
 				shopItem.SetActive(true);
 			}
 
+			SetShopItemsActiveForModItem(modItem, true);
+		}
+
+		private void SetShopItemsActiveForModItem(ModItem modItem, bool active)
+		{
 			foreach (var shopLocationMap in shopItems)
 			{
 				var location = shopLocationMap.Key;
 				var modItemMap = shopLocationMap.Value;
 				foreach (var valuePair in modItemMap)
 				{
+					var shopItemMap = valuePair.Value;
 					if (modItem == valuePair.Key)
 					{
-						continue;
+						foreach (var keyValuePair in shopItemMap) {
+							var shopItem = keyValuePair.Value;
+							shopItem.SetActive(active);
+						}
 					}
-					var shopItemMap = valuePair.Value;
-
-					foreach (var keyValuePair in shopItemMap)
+					else
 					{
-						var shopItem = keyValuePair.Value;
-						shopItem.SetActive(false);
+						foreach (var keyValuePair in shopItemMap) {
+							var shopItem = keyValuePair.Value;
+							shopItem.SetActive(!active);
+						}
 					}
+
 				}
 			}
 		}

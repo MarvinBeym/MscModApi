@@ -67,17 +67,20 @@ namespace MscModApi.Shopping
 		public static void Add(ShopBaseInfo baseInfo, ShopLocation shopLocation, ShopItem shopItem)
 		{
 			shopItem.SetBaseInfo(baseInfo);
-			ModItem modItem;
+			ModItem modItem = null;
 
-			if (!modItemMapping.ContainsKey(baseInfo.mod))
+			foreach (var keyValuePair in shopItems[shopLocation])
+			{
+				if (keyValuePair.Key.mod == baseInfo.mod)
+				{
+					modItem = keyValuePair.Key;
+				}
+			}
+
+			if (modItem == null)
 			{
 				modItem = new ModItem(shopLocation, shopInterface, baseInfo.mod);
-				modItemMapping.Add(baseInfo.mod, modItem);
 				shopItems[shopLocation].Add(modItem, new Dictionary<string, ShopItem>());
-			}
-			else
-			{
-				modItem = modItemMapping[baseInfo.mod];
 			}
 
 			if (shopItems[shopLocation][modItem].ContainsKey(shopItem.GetName()))

@@ -1,5 +1,6 @@
 ﻿using MSCLoader;
 using MscModApi.Tools;
+using System;
 using UnityEngine;
 using UnityEngine.UI;
 using static MscModApi.Shopping.Shop;
@@ -10,7 +11,8 @@ namespace MscModApi.Shopping
 	{
 		private ShopLocation shopLocation;
 		private ShopInterface shopInterface;
-		private Mod mod;
+		internal Mod mod;
+		private GameObject gameObject;
 		private Text partCountComp;
 
 		internal ModItem(ShopLocation shopLocation, ShopInterface shopInterface, Mod mod)
@@ -19,7 +21,7 @@ namespace MscModApi.Shopping
 			this.shopInterface = shopInterface;
 			this.mod = mod;
 
-			var gameObject = GameObject.Instantiate(Prefabs.modPanel);
+			gameObject = GameObject.Instantiate(Prefabs.modPanel);
 
 			var modImage = gameObject.FindChild("panel/mod_image").GetComponent<Image>();
 			modImage.enabled = false; //Tmp until solution is found
@@ -40,6 +42,11 @@ namespace MscModApi.Shopping
 		internal void SetPartCount(int count)
 		{
 			partCountComp.text = count.ToString();
+		}
+
+		internal void SetActive(bool active)
+		{
+			gameObject.SetActive(active);
 		}
 	}
 }
