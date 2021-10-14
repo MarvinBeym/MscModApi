@@ -114,7 +114,7 @@ namespace MscModApi.Shopping
 					{
 						foreach (var keyValuePair in shopItemMap) {
 							var shopItem = keyValuePair.Value;
-							shopItem.SetActive(active);
+							shopItem.SetActive(active && shopItem.IsBuyable());
 						}
 					}
 					else

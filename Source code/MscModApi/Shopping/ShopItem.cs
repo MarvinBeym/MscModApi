@@ -24,6 +24,7 @@ namespace MscModApi.Shopping
 		internal int itemCount = 1;
 		internal float baseItemPrize = 0;
 		internal GameObject cartItemGameObject;
+		private bool buyable = true;
 
 		public ShopItem(string name, float prize, Vector3 spawnLocation, Action onPurchaseAction, string imageAssetName = "")
 		{
@@ -42,14 +43,24 @@ namespace MscModApi.Shopping
 
 			part.SetDefaultPosition(spawnLocation);
 
-			if (!part.GetBought()) {
+			if (!part.GetBought())
+			{
 				part.SetActive(false);
+			}
+			else
+			{
+				buyable = false;
 			}
 
 			onPurchaseAction = delegate
 			{
 				OnPartPurchase(part);
 			};
+		}
+
+		internal bool IsBuyable()
+		{
+			return buyable;
 		}
 
 		private void Setup(string name, float prize, Vector3 spawnLocation, string imageAssetName)
@@ -115,7 +126,7 @@ namespace MscModApi.Shopping
 
 		internal void SetActive(bool active)
 		{
-			partItemGameObject.SetActive(active);
+			partItemGameObject?.SetActive(active);
 		}
 
 		internal void IncreaseCount()

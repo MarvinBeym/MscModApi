@@ -119,9 +119,7 @@
       <Link>Project\README.md</Link>
     </Content>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Shopping\Rework\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>if "$(ConfigurationName)" == "Debug" (
