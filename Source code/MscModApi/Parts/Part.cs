@@ -331,7 +331,7 @@ namespace MscModApi.Parts
 			partSave.bought = bought ? PartSave.BoughtState.Yes : PartSave.BoughtState.No;
 		}
 
-		public bool GetBought()
+		public bool IsBought()
 		{
 			return partSave.bought == PartSave.BoughtState.Yes;
 		}

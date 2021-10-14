@@ -43,7 +43,7 @@ namespace MscModApi.Shopping
 
 			part.SetDefaultPosition(spawnLocation);
 
-			if (!part.GetBought())
+			if (!part.IsBought())
 			{
 				part.SetActive(false);
 			}
