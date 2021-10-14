@@ -72,6 +72,12 @@ namespace MscModApi.Parts
 				partSave = new PartSave();
 			}
 
+			try {
+				CustomSaveLoading(partBaseInfo.mod, $"{id}_saveFile.json");
+			} catch {
+				// ignored
+			}
+
 			savedScrews = new List<Screw>(partSave.screws);
 			partSave.screws.Clear();
 
@@ -377,9 +383,14 @@ namespace MscModApi.Parts
 			return trigger != null;
 		}
 
-		public virtual void CustomSaving(Mod mod, string saveFileName)
+		public virtual void CustomSaveLoading(Mod mod, string saveFileName)
 		{
-			throw new Exception("Should only be called for subclasses of this class");
+			throw new Exception("Only subclasses should not throw an error");
+		}
+
+		public virtual void CustomSaveSaving(Mod mod, string saveFileName)
+		{
+			throw new Exception("Only subclasses should not throw an error");
 		}
 	}
 }

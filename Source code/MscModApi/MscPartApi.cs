@@ -116,7 +116,7 @@ namespace MscModApi
 					var part = partData.Value;
 					try
 					{
-						part.CustomSaving(mod, $"{id}_saveFile.json");
+						part.CustomSaveSaving(mod, $"{id}_saveFile.json");
 					}
 					catch
 					{
