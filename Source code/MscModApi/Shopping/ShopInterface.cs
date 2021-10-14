@@ -14,14 +14,16 @@ namespace MscModApi.Shopping
 		internal GameObject partsPanel;
 		internal GameObject modsPanel;
 		internal GameObject cartPanel;
-
+		private Text btnBuyTextComp;
 		internal GameObject partsList;
 		internal GameObject modsList;
 		internal GameObject cartList;
 		private Text moneyComp;
 		private Text totalCostComp;
-
+		private Button btnBuyComp;
 		private List<ShopItem> shoppingCart = new List<ShopItem>();
+
+		private Color textColor = new Color(1, 1, 0, 1);
 
 		private float totalCost = 0;
 
@@ -38,7 +40,10 @@ namespace MscModApi.Shopping
 
 			moneyComp = cartPanel.FindChild("money").GetComponent<Text>();
 			totalCostComp = cartPanel.FindChild("totalCost").GetComponent<Text>();
-			cartPanel.FindChild("btnBuy").GetComponent<Button>().onClick.AddListener(OnCheckout);
+
+			btnBuyComp = cartPanel.FindChild("btnBuy").GetComponent<Button>();
+			btnBuyComp.onClick.AddListener(OnCheckout);
+			btnBuyTextComp = btnBuyComp.gameObject.FindChild("Text").GetComponent<Text>();
 
 			partsList = partsPanel.FindChild("parts_list/list/grid");
 			modsList = modsPanel.FindChild("mod_list/list/grid");
@@ -47,6 +52,8 @@ namespace MscModApi.Shopping
 
 		internal void Open(Shop.ShopLocation shopLocation)
 		{
+			modsPanel.SetActive(true);
+			partsPanel.SetActive(false);
 			moneyComp.text = Game.money.ToString();
 			gameObject.SetActive(true);
 
@@ -141,6 +148,24 @@ namespace MscModApi.Shopping
 			shoppingCart.Add(shopItem);
 			totalCost += shopItem.baseItemPrize;
 			totalCostComp.text = totalCost.ToString();
+
+			SetBuyPossible(totalCost < Game.money);
+		}
+
+		internal void SetBuyPossible(bool possible)
+		{
+			if (possible)
+			{
+				totalCostComp.color = textColor;
+				btnBuyTextComp.color = textColor;
+				btnBuyComp.enabled = true;
+			}
+			else
+			{
+				totalCostComp.color = Color.red;
+				btnBuyTextComp.color = Color.red;
+				btnBuyComp.enabled = false;
+			}
 		}
 
 		internal void OnRemoveFromCart(ShopItem shopItem)

@@ -1,4 +1,5 @@
-﻿using System.Data.SqlTypes;
+﻿using System;
+using System.Data.SqlTypes;
 using HutongGames.PlayMaker;
 
 namespace MscModApi.Caching
@@ -13,7 +14,7 @@ namespace MscModApi.Caching
 			{
 				if (_money != null) return _money.Value;
 				_money = PlayMakerGlobals.Instance.Variables.FindFsmFloat("PlayerMoney");
-				return _money.Value;
+				return (float) Math.Round(_money.Value, 1);
 			}
 			set
 			{
