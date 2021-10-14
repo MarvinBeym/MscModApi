@@ -375,5 +375,10 @@ namespace MscModApi.Parts
 		{
 			return partSave;
 		}
+
+		public bool HasParent()
+		{
+			return trigger != null;
+		}
 	}
 }

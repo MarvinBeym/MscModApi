@@ -215,13 +215,14 @@ namespace MscModApi
 				if (part != null) break;
 			}
 
-			if (part == null) return;
+			if (part == null || !part.HasParent()) return;
 
 			if (part.IsInstallBlocked())
 			{
 				UserInteraction.GuiInteraction("Installation is blocked");
 				return;
 			}
+
 
 			if (!part.IsFixed()) {
 				if (part.IsInstalled()) {
