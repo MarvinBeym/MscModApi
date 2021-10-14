@@ -16,7 +16,7 @@ namespace MscModApi.Parts
 		public string id;
 		public PartBaseInfo partBaseInfo;
 		public GameObject gameObject;
-		internal PartSave partSave;
+		protected PartSave partSave;
 		internal Vector3 installPosition;
 		internal bool uninstallWhenParentUninstalls;
 		internal Vector3 installRotation;
@@ -369,6 +369,11 @@ namespace MscModApi.Parts
 		public bool IsInstallBlocked()
 		{
 			return installBlocked;
+		}
+
+		internal PartSave GetPartSave()
+		{
+			return partSave;
 		}
 	}
 }

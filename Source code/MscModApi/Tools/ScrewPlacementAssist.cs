@@ -95,7 +95,7 @@ namespace MscModApi.Tools
 			if (keySelectPart.GetKeybindDown()) {
 				if (selectedPart == null) {
 					selectedPart = part;
-					screws = selectedPart.partSave.screws.OrderBy(screw => screw.gameObject.name).ToArray();
+					screws = selectedPart.GetPartSave().screws.OrderBy(screw => screw.gameObject.name).ToArray();
 				} else {
 					selectedPart = null;
 					screws = new Screw[0];

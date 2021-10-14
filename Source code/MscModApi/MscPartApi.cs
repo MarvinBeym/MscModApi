@@ -117,7 +117,7 @@ namespace MscModApi
 
 					part.preSaveActions.InvokeAll();
 
-					var partSave = part.partSave;
+					var partSave = part.GetPartSave();
 					partSave.position = part.gameObject.transform.position;
 					partSave.rotation = part.gameObject.transform.rotation;
 
@@ -227,7 +227,7 @@ namespace MscModApi
 				if (part.IsInstalled()) {
 					UserInteraction.GuiInteraction("Tighten all screws");
 					if (instantInstallKeybind.GetKeybindDown()) {
-						part.partSave.screws.ForEach(delegate(Screw screw)
+						part.GetPartSave().screws.ForEach(delegate(Screw screw)
 						{
 							screw.InBy(Screw.maxTightness - screw.tightness);
 						});
@@ -236,7 +236,7 @@ namespace MscModApi
 					UserInteraction.GuiInteraction("Fully install part");
 					if (instantInstallKeybind.GetKeybindDown()) {
 						part.Install();
-						part.partSave.screws.ForEach(delegate (Screw screw) {
+						part.GetPartSave().screws.ForEach(delegate (Screw screw) {
 							screw.InBy(Screw.maxTightness);
 						});
 					}
@@ -244,7 +244,7 @@ namespace MscModApi
 			} else {
 				UserInteraction.GuiInteraction( "Loosen all screws");
 				if (instantInstallKeybind.GetKeybindDown()) {
-					part.partSave.screws.ForEach(delegate (Screw screw) {
+					part.GetPartSave().screws.ForEach(delegate (Screw screw) {
 						screw.OutBy(Screw.maxTightness);
 					});
 				}
