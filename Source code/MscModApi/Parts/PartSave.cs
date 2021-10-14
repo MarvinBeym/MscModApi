@@ -2,11 +2,11 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace MscModApi
+namespace MscModApi.Parts
 {
-	internal class PartSave
+	public class PartSave
 	{
-		internal enum BoughtState
+		public enum BoughtState
 		{
 			No,
 			Yes,

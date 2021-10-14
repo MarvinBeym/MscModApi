@@ -3,7 +3,7 @@ using MscModApi.Tools;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace MscModApi
+namespace MscModApi.Parts
 {
 	public class PartBaseInfo
 	{

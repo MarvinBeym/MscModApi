@@ -94,9 +94,9 @@
     <Compile Include="Tools\Helper.cs" />
     <Compile Include="MscPartApi.cs" />
     <Compile Include="Parts\Part.cs" />
-    <Compile Include="PartBaseInfo.cs" />
+    <Compile Include="Parts\PartBaseInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="PartSave.cs" />
+    <Compile Include="Parts\PartSave.cs" />
     <Compile Include="Screw.cs" />
     <Compile Include="Trigger\Trigger.cs" />
   </ItemGroup>
