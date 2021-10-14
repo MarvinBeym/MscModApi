@@ -149,7 +149,7 @@ namespace MscModApi
 			tightness++;
 
 			if (tightness == maxTightness) {
-				if (part.GetPartSave().screws.All(screw => screw.tightness == maxTightness) && !part.IsFixed()) {
+				if (part.partSave.screws.All(screw => screw.tightness == maxTightness) && !part.IsFixed()) {
 					part.SetFixed(true);
 				}
 			}

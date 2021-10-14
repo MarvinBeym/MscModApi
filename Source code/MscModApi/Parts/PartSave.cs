@@ -4,7 +4,7 @@ using UnityEngine;
 
 namespace MscModApi.Parts
 {
-	public class PartSave
+	internal class PartSave
 	{
 		public enum BoughtState
 		{

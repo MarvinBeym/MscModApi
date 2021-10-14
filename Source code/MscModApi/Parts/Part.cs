@@ -3,6 +3,7 @@ using MscModApi.Trigger;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using MSCLoader;
 using UnityEngine;
 
 namespace MscModApi.Parts
@@ -16,7 +17,7 @@ namespace MscModApi.Parts
 		public string id;
 		public PartBaseInfo partBaseInfo;
 		public GameObject gameObject;
-		protected PartSave partSave;
+		internal PartSave partSave;
 		internal Vector3 installPosition;
 		internal bool uninstallWhenParentUninstalls;
 		internal Vector3 installRotation;
@@ -371,14 +372,14 @@ namespace MscModApi.Parts
 			return installBlocked;
 		}
 
-		internal PartSave GetPartSave()
-		{
-			return partSave;
-		}
-
 		public bool HasParent()
 		{
 			return trigger != null;
+		}
+
+		public virtual void CustomSaving(Mod mod, string saveFileName)
+		{
+			throw new Exception("Should only be called for subclasses of this class");
 		}
 	}
 }

@@ -81,7 +81,7 @@ namespace MscModApi.Trigger
 				return;
 			}
 
-			if (part.GetPartSave().bought == PartSave.BoughtState.No)
+			if (part.partSave.bought == PartSave.BoughtState.No)
 			{
 				return;
 			}
@@ -90,7 +90,7 @@ namespace MscModApi.Trigger
 				return;
 			}
 
-			part.GetPartSave().installed = true;
+			part.partSave.installed = true;
 			part.gameObject.tag = "Untagged";
 
 			if (handleUninstallRoutine == null) {
@@ -124,7 +124,7 @@ namespace MscModApi.Trigger
 				}
 			});
 
-			part.GetPartSave().installed = false;
+			part.partSave.installed = false;
 			part.gameObject.tag = "PART";
 
 			if (!part.IsInstalled() && verifyUninstalledRoutine == null) {

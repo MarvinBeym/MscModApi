@@ -37,8 +37,8 @@ namespace MscModApi.Shopping
 		{
 			Setup(name, prize, spawnLocation, imageAssetName);
 
-			if (part.GetPartSave().bought == PartSave.BoughtState.NotConfigured) {
-				part.GetPartSave().bought = PartSave.BoughtState.No;
+			if (part.partSave.bought == PartSave.BoughtState.NotConfigured) {
+				part.partSave.bought = PartSave.BoughtState.No;
 			}
 
 			part.SetDefaultPosition(spawnLocation);
