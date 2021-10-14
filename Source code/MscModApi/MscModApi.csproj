@@ -77,8 +77,10 @@
   <ItemGroup>
     <Compile Include="Caching\Cache.cs" />
     <Compile Include="Caching\CarH.cs" />
+    <Compile Include="Caching\Game.cs" />
     <Compile Include="Parts\ReplacePart\OldPart.cs" />
     <Compile Include="Parts\ReplacePart\ReplacementPart.cs" />
+    <Compile Include="Shopping\CartItem.cs" />
     <Compile Include="Shopping\ModPanel.cs" />
     <Compile Include="Shopping\PartPanel.cs" />
     <Compile Include="Shopping\Shop.cs" />

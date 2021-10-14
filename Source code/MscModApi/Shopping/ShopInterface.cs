@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using MSCLoader;
+using MscModApi.Caching;
 using MscModApi.Parts;
 using MscModApi.Tools;
 using UnityEngine;
@@ -14,57 +15,85 @@ namespace MscModApi.Shopping
 	{
 		internal GameObject shopInterface;
 		internal static GameObject prefab;
-		private Button btnClose;
-		private Button btnBack;
-		private GameObject cardList;
 
 		internal List<ModPanel> modPanels = new List<ModPanel>();
+
+		internal Dictionary<string, CartItem> cartItems = new Dictionary<string, CartItem>();
+		private Button btnBuy;
+		private Text money;
+		internal float totalCostValue;
+		internal Text totalCost;
+		private Button btnBack;
 
 		internal ShopInterface()
 		{
 			shopInterface = GameObject.Instantiate(prefab);
 			shopInterface.SetActive(false);
-			btnClose = shopInterface.FindChild("panel/cart/btnClose").GetComponent<Button>();
+			var cart = shopInterface.FindChild("panel/cart/");
+
+
+			var btnClose = cart.FindChild("btnClose").GetComponent<Button>();
 			btnClose.onClick.AddListener(Close);
 			btnBack = shopInterface.FindChild("panel/shop/parts_panel/btnBack").GetComponent<Button>();
 			btnBack.onClick.AddListener(OnBtnBack);
 			PartPanel.Init(shopInterface);
 			ModPanel.Init(shopInterface);
-			cardList = shopInterface.FindChild("panel/cart/cart_list/list/grid");
+			CartItem.Init(shopInterface);
+
+			btnBuy = cart.FindChild("btnBuy").GetComponent<Button>();
+			money = cart.FindChild("money").GetComponent<Text>();
+			totalCost = cart.FindChild("totalCost").GetComponent<Text>();
+		}
+
+		internal void AddMultiBuyPartPanel(ModPanel modPanel, string name, float prize, GameObject partToInstantiate,
+			string iconName, ShopLocation shopLocation, SpawnLocation spawnLocation)
+		{
+			var partPanels = GetPartPanels(modPanel, shopLocation);
+
+			if (!CheckPartPanelDoesNotExist(modPanel, name)) {
+				var partPanel = new PartPanel(this, name, prize, partToInstantiate, iconName, shopLocation, spawnLocation);
+				partPanels.Add(partPanel);
+				modPanel.partPanels.Add(partPanel);
+				modPanel.UpdatePartCounter(shopLocation);
+			}
+		}
+
+		private List<PartPanel> GetPartPanels(ModPanel modPanel, ShopLocation shopLocation)
+		{
+			switch (shopLocation) {
+				case ShopLocation.Teimo:
+					return modPanel.teimoPanels;
+				case ShopLocation.Fleetari:
+					return modPanel.fleetariPanels;
+			}
+
+			return null;
+		}
+
+		private bool CheckPartPanelDoesNotExist(ModPanel modPanel, string name)
+		{
+			foreach (var panel in modPanel.partPanels) {
+				if (panel.GetName() == name)
+				{
+					return false;
+				}
+			}
+
+			return true;
 		}
 
 		internal void AddPartPanel(ModPanel modPanel, string name, float prize, Part part, string iconName, ShopLocation shopLocation, SpawnLocation spawnLocation)
 		{
+			var partPanels = GetPartPanels(modPanel, shopLocation);
 
-			List<PartPanel> partPanels = new List<PartPanel>();
-			switch (shopLocation)
-			{
-				case ShopLocation.Teimo:
-					partPanels = modPanel.teimoPanels;
-					
-					break;
-				case ShopLocation.Fleetari:
-					partPanels = modPanel.fleetariPanels;
-					break;
-			}
-
-			bool partPanelAlreadyExists = false;
-			foreach (var panel in modPanel.partPanels)
-			{
-				if (panel.GetName() == name || panel.GetPart() == part || panel.GetPart().id == part.id)
-				{
-					partPanelAlreadyExists = true;
-				}
-			}
-
-			if (!partPanelAlreadyExists)
+			if (CheckPartPanelDoesNotExist(modPanel, name))
 			{
 				var partPanel = new PartPanel(this, name, prize, part, iconName, shopLocation, spawnLocation);
 				partPanels.Add(partPanel);
 				modPanel.partPanels.Add(partPanel);
 				modPanel.UpdatePartCounter(shopLocation);
 			}
-
+			
 		}
 
 		internal ModPanel AddModPanel(Mod mod, Shop.ShopLocation shopLocation)
@@ -94,6 +123,7 @@ namespace MscModApi.Shopping
 
 		internal void Open(Shop.ShopLocation shopLocation)
 		{
+			money.text = Game.money.ToString();
 			switch (shopLocation)
 			{
 				case ShopLocation.Teimo:
@@ -129,7 +159,12 @@ namespace MscModApi.Shopping
 
 		internal void Close()
 		{
+			totalCost.text = "0";
 			shopInterface.SetActive(false);
+			foreach (var cartItem in cartItems)
+			{
+				cartItem.Value.RemoveFromCart();
+			}
 			OnBtnBack();
 		}
 

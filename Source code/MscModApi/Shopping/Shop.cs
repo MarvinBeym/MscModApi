@@ -25,6 +25,7 @@ namespace MscModApi.Shopping
 		{
 			ShopInterface.prefab = assetBundle.LoadAsset<GameObject>("shop_interface.prefab");
 			PartPanel.prefab = assetBundle.LoadAsset<GameObject>("part_panel.prefab");
+			CartItem.cartItemPrefab = assetBundle.LoadAsset<GameObject>("cart_item.prefab");
 			ModPanel.prefab = assetBundle.LoadAsset<GameObject>("mod_panel.prefab");
 		}
 
@@ -69,17 +70,33 @@ namespace MscModApi.Shopping
 			shopInterface.Open(ShopLocation.Fleetari);
 		}
 
-		public static void AddTeimo(Mod mod, string name, float prize, Part part, SpawnLocation spawnLocation, string iconName = null)
+		public static void AddToTeimo(Mod mod, string name, float prize, Part part, SpawnLocation spawnLocation, string iconName = null)
 		{
-			Add(mod, name, prize, part, ShopLocation.Teimo, spawnLocation, iconName);
+			Add(mod, name, prize, part, ShopLocation.Teimo, spawnLocation, iconName ?? "");
 		}
 
-		public static void AddFleetari(Mod mod, string name, float prize, Part part, SpawnLocation spawnLocation, string iconName = null)
+		public static void AddMultiToTeimo(Mod mod, string name, float prize, GameObject partToInstantiate, SpawnLocation spawnLocation, string iconName = null)
 		{
-			Add(mod, name, prize, part, ShopLocation.Fleetari, spawnLocation, iconName);
+			AddMulti(mod, name, prize, partToInstantiate, ShopLocation.Teimo, spawnLocation, iconName ?? "");
 		}
 
-		private static void Add(Mod mod, string name, float prize, Part part, ShopLocation shopLocation, SpawnLocation spawnLocation, string iconName = null)
+		public static void AddMultiToFleetari(Mod mod, string name, float prize, GameObject partToInstantiate, SpawnLocation spawnLocation, string iconName = null)
+		{
+			AddMulti(mod, name, prize, partToInstantiate, ShopLocation.Fleetari, spawnLocation, iconName ?? "");
+		}
+
+		public static void AddToFleetari(Mod mod, string name, float prize, Part part, SpawnLocation spawnLocation, string iconName = null)
+		{
+			Add(mod, name, prize, part, ShopLocation.Fleetari, spawnLocation, iconName ?? "");
+		}
+
+		private static void AddMulti(Mod mod, string name, float prize, GameObject partToInstantiate, ShopLocation shopLocation, SpawnLocation spawnLocation, string iconName)
+		{
+			var modPanel = shopInterface.AddModPanel(mod, shopLocation);
+			shopInterface.AddMultiBuyPartPanel(modPanel, name, prize, partToInstantiate, iconName ?? "", shopLocation, spawnLocation);
+		}
+
+		private static void Add(Mod mod, string name, float prize, Part part, ShopLocation shopLocation, SpawnLocation spawnLocation, string iconName)
 		{
 			var modPanel = shopInterface.AddModPanel(mod, shopLocation);
 			shopInterface.AddPartPanel(modPanel, name, prize, part, iconName, shopLocation, spawnLocation);
