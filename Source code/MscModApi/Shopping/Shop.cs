@@ -64,6 +64,14 @@ namespace MscModApi.Shopping
 			shopInterface.Close();
 		}
 
+		public static void Add(ShopBaseInfo baseInfo, ShopLocation shopLocation, ShopItem[] shopItems)
+		{
+			foreach (var shopItem in shopItems)
+			{
+				Add(baseInfo, shopLocation, shopItem);
+			}
+		}
+
 		public static void Add(ShopBaseInfo baseInfo, ShopLocation shopLocation, ShopItem shopItem)
 		{
 			shopItem.SetBaseInfo(baseInfo);
