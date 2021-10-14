@@ -1,10 +1,7 @@
-﻿using System;
+﻿using MscModApi.Tools;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using MSCLoader;
 using MscModApi.Caching;
-using MscModApi.Parts;
-using MscModApi.Tools;
 using UnityEngine;
 using UnityEngine.UI;
 using static MscModApi.Shopping.Shop;
@@ -13,165 +10,157 @@ namespace MscModApi.Shopping
 {
 	internal class ShopInterface
 	{
-		internal GameObject shopInterface;
-		internal static GameObject prefab;
+		private GameObject gameObject;
+		internal GameObject partsPanel;
+		internal GameObject modsPanel;
+		internal GameObject cartPanel;
 
-		internal List<ModPanel> modPanels = new List<ModPanel>();
+		internal GameObject partsList;
+		internal GameObject modsList;
+		internal GameObject cartList;
+		private Text moneyComp;
+		private Text totalCostComp;
 
-		internal Dictionary<string, CartItem> cartItems = new Dictionary<string, CartItem>();
-		private Button btnBuy;
-		private Text money;
-		internal float totalCostValue;
-		internal Text totalCost;
-		private Button btnBack;
+		private List<ShopItem> shoppingCart = new List<ShopItem>();
+
+		private float totalCost = 0;
 
 		internal ShopInterface()
 		{
-			shopInterface = GameObject.Instantiate(prefab);
-			shopInterface.SetActive(false);
-			var cart = shopInterface.FindChild("panel/cart/");
+			gameObject = GameObject.Instantiate(Shop.Prefabs.shopInterface);
+			gameObject.SetActive(false);
+			partsPanel = gameObject.FindChild("panel/shop/parts_panel");
+			modsPanel = gameObject.FindChild("panel/shop/mods_panel");
+			cartPanel = gameObject.FindChild("panel/cart");
 
+			partsPanel.FindChild("btnBack").GetComponent<Button>().onClick.AddListener(OnBack);
+			cartPanel.FindChild("btnClose").GetComponent<Button>().onClick.AddListener(Close);
 
-			var btnClose = cart.FindChild("btnClose").GetComponent<Button>();
-			btnClose.onClick.AddListener(Close);
-			btnBack = shopInterface.FindChild("panel/shop/parts_panel/btnBack").GetComponent<Button>();
-			btnBack.onClick.AddListener(OnBtnBack);
-			PartPanel.Init(shopInterface);
-			ModPanel.Init(shopInterface);
-			CartItem.Init(shopInterface);
+			moneyComp = cartPanel.FindChild("money").GetComponent<Text>();
+			totalCostComp = cartPanel.FindChild("totalCost").GetComponent<Text>();
+			cartPanel.FindChild("btnBuy").GetComponent<Button>().onClick.AddListener(OnCheckout);
 
-			btnBuy = cart.FindChild("btnBuy").GetComponent<Button>();
-			money = cart.FindChild("money").GetComponent<Text>();
-			totalCost = cart.FindChild("totalCost").GetComponent<Text>();
-		}
-
-		internal void AddMultiBuyPartPanel(ModPanel modPanel, string name, float prize, GameObject partToInstantiate,
-			string iconName, ShopLocation shopLocation, SpawnLocation spawnLocation)
-		{
-			var partPanels = GetPartPanels(modPanel, shopLocation);
-
-			if (!CheckPartPanelDoesNotExist(modPanel, name)) {
-				var partPanel = new PartPanel(this, name, prize, partToInstantiate, iconName, shopLocation, spawnLocation);
-				partPanels.Add(partPanel);
-				modPanel.partPanels.Add(partPanel);
-				modPanel.UpdatePartCounter(shopLocation);
-			}
-		}
-
-		private List<PartPanel> GetPartPanels(ModPanel modPanel, ShopLocation shopLocation)
-		{
-			switch (shopLocation) {
-				case ShopLocation.Teimo:
-					return modPanel.teimoPanels;
-				case ShopLocation.Fleetari:
-					return modPanel.fleetariPanels;
-			}
-
-			return null;
-		}
-
-		private bool CheckPartPanelDoesNotExist(ModPanel modPanel, string name)
-		{
-			foreach (var panel in modPanel.partPanels) {
-				if (panel.GetName() == name)
-				{
-					return false;
-				}
-			}
-
-			return true;
-		}
-
-		internal void AddPartPanel(ModPanel modPanel, string name, float prize, Part part, string iconName, ShopLocation shopLocation, SpawnLocation spawnLocation)
-		{
-			var partPanels = GetPartPanels(modPanel, shopLocation);
-
-			if (CheckPartPanelDoesNotExist(modPanel, name))
-			{
-				var partPanel = new PartPanel(this, name, prize, part, iconName, shopLocation, spawnLocation);
-				partPanels.Add(partPanel);
-				modPanel.partPanels.Add(partPanel);
-				modPanel.UpdatePartCounter(shopLocation);
-			}
-			
-		}
-
-		internal ModPanel AddModPanel(Mod mod, Shop.ShopLocation shopLocation)
-		{
-			ModPanel modPanel = null;
-			modPanels.ForEach(delegate(ModPanel panel)
-			{
-				if (panel.mod == mod)
-				{
-					modPanel = panel;
-				}
-			});
-
-			if (modPanel != null) return modPanel;
-			modPanel = new ModPanel(this, mod);
-			modPanels.Add(modPanel);
-
-			return modPanel;
-		}
-
-		internal void ChangeModPanel(ModPanel modPanel)
-		{
-			PartPanel.panel.SetActive(true);
-			ModPanel.panel.SetActive(false);
-			btnBack.enabled = true;
+			partsList = partsPanel.FindChild("parts_list/list/grid");
+			modsList = modsPanel.FindChild("mod_list/list/grid");
+			cartList = cartPanel.FindChild("cart_list/list/grid");
 		}
 
 		internal void Open(Shop.ShopLocation shopLocation)
 		{
-			money.text = Game.money.ToString();
-			switch (shopLocation)
-			{
-				case ShopLocation.Teimo:
-					foreach (var modPanel in modPanels) {
-						var countVisible = 0;
-						foreach (var partPanel in modPanel.teimoPanels) {
-							partPanel.SetVisible(partPanel.shopLocation == shopLocation && !partPanel.IsBought());
-							countVisible += partPanel.GetVisible() ? 1 : 0;
-						}
-
-						modPanel.SetVisible(countVisible > 0);
-
-					}
-					break;
-				case ShopLocation.Fleetari:
-					foreach (var modPanel in modPanels)
-					{
-						var countVisible = 0;
-						foreach (var partPanel in modPanel.fleetariPanels)
-						{
-							partPanel.SetVisible(partPanel.shopLocation == shopLocation && !partPanel.IsBought());
-							countVisible += partPanel.GetVisible() ? 1 : 0;
-						}
-
-						modPanel.SetVisible(countVisible > 0);
-
-					}
-					break;
-			}
-
-			shopInterface.SetActive(true);
+			moneyComp.text = Game.money.ToString();
+			gameObject.SetActive(true);
 		}
 
 		internal void Close()
 		{
-			totalCost.text = "0";
-			shopInterface.SetActive(false);
-			foreach (var cartItem in cartItems)
-			{
-				cartItem.Value.RemoveFromCart();
-			}
-			OnBtnBack();
+			OnBack();
+			gameObject.SetActive(false);
 		}
 
-		internal void OnBtnBack()
+		internal void OnBack()
 		{
-			PartPanel.panel.SetActive(false);
-			ModPanel.panel.SetActive(true);
+			modsPanel.SetActive(true);
+			partsPanel.SetActive(false);
+		}
+
+		internal void OnOpenShop(ShopLocation shopLocation, ModItem modItem)
+		{
+			modsPanel.SetActive(false);
+			partsPanel.SetActive(true);
+
+			foreach (var keyValuePair in shopItems[shopLocation][modItem])
+			{
+				var shopItem = keyValuePair.Value;
+				shopItem.SetActive(true);
+			}
+
+			foreach (var shopLocationMap in shopItems)
+			{
+				var location = shopLocationMap.Key;
+				var modItemMap = shopLocationMap.Value;
+				foreach (var valuePair in modItemMap)
+				{
+					if (modItem == valuePair.Key)
+					{
+						continue;
+					}
+					var shopItemMap = valuePair.Value;
+
+					foreach (var keyValuePair in shopItemMap)
+					{
+						var shopItem = keyValuePair.Value;
+						shopItem.SetActive(false);
+					}
+				}
+			}
+		}
+
+		internal void OnAddToCart(ShopItem shopItem)
+		{
+			if (shoppingCart.Contains(shopItem))
+			{
+				if (shopItem.IsMultiPurchase())
+				{
+					shopItem.IncreaseCount();
+					totalCost += shopItem.baseItemPrize;
+					totalCostComp.text = totalCost.ToString();
+				}
+
+				return;
+			}
+
+			shopItem.AddToCart();
+
+			shoppingCart.Add(shopItem);
+			totalCost += shopItem.baseItemPrize;
+			totalCostComp.text = totalCost.ToString();
+		}
+
+		internal void OnRemoveFromCart(ShopItem shopItem)
+		{
+			totalCost -= shopItem.baseItemPrize;
+			totalCostComp.text = totalCost.ToString();
+			if (!shopItem.IsMultiPurchase())
+			{
+				GameObject.Destroy(shopItem.cartItemGameObject);
+				shoppingCart.Remove(shopItem);
+			}
+			else
+			{
+				if (shopItem.itemCount <= 1)
+				{
+					GameObject.Destroy(shopItem.cartItemGameObject);
+					shoppingCart.Remove(shopItem);
+				}
+				else
+				{
+					shopItem.DecreaseCount();
+				}
+				
+			}
+		}
+		internal void OnCheckout()
+		{
+			Game.money -= totalCost;
+			totalCost = 0;
+			totalCostComp.text = totalCost.ToString();
+			foreach (var shopItem in shoppingCart) {
+				if (shopItem.IsMultiPurchase())
+				{
+					for (var i = 0; i < shopItem.itemCount; i++)
+					{
+						shopItem.onPurchaseAction.Invoke();
+					}
+				}
+				else
+				{
+					shopItem.onPurchaseAction.Invoke();
+				}
+				GameObject.Destroy(shopItem.cartItemGameObject);
+			}
+			shoppingCart.Clear();
+			gameObject.PlayCheckout();
+			Close();
 		}
 	}
 }

@@ -80,11 +80,11 @@
     <Compile Include="Caching\Game.cs" />
     <Compile Include="Parts\ReplacePart\OldPart.cs" />
     <Compile Include="Parts\ReplacePart\ReplacementPart.cs" />
-    <Compile Include="Shopping\CartItem.cs" />
-    <Compile Include="Shopping\ModPanel.cs" />
-    <Compile Include="Shopping\PartPanel.cs" />
+    <Compile Include="Shopping\ModItem.cs" />
+    <Compile Include="Shopping\ShopBaseInfo.cs" />
     <Compile Include="Shopping\Shop.cs" />
     <Compile Include="Shopping\ShopInterface.cs" />
+    <Compile Include="Shopping\ShopItem.cs" />
     <Compile Include="Tools\Extensions.cs" />
     <Compile Include="Tools\Logger.cs" />
     <Compile Include="Tools\ScrewPlacementAssist.cs" />
@@ -119,7 +119,9 @@
       <Link>Project\README.md</Link>
     </Content>
   </ItemGroup>
-  <ItemGroup />
+  <ItemGroup>
+    <Folder Include="Shopping\Rework\" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
     <PostBuildEvent>if "$(ConfigurationName)" == "Debug" (

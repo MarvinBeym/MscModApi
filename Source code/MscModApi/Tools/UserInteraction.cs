@@ -18,6 +18,8 @@ namespace MscModApi.Tools
 		private static AudioSource assembleAudio;
 		private static AudioSource disassembleAudio;
 		private static AudioSource touchAudio;
+		private static AudioSource buyAudio;
+		private static AudioSource checkoutAudio;
 
 		private static FsmString guiInteraction;
 		private static FsmBool guiAssemble;
@@ -136,6 +138,39 @@ namespace MscModApi.Tools
 
 			if (touchAudio != null) {
 				AudioSource.PlayClipAtPoint(touchAudio.clip, gameObject.transform.position);
+			}
+		}
+
+		public static void PlayBuy(this GameObject gameObject)
+		{
+			if (buyAudio == null)
+			{
+				var audioGameObject = Cache.Find("MasterAudio/Store/cash_register_1");
+				if (!audioGameObject) return;
+				var audioSource = audioGameObject.GetComponent<AudioSource>();
+				if (audioSource) {
+					buyAudio = audioSource;
+				}
+			}
+
+			if (buyAudio != null) {
+				AudioSource.PlayClipAtPoint(buyAudio.clip, gameObject.transform.position);
+			}
+		}
+
+		public static void PlayCheckout(this GameObject gameObject)
+		{
+			if (checkoutAudio == null) {
+				var audioGameObject = Cache.Find("MasterAudio/Store/cash_register_2");
+				if (!audioGameObject) return;
+				var audioSource = audioGameObject.GetComponent<AudioSource>();
+				if (audioSource) {
+					checkoutAudio = audioSource;
+				}
+			}
+
+			if (checkoutAudio != null) {
+				AudioSource.PlayClipAtPoint(checkoutAudio.clip, gameObject.transform.position);
 			}
 		}
 

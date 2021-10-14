@@ -56,7 +56,7 @@ namespace MscModApi.Tools
 
 		public static GameObject FindChild(this GameObject gameObject, string childName)
 		{
-			return gameObject.transform.FindChild(childName).gameObject;
+			return gameObject.transform.FindChild(childName)?.gameObject;
 		}
 
 		public static void InvokeAll(this List<Action> actions)
