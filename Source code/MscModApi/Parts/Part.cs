@@ -103,7 +103,7 @@ namespace MscModApi.Parts
 
 		public Part(string id, string name, GameObject part, Part parentPart, Vector3 installPosition, Vector3 installRotation,
 			PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls = true,
-			bool disableCollisionWhenInstalled = true, string prefabName = null)
+			bool disableCollisionWhenInstalled = true)
 		{
 			usingGameObjectInstantiation = true;
 			gameObjectUsedForInstantiation = part;
@@ -112,7 +112,7 @@ namespace MscModApi.Parts
 			this.parentPart = parentPart;
 
 			Setup(id, name, parentPart.gameObject, installPosition, installRotation, partBaseInfo,
-				uninstallWhenParentUninstalls, disableCollisionWhenInstalled, prefabName);
+				uninstallWhenParentUninstalls, disableCollisionWhenInstalled, null);
 		}
 
 		public Part(string id, string name, GameObject parent, Vector3 installPosition, Vector3 installRotation,
