@@ -138,6 +138,7 @@ namespace MscModApi
 
 		private new void Update()
 		{
+			Shop.Handle();
 #if DEBUG
 			InstantInstallDebug();
 #endif

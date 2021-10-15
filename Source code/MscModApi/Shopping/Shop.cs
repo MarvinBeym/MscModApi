@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using MSCLoader;
 using MscModApi.Caching;
+using MscModApi.Tools;
 using UnityEngine;
 
 namespace MscModApi.Shopping
@@ -12,8 +13,6 @@ namespace MscModApi.Shopping
 
 		internal static Dictionary<ShopLocation, Dictionary<ModItem, Dictionary<string, ShopItem>>> shopItems =
 			new Dictionary<ShopLocation, Dictionary<ModItem, Dictionary<string, ShopItem>>>();
-
-		internal static Dictionary<Mod, ModItem> modItemMapping = new Dictionary<Mod, ModItem>();
 
 		public enum ShopLocation
 		{
@@ -48,20 +47,47 @@ namespace MscModApi.Shopping
 			internal static GameObject shopCatalog;
 		}
 
+		public static Dictionary<ShopLocation, GameObject> shopCatalogs = new Dictionary<ShopLocation, GameObject>();
+
 		internal static void Init()
 		{
+			shopCatalogs = new Dictionary<ShopLocation, GameObject>();
 			shopInterface = new ShopInterface();
 
-			shopItems[ShopLocation.Teimo] = new Dictionary<ModItem, Dictionary<string, ShopItem>>();
-			shopItems[ShopLocation.Fleetari] = new Dictionary<ModItem, Dictionary<string, ShopItem>>();
+			foreach (var shopLocation in (ShopLocation[]) Enum.GetValues(typeof(ShopLocation))) {
+				shopItems[shopLocation] = new Dictionary<ModItem, Dictionary<string, ShopItem>>();
+				GameObject shopCatalogParent = null;
+				Vector3 position = new Vector3(0, 0, 0);
+				Vector3 rotation = new Vector3(0, 0, 0);
+				Vector3 scale = new Vector3(1, 1, 1);
 
-			var t = Cache.Find("REPAIRSHOP/inspection_desk 1");
-			var t1 = GameObject.Instantiate(Prefabs.shopCatalog);
-			t1.transform.SetParent(t.transform);
-			t1.transform.localRotation = Quaternion.Euler(0, -90f, -90f);
-			t1.transform.localPosition = new Vector3(0.8f, -0.2f, 0.35f);
-			t1.transform.localScale = new Vector3(-1f, 1, 1f);
-			t1.name = "Shop Catalog";
+				switch (shopLocation)
+				{
+					case ShopLocation.Teimo:
+						shopCatalogParent = Cache.Find("STORE");
+						position = new Vector3(-2.96f, 1.31f, -0.34f);
+						rotation = new Vector3(0, -180f, 0);
+						break;
+					case ShopLocation.Fleetari:
+						shopCatalogParent = Cache.Find("REPAIRSHOP/inspection_desk 1");
+						position = new Vector3(0.8f, -0.2f, 0.35f);
+						rotation = new Vector3(0, -90f, -90f);
+						scale = new Vector3(-1f, 1, 1f);
+						break;
+				}
+
+				if (shopCatalogParent != null)
+				{
+					var shopCatalog = GameObject.Instantiate(Prefabs.shopCatalog);
+					shopCatalog.transform.SetParent(shopCatalogParent.transform);
+					shopCatalog.transform.localPosition = position;
+					shopCatalog.transform.localRotation = Quaternion.Euler(rotation);
+					shopCatalog.transform.localScale = scale;
+					shopCatalog.name = $"{shopLocation} Shop Catalog(Clone)";
+					shopCatalogs.Add(shopLocation, shopCatalog);
+				}
+
+			}
 		}
 
 		public static void Open(ShopLocation shopLocation)
@@ -109,6 +135,23 @@ namespace MscModApi.Shopping
 			shopItems[shopLocation][modItem].Add(shopItem.GetName(), shopItem);
 
 			shopItem.Create(shopInterface);
+		}
+
+		internal static void Handle()
+		{
+			foreach (var keyValuePair in shopCatalogs)
+			{
+				var shopLocation = keyValuePair.Key;
+				var shopCatalog = keyValuePair.Value;
+				if (shopCatalog.IsLookingAt())
+				{
+					UserInteraction.GuiInteraction($"Open catalog");
+					if (UserInteraction.LeftMouseDown)
+					{
+						Open(shopLocation);
+					}
+				}
+			}
 		}
 
 		internal static void LoadAssets(AssetBundle assetBundle)
