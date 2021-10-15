@@ -47,7 +47,7 @@ namespace MscModApi.Shopping
 			internal static GameObject shopCatalog;
 		}
 
-		public static Dictionary<ShopLocation, GameObject> shopCatalogs = new Dictionary<ShopLocation, GameObject>();
+		private static Dictionary<ShopLocation, GameObject> shopCatalogs = new Dictionary<ShopLocation, GameObject>();
 
 		internal static void Init()
 		{
@@ -76,26 +76,24 @@ namespace MscModApi.Shopping
 						break;
 				}
 
-				if (shopCatalogParent != null)
-				{
-					var shopCatalog = GameObject.Instantiate(Prefabs.shopCatalog);
-					shopCatalog.transform.SetParent(shopCatalogParent.transform);
-					shopCatalog.transform.localPosition = position;
-					shopCatalog.transform.localRotation = Quaternion.Euler(rotation);
-					shopCatalog.transform.localScale = scale;
-					shopCatalog.name = $"{shopLocation} Shop Catalog(Clone)";
-					shopCatalogs.Add(shopLocation, shopCatalog);
-				}
+				if (shopCatalogParent == null) continue;
+				var shopCatalog = GameObject.Instantiate(Prefabs.shopCatalog);
+				shopCatalog.transform.SetParent(shopCatalogParent.transform);
+				shopCatalog.transform.localPosition = position;
+				shopCatalog.transform.localRotation = Quaternion.Euler(rotation);
+				shopCatalog.transform.localScale = scale;
+				shopCatalog.name = $"{shopLocation} Shop Catalog(Clone)";
+				shopCatalogs.Add(shopLocation, shopCatalog);
 
 			}
 		}
 
-		public static void Open(ShopLocation shopLocation)
+		private static void Open(ShopLocation shopLocation)
 		{
 			shopInterface.Open(shopLocation);
 		}
 
-		public static void Close()
+		private static void Close()
 		{
 			shopInterface.Close();
 		}
