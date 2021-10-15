@@ -1,12 +1,12 @@
 ManifestFileVersion: 0
-CRC: 475596240
+CRC: 3978724999
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: c077d858fa0eab58bc5cf5f4b7cc9f32
+    Hash: bf0ba84a30b5785aed19792341dd0429
   TypeTreeHash:
     serializedVersion: 2
-    Hash: 30d409419a0803e976a554959ec9ebd7
+    Hash: d43d92a23e53643d58ea03558ca16049
 HashAppended: 0
 ClassTypes:
 - Class: 1
@@ -24,6 +24,8 @@ ClassTypes:
 - Class: 43
   Script: {instanceID: 0}
 - Class: 48
+  Script: {instanceID: 0}
+- Class: 65
   Script: {instanceID: 0}
 - Class: 83
   Script: {instanceID: 0}
@@ -78,6 +80,7 @@ ClassTypes:
 Assets:
 - Assets/screwable_texture.png
 - Assets/Shop/cart_item.prefab
+- Assets/Shop/shop_catalog.prefab
 - Assets/Materials/screw_material.mat
 - Assets/Shop/part_panel.prefab
 - Assets/Shop/mod_panel.prefab

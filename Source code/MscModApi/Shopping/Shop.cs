@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using MSCLoader;
+using MscModApi.Caching;
 using UnityEngine;
 
 namespace MscModApi.Shopping
@@ -44,6 +45,7 @@ namespace MscModApi.Shopping
 			public static GameObject modPanel;
 			public static GameObject partPanel;
 			public static GameObject cartItem;
+			internal static GameObject shopCatalog;
 		}
 
 		internal static void Init()
@@ -52,6 +54,14 @@ namespace MscModApi.Shopping
 
 			shopItems[ShopLocation.Teimo] = new Dictionary<ModItem, Dictionary<string, ShopItem>>();
 			shopItems[ShopLocation.Fleetari] = new Dictionary<ModItem, Dictionary<string, ShopItem>>();
+
+			var t = Cache.Find("REPAIRSHOP/inspection_desk 1");
+			var t1 = GameObject.Instantiate(Prefabs.shopCatalog);
+			t1.transform.SetParent(t.transform);
+			t1.transform.localRotation = Quaternion.Euler(0, -90f, -90f);
+			t1.transform.localPosition = new Vector3(0.8f, -0.2f, 0.35f);
+			t1.transform.localScale = new Vector3(-1f, 1, 1f);
+			t1.name = "Shop Catalog";
 		}
 
 		public static void Open(ShopLocation shopLocation)
@@ -103,6 +113,7 @@ namespace MscModApi.Shopping
 
 		internal static void LoadAssets(AssetBundle assetBundle)
 		{
+			Prefabs.shopCatalog = assetBundle.LoadAsset<GameObject>("shop_catalog.prefab");
 			Prefabs.shopInterface = assetBundle.LoadAsset<GameObject>("shop_interface.prefab");
 			Prefabs.partPanel = assetBundle.LoadAsset<GameObject>("part_panel.prefab");
 			Prefabs.modPanel = assetBundle.LoadAsset<GameObject>("mod_panel.prefab");
