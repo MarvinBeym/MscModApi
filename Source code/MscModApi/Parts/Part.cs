@@ -120,6 +120,7 @@ namespace MscModApi.Parts
 
 			Setup(id, name, parentPart.gameObject, installPosition, installRotation, partBaseInfo,
 				uninstallWhenParentUninstalls, disableCollisionWhenInstalled, null);
+			parentPart.childParts.Add(this);
 		}
 
 		public Part(string id, string name, GameObject parent, Vector3 installPosition, Vector3 installRotation,
