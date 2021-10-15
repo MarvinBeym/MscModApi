@@ -42,26 +42,29 @@ namespace MscModApi.Parts.ReplacePart
 		internal Actions newPartActions = new Actions();
 		internal Actions oldPartActions = new Actions();
 
-		public ReplacementPart(GameObject oldFsmGameObject, Part newPart) : this(new[] { oldFsmGameObject }, new[] { newPart })
+		public ReplacementPart(OldPart oldPart, Part newPart) : this(new[] { oldPart }, new[] { newPart })
 		{
 		}
 
-		public ReplacementPart(GameObject[] oldFsmGameObjects, Part newPart) : this(oldFsmGameObjects, new[] { newPart })
+		public ReplacementPart(OldPart[] oldParts, Part newPart) : this(oldParts, new[] { newPart })
 		{
 		}
 
-		public ReplacementPart(GameObject oldFsmGameObject, Part[] newParts) : this(new[] { oldFsmGameObject }, newParts)
+		public ReplacementPart(OldPart oldPart, Part[] newParts) : this(new[] { oldPart }, newParts)
 		{
 		}
 
-		public ReplacementPart(GameObject[] oldFsmGameObjects, Part[] newParts)
+		public ReplacementPart(OldPart[] oldParts, Part[] newParts)
 		{
 			foreach (var newPart in newParts) {
 				this.newParts.Add(newPart);
 			}
 
-			foreach (var oldFsmGameObject in oldFsmGameObjects) {
-				oldParts.Add(new OldPart(oldFsmGameObject, new Action(OldPartInstalled), new Action(OldPartUninstalled)));
+			foreach (var oldPart in oldParts)
+			{
+				oldPart.SetInstallAction(OldPartInstalled);
+				oldPart.SetUninstallAction(OldPartUninstalled);
+				this.oldParts.Add(oldPart);
 			}
 			foreach (var newPart in newParts) {
 				newPart.AddPostInstallAction(NewPartInstalled);
@@ -92,9 +95,9 @@ namespace MscModApi.Parts.ReplacePart
 			}
 		}
 
-		public bool AreAllNewFixed(bool ignoreScrews)
+		public bool AreAllNewFixed(bool ignoreUnsetScrews)
 		{
-			return newParts.All(part => part.IsFixed(ignoreScrews));
+			return newParts.All(part => part.IsFixed(ignoreUnsetScrews));
 		}
 
 		public bool AreAnyOldFixed()
