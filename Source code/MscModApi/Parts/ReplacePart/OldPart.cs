@@ -16,6 +16,7 @@ namespace MscModApi.Parts.ReplacementPart
 		private PlayMakerFSM assembleFsm;
 		private PlayMakerFSM removalFsm;
 		private bool allowSettingFakedStatus;
+		internal bool justUninstalled = false;
 
 		public OldPart(GameObject oldFsmGameObject, bool allowSettingFakedStatus = true)
 		{
@@ -45,16 +46,20 @@ namespace MscModApi.Parts.ReplacementPart
 			assembleFsm.enabled = !blocked;
 		}
 
-		public bool IsInstalled() => installed.Value;
+		public bool IsInstalled()
+		{
+			if (justUninstalled)
+			{
+				justUninstalled = false;
+				return false;
+			}
 
-		public bool IsFixed() => installed.Value && bolted.Value;
+			return installed.Value;
+		}
+
+		public bool IsFixed() => IsInstalled() && bolted.Value;
 
 		public void Uninstall() => removalFsm.SendEvent("REMOVE");
-
-		internal void SetInstallAction(Action installAction)
-		{
-			FsmHook.FsmInject(trigger, "Assemble", installAction);
-		}
 
 		internal void SetFakedInstallStatus(bool status)
 		{
@@ -63,9 +68,18 @@ namespace MscModApi.Parts.ReplacementPart
 			bolted.Value = status;
 		}
 
+		internal void SetInstallAction(Action installAction)
+		{
+			FsmHook.FsmInject(trigger, "Assemble", installAction);
+		}
+
 		internal void SetUninstallAction(Action uninstallAction)
 		{
-			FsmHook.FsmInject(gameObject, "Remove part", uninstallAction);
+			FsmHook.FsmInject(gameObject, "Remove part", delegate
+			{
+				justUninstalled = true;
+				uninstallAction.Invoke();
+			});
 		}
 	}
 }
