@@ -26,11 +26,11 @@ namespace MscModApi
 		internal Collider parentCollider;
 
 		internal static Material material;
-		private Vector3 position;
-		private Vector3 rotation;
+		internal Vector3 position;
+		internal Vector3 rotation;
 		internal float scale;
 		internal float size;
-		private Type type;
+		internal Type type;
 		internal GameObject gameObject;
 		private MeshRenderer renderer;
 

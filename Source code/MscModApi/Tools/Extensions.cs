@@ -66,5 +66,10 @@ namespace MscModApi.Tools
 				action.Invoke();
 			}
 		}
+
+		public static Screw Clone(this Screw screw)
+		{
+			return new Screw(screw.position, screw.rotation, screw.type, screw.scale, screw.size, screw.showSize);
+		}
 	}
 }
