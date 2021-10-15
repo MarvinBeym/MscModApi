@@ -67,17 +67,17 @@ namespace MscModApi.Tools
 			}
 		}
 
-		public static Screw Clone(this Screw screw)
+		public static Screw CloneToNew(this Screw screw)
 		{
 			return new Screw(screw.position, screw.rotation, screw.type, screw.scale, screw.size, screw.showSize);
 		}
 
-		public static Screw[] Clone(this Screw[] screws)
+		public static Screw[] CloneToNew(this Screw[] screws)
 		{
 			var newScrews = new Screw[screws.Length];
 			for (var i = 0; i < screws.Length; i++) {
 				var screw = screws[i];
-				newScrews[i] = screw.Clone();
+				newScrews[i] = screw.CloneToNew();
 			}
 
 			return newScrews;
