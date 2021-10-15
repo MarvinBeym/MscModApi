@@ -193,9 +193,13 @@ namespace MscModApi.Parts
 			return partSave.installed;
 		}
 
-		public bool IsFixed()
+		public bool IsFixed(bool ignoreScrews = false)
 		{
-			return partFixed;
+			if (!ignoreScrews)
+			{
+				return partFixed;
+			}
+			return partSave.screws.Count == 0 ? IsInstalled() : partFixed;
 		}
 
 		public void SetFixed(bool partFixed) => this.partFixed = partFixed;

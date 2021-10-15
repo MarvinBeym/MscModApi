@@ -52,5 +52,11 @@ namespace MscModApi.Parts.ReplacementPart
 		public bool IsFixed() => installed.Value && bolted.Value;
 
 		public void Uninstall() => removalFsm.SendEvent("REMOVE");
+
+		internal void SetFakedInstallStatus(bool status)
+		{
+			installed.Value = status;
+			bolted.Value = status;
+		}
 	}
 }
