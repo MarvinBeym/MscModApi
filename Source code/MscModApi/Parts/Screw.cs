@@ -4,7 +4,7 @@ using System.Linq;
 using MscModApi.Parts;
 using UnityEngine;
 
-namespace MscModApi
+namespace MscModApi.Parts
 {
 	[JsonObject(MemberSerialization.OptIn)]
 	public class Screw

@@ -29,7 +29,6 @@ namespace MscModApi
 		internal static Dictionary<string, string> modSaveFileMapping;
 		internal static Dictionary<string, Dictionary<string, Part>> modsParts;
 		internal static Dictionary<string, Screw> screws;
-		internal static List<string> modsToIgnoreWhenSaving;
 		private Screw previousScrew;
 		
 #if DEBUG
@@ -49,20 +48,11 @@ namespace MscModApi
 			modSaveFileMapping = new Dictionary<string, string>();
 			modsParts = new Dictionary<string, Dictionary<string, Part>>();
 			screws = new Dictionary<string, Screw>();
-			modsToIgnoreWhenSaving = new List<string>();
 
 			if (!loadedAssets)
 			{
 				LoadAssets();
 				loadedAssets = true;
-			}
-		}
-
-		public static void DontSaveParts(Mod mod)
-		{
-			if (!modsToIgnoreWhenSaving.Contains(mod.ID))
-			{
-				modsToIgnoreWhenSaving.Add(mod.ID);
 			}
 		}
 
@@ -98,11 +88,6 @@ namespace MscModApi
 		{
 			foreach (var modParts in modsParts) {
 				var mod = ModLoader.GetMod(modParts.Key);
-
-				if (modsToIgnoreWhenSaving.Contains(mod.ID))
-				{
-					return;
-				}
 
 				if (!modSaveFileMapping.TryGetValue(mod.ID, out var saveFileName)) {
 					//save file for mod can't be found, skip the whole mod.
@@ -196,9 +181,6 @@ namespace MscModApi
 						break;
 				}
 			}
-
-
-			//ModConsole.Print();
 		}
 
 		private void InstantInstallDebug()
