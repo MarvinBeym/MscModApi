@@ -39,12 +39,12 @@ namespace MscModApi.Parts.ReplacementPart
 
 		public bool IsInstallBlocked()
 		{
-			return !trigger.gameObject.activeSelf;
+			return !assembleFsm.enabled;
 		}
 
 		public void BlockInstall(bool blocked)
 		{
-			trigger.gameObject.SetActive(!blocked);
+			assembleFsm.enabled = !blocked;
 		}
 
 		public bool IsInstalled() => installed.Value;
