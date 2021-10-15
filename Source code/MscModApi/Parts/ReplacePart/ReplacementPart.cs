@@ -76,7 +76,7 @@ namespace MscModApi.Parts.ReplacePart
 
 		public bool AreAllNewUninstalled()
 		{
-			return !AreAllNewInstalled();
+			return newParts.All(part => !part.IsInstalled());
 		}
 
 		public bool AreAnyNewFixed()
@@ -106,7 +106,7 @@ namespace MscModApi.Parts.ReplacePart
 
 		public bool AreAnyNewUninstalled()
 		{
-			return !AreAnyNewInstalled();
+			return newParts.Any(part => !part.IsInstalled());
 		}
 
 		public bool AreAllOldInstalled()
@@ -116,7 +116,7 @@ namespace MscModApi.Parts.ReplacePart
 
 		public bool AreAllOldUninstalled()
 		{
-			return !AreAllOldInstalled();
+			return oldParts.All(part => !part.IsInstalled());
 		}
 
 		public bool AreAnyOldInstalled()
@@ -126,7 +126,7 @@ namespace MscModApi.Parts.ReplacePart
 
 		public bool AreAnyOldUninstalled()
 		{
-			return !AreAnyOldInstalled();
+			return oldParts.Any(part => !part.IsInstalled());
 		}
 
 		public void AddInstalledAction(ActionType actionType, PartType partType, Action action)
