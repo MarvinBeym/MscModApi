@@ -72,7 +72,7 @@ namespace MscModApi
 			ScrewPlacementAssist.OnGui();
 		}
 
-		public static void NewGameCleanUp(Mod mod, string saveFileName)
+		public static void NewGameCleanUp(Mod mod, string saveFileName = "parts_saveFile.json")
 		{
 			SaveLoad.SerializeSaveFile(mod, new Dictionary<string, PartSave>(), saveFileName);
 		}

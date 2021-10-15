@@ -14,7 +14,7 @@ namespace MscModApi.Parts
 		private List<Part> partsList;
 		internal Dictionary<string, PartSave> partsSave;
 
-		public PartBaseInfo(Mod mod, AssetBundle assetBundle, string saveFilePath, List<Part> partsList = null)
+		public PartBaseInfo(Mod mod, AssetBundle assetBundle, List<Part> partsList = null, string saveFilePath = "parts_saveFile.json")
 		{
 			this.mod = mod;
 			this.assetBundle = assetBundle;
