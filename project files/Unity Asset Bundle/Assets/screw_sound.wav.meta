@@ -1,0 +1,21 @@
+fileFormatVersion: 2
+guid: 49d044496f5dbb140a7fe05c1ef3ec29
+timeCreated: 1586020327
+licenseType: Free
+AudioImporter:
+  serializedVersion: 6
+  defaultSettings:
+    loadType: 0
+    sampleRateSetting: 0
+    sampleRateOverride: 0
+    compressionFormat: 1
+    quality: 1
+    conversionMode: 0
+  platformSettingOverrides: {}
+  forceToMono: 0
+  preloadAudioData: 1
+  loadInBackground: 0
+  3D: 1
+  userData: 
+  assetBundleName: msc-mod-api.unity3d
+  assetBundleVariant: 

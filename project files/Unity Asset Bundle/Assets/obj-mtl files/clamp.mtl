@@ -1,0 +1,12 @@
+# Blender MTL File: 'Turbocharger & ECU mod.blend'
+# Material Count: 1
+
+newmtl Silver_Ascent
+Ns 225.000000
+Ka 0.677273 0.677273 0.677273
+Kd 0.264799 0.264799 0.264799
+Ks 0.500000 0.500000 0.500000
+Ke 0.000000 0.000000 0.000000
+Ni 1.450000
+d 1.000000
+illum 3
