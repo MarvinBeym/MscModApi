@@ -9,7 +9,7 @@ namespace MscModApi.Trigger
 		private Trigger logic;
 		private GameObject triggerGameObject;
 		private Renderer renderer;
-		private static readonly Vector3 defaultScale = new Vector3(0.1f, 0.1f, 0.1f);
+		private static readonly Vector3 defaultScale = new Vector3(0.05f, 0.05f, 0.05f);
 
 		public TriggerWrapper(Part part, GameObject parentGameObject, bool disableCollisionWhenInstalled)
 		{
