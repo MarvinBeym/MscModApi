@@ -35,6 +35,13 @@ namespace MscModApi
 		private Keybind instantInstallKeybind;
 #endif
 
+		internal static List<Mod> globalScrewPlacementModeEnabled = new List<Mod>();
+
+		public static void EnableScrewPlacementForAllParts(Mod mod)
+		{
+			globalScrewPlacementModeEnabled.Add(mod);
+		}
+
 		internal static bool ShowScrewSize => (bool) showBoltSizeSetting.Value;
 		private static bool loadedAssets = false;
 

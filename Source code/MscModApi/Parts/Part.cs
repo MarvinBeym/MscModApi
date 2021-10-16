@@ -112,6 +112,11 @@ namespace MscModApi.Parts
 					{id, this}
 				});
 			}
+
+			if (MscModApi.globalScrewPlacementModeEnabled.Contains(partBaseInfo.mod))
+			{
+				EnableScrewPlacementMode();
+			}
 		}
 
 		public Part(string id, string name, GameObject part, Part parentPart, Vector3 installPosition, Vector3 installRotation,
