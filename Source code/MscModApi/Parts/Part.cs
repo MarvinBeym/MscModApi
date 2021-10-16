@@ -164,6 +164,11 @@ namespace MscModApi.Parts
 
 		public void EnableScrewPlacementMode() => screwPlacementMode = true;
 
+		internal bool IsInScrewPlacementMode()
+		{
+			return screwPlacementMode;
+		}
+
 		public void SetPosition(Vector3 position)
 		{
 			if (!IsInstalled()) {

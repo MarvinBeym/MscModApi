@@ -213,7 +213,7 @@ namespace MscModApi
 				if (part != null) break;
 			}
 
-			if (part == null || !part.HasParent() || part.uninstallWhenParentUninstalls && !part.ParentInstalled()) return;
+			if (part == null || !part.HasParent() || part.IsInScrewPlacementMode() || part.uninstallWhenParentUninstalls && !part.ParentInstalled()) return;
 
 			if (part.IsInstallBlocked())
 			{
