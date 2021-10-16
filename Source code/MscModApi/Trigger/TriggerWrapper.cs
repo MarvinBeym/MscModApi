@@ -1,4 +1,5 @@
 ﻿using MscModApi.Parts;
+using System;
 using UnityEngine;
 
 namespace MscModApi.Trigger
@@ -50,5 +51,10 @@ namespace MscModApi.Trigger
 
 		internal void Install() => logic.Install();
 		internal void Uninstall() => logic.Uninstall();
+
+		internal void SetActive(bool active)
+		{
+			triggerGameObject.SetActive(active);
+		}
 	}
 }
