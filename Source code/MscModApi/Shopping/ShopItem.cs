@@ -26,9 +26,9 @@ namespace MscModApi.Shopping
 		internal GameObject cartItemGameObject;
 		private bool buyable = true;
 
-		public ShopItem(string name, float prize, Vector3 spawnLocation, Action onPurchaseAction, string imageAssetName = "")
+		public ShopItem(string name, float prize, Vector3 spawnLocation, Action onPurchaseAction, string imageAssetName = "", bool multiPurchase = true)
 		{
-			multiPurchase = true;
+			SetMultiPurchase(multiPurchase);
 			Setup(name, prize, spawnLocation, imageAssetName);
 			this.onPurchaseAction = onPurchaseAction;
 		}
@@ -36,7 +36,7 @@ namespace MscModApi.Shopping
 		public ShopItem(string name, float prize, Vector3 spawnLocation, Part part, string imageAssetName = "")
 		{
 			Setup(name, prize, spawnLocation, imageAssetName);
-
+			
 			if (part.partSave.bought == PartSave.BoughtState.NotConfigured) {
 				part.partSave.bought = PartSave.BoughtState.No;
 			}
@@ -153,7 +153,12 @@ namespace MscModApi.Shopping
 			this.baseInfo = baseInfo;
 		}
 
-		internal bool IsMultiPurchase()
+		public void SetMultiPurchase(bool multiPurchase)
+		{
+			this.multiPurchase = multiPurchase;
+		}
+
+		public bool IsMultiPurchase()
 		{
 			return multiPurchase;
 		}

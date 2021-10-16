@@ -88,16 +88,6 @@ namespace MscModApi.Shopping
 			}
 		}
 
-		private static void Open(ShopLocation shopLocation)
-		{
-			shopInterface.Open(shopLocation);
-		}
-
-		private static void Close()
-		{
-			shopInterface.Close();
-		}
-
 		public static void Add(ShopBaseInfo baseInfo, ShopLocation shopLocation, ShopItem[] shopItems)
 		{
 			foreach (var shopItem in shopItems)
@@ -137,6 +127,7 @@ namespace MscModApi.Shopping
 
 		internal static void Handle()
 		{
+			if (shopInterface.IsOpen()) return;
 			foreach (var keyValuePair in shopCatalogs)
 			{
 				var shopLocation = keyValuePair.Key;
@@ -146,7 +137,7 @@ namespace MscModApi.Shopping
 					UserInteraction.GuiInteraction($"Open catalog");
 					if (UserInteraction.LeftMouseDown)
 					{
-						Open(shopLocation);
+						shopInterface.Open(shopLocation);
 					}
 				}
 			}

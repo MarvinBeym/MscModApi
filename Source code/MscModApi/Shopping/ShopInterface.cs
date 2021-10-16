@@ -1,6 +1,8 @@
 ﻿using MscModApi.Tools;
 using System;
 using System.Collections.Generic;
+using HutongGames.PlayMaker;
+using MSCLoader;
 using MscModApi.Caching;
 using UnityEngine;
 using UnityEngine.UI;
@@ -26,9 +28,14 @@ namespace MscModApi.Shopping
 		private Color textColor = new Color(1, 1, 0, 1);
 
 		private float totalCost = 0;
+		private FsmBool playerInMenu;
+		private FsmBool playerStop;
+		internal bool open = false;
 
 		internal ShopInterface()
 		{
+			playerInMenu = FsmVariables.GlobalVariables.FindFsmBool("PlayerInMenu");
+			playerStop = FsmVariables.GlobalVariables.FindFsmBool("PlayerStop");
 			gameObject = GameObject.Instantiate(Shop.Prefabs.shopInterface);
 			gameObject.SetActive(false);
 			partsPanel = gameObject.FindChild("panel/shop/parts_panel");
@@ -52,6 +59,10 @@ namespace MscModApi.Shopping
 
 		internal void Open(Shop.ShopLocation shopLocation)
 		{
+			open = true;
+			playerInMenu.Value = true;
+			playerStop.Value = true;
+
 			modsPanel.SetActive(true);
 			partsPanel.SetActive(false);
 			moneyComp.text = Game.money.ToString();
@@ -75,8 +86,17 @@ namespace MscModApi.Shopping
 
 		}
 
+		internal bool IsOpen()
+		{
+			return open;
+		}
+
 		internal void Close()
 		{
+			open = false;
+			playerInMenu.Value = false;
+			playerStop.Value = false;
+
 			OnBack();
 			gameObject.SetActive(false);
 		}
@@ -207,6 +227,7 @@ namespace MscModApi.Shopping
 				else
 				{
 					shopItem.onPurchaseAction.Invoke();
+					GameObject.Destroy(shopItem.partItemGameObject);
 				}
 				GameObject.Destroy(shopItem.cartItemGameObject);
 			}
