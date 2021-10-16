@@ -22,7 +22,7 @@ namespace MscModApi.Trigger
 		{
 			while (part.IsInstalled()) {
 
-				if (!part.IsFixed() && part.gameObject.IsLookingAt() && UserInteraction.EmptyHand() &&
+				if (!part.IsFixed(false) && part.gameObject.IsLookingAt() && UserInteraction.EmptyHand() &&
 					!Tool.HasToolInHand()) {
 					if (part.screwPlacementMode) {
 						ScrewPlacementAssist.ShowPartInteraction(part);
