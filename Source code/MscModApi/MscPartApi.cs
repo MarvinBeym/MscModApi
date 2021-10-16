@@ -189,7 +189,7 @@ namespace MscModApi
 				}
 			}
 		}
-
+#if DEBUG
 		private void InstantInstallDebug()
 		{
 			if (Camera.main == null || !UserInteraction.EmptyHand()) return;
@@ -251,7 +251,7 @@ namespace MscModApi
 
 			
 		}
-
+#endif
 		private Screw DetectScrew()
 		{
 			if (previousScrew != null) {
