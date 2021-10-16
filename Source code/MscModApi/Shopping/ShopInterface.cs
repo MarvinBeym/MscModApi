@@ -1,6 +1,7 @@
 ﻿using MscModApi.Tools;
 using System;
 using System.Collections.Generic;
+using HutongGames.PlayMaker;
 using MscModApi.Caching;
 using UnityEngine;
 using UnityEngine.UI;
@@ -52,6 +53,8 @@ namespace MscModApi.Shopping
 
 		internal void Open(Shop.ShopLocation shopLocation)
 		{
+			FsmVariables.GlobalVariables.FindFsmBool("PlayerInMenu").Value = true;
+			FsmVariables.GlobalVariables.FindFsmBool("PlayerStop").Value = true;
 			modsPanel.SetActive(true);
 			partsPanel.SetActive(false);
 			moneyComp.text = Game.money.ToString();
@@ -77,6 +80,8 @@ namespace MscModApi.Shopping
 
 		internal void Close()
 		{
+			FsmVariables.GlobalVariables.FindFsmBool("PlayerInMenu").Value = false;
+			FsmVariables.GlobalVariables.FindFsmBool("PlayerStop").Value = false;
 			OnBack();
 			gameObject.SetActive(false);
 		}
