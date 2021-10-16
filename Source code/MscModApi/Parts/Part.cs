@@ -308,6 +308,10 @@ namespace MscModApi.Parts
 		public void AddPostInstallAction(Action action)
 		{
 			postInstallActions.Add(action);
+			if (IsInstalled())
+			{
+				postInstallActions.InvokeAll();
+			}
 		}
 
 		public void AddPreUninstallAction(Action action)
@@ -318,11 +322,19 @@ namespace MscModApi.Parts
 		public void AddPostUninstallAction(Action action)
 		{
 			postUninstallActions.Add(action);
+			if (!IsInstalled())
+			{
+				postUninstallActions.InvokeAll();
+			}
 		}
 
 		public void AddPostFixedAction(Action action)
 		{
 			postFixedActions.Add(action);
+			if (IsFixed())
+			{
+				postFixedActions.InvokeAll();
+			}
 		}
 
 		public void AddPreFixedAction(Action action)
@@ -338,6 +350,10 @@ namespace MscModApi.Parts
 		public void AddPostUnfixedActions(Action action)
 		{
 			postUnfixedActions.Add(action);
+			if (!IsFixed())
+			{
+				postUnfixedActions.InvokeAll();
+			}
 
 		}
 
