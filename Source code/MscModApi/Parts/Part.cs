@@ -194,7 +194,7 @@ namespace MscModApi.Parts
 			return partSave.installed;
 		}
 
-		public bool IsFixed(bool ignoreUnsetScrews = false)
+		public bool IsFixed(bool ignoreUnsetScrews = true)
 		{
 			if (!ignoreUnsetScrews) {
 				return partFixed;
@@ -226,6 +226,19 @@ namespace MscModApi.Parts
 				return parentPart.IsInstalled();
 			} else {
 				//Todo: Implement normal msc parts installed/uninstalled
+				return true;
+			}
+		}
+
+		public bool ParentFixed()
+		{
+			if (usingPartParent)
+			{
+				return parentPart.IsFixed(true);
+			}
+			else
+			{
+				//Todo: Implement normal msc parts fixed
 				return true;
 			}
 		}
