@@ -106,7 +106,7 @@ namespace MscModApi.Trigger
 			}
 
 			part.SetScrewsActive(true);
-			part.trigger.SetActive(false);
+			//part.trigger.SetActive(false);
 
 			canBeInstalled = false;
 
@@ -137,7 +137,7 @@ namespace MscModApi.Trigger
 			}
 
 			part.SetScrewsActive(false);
-			part.trigger.SetActive(true);
+			//part.trigger.SetActive(true);
 
 			part.postUninstallActions.InvokeAll();
 		}
