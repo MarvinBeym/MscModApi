@@ -71,12 +71,28 @@ namespace MscModApi.Parts.ReplacePart
 				oldPart.Setup(this);
 				this.oldParts.Add(oldPart);
 			}
+
+			if (AreAnyOldInstalled())
+			{
+				OldPartInstalled();
+			}
+
 			foreach (var newPart in newParts) {
 				newPart.AddPostInstallAction(NewPartInstalled);
 				newPart.AddPostUninstallAction(NewPartUninstalled);
 
 				newPart.AddPostFixedAction(NewPartFixed);
 				newPart.AddPostUnfixedActions(NewPartUnfixed);
+			}
+
+			if (AreAnyNewInstalled())
+			{
+				NewPartInstalled();
+			}
+
+			if (AreAnyNewFixed())
+			{
+				NewPartFixed();
 			}
 		}
 
@@ -160,6 +176,7 @@ namespace MscModApi.Parts.ReplacePart
 		{
 			var actions = new Actions();
 			var actionList = new List<Action>();
+			bool invokeActionsNow = false;
 			switch (partType)
 			{
 				case PartType.NewPart:
@@ -174,24 +191,60 @@ namespace MscModApi.Parts.ReplacePart
 			{
 				case ActionType.AllInstalled:
 					actionList = actions.allInstalled;
+					if (partType == PartType.NewPart)
+					{
+						invokeActionsNow = AreAllNewInstalled();
+					}
+					else
+					{
+						invokeActionsNow = AreAllOldInstalled();
+					}
 					break;
 				case ActionType.AllUninstalled:
 					actionList = actions.allUninstalled;
+					if (partType == PartType.NewPart)
+					{
+						invokeActionsNow = AreAllNewUninstalled();
+					} else
+					{
+						invokeActionsNow = AreAllOldUninstalled();
+					}
 					break;
 				case ActionType.AllFixed:
 					actionList = actions.allFixed;
+					if (partType == PartType.NewPart) {
+						invokeActionsNow = AreAllNewFixed();
+					} else {
+						invokeActionsNow = AreAllOldFixed();
+					}
 					break;
 				case ActionType.AllUnfixed:
 					actionList = actions.allUnfixed;
 					break;
 				case ActionType.AnyInstalled:
 					actionList = actions.anyInstalled;
+					if (partType == PartType.NewPart) {
+						invokeActionsNow = AreAnyNewInstalled();
+					} else {
+						invokeActionsNow = AreAnyOldInstalled();
+					}
 					break;
 				case ActionType.AnyUninstalled:
 					actionList = actions.anyUninstalled;
+					if (partType == PartType.NewPart)
+					{
+						invokeActionsNow = AreAnyNewUninstalled();
+					} else {
+						invokeActionsNow = AreAnyOldUninstalled();
+					}
 					break;
 				case ActionType.AnyFixed:
 					actionList = actions.anyFixed;
+					if (partType == PartType.NewPart) {
+						invokeActionsNow = AreAnyNewFixed();
+					} else {
+						invokeActionsNow = AreAnyOldFixed();
+					}
 					break;
 				case ActionType.AnyUnfixed:
 					actionList = actions.anyUnfixed;
@@ -199,6 +252,10 @@ namespace MscModApi.Parts.ReplacePart
 			}
 
 			actionList.Add(action);
+			if (invokeActionsNow)
+			{
+				actionList.InvokeAll();
+			}
 		}
 
 		internal void NewPartInstalled()
@@ -215,9 +272,6 @@ namespace MscModApi.Parts.ReplacePart
 					newPartActions.allInstalled.InvokeAll();
 				}
 			}
-
-			// => wont work => if(newPartActions.anyFixed.Count > 0 && AreAnyNewFixed()) newPartActions.anyFixed.InvokeAll();
-			// => wont work => if (newPartActions.allFixed.Count > 0 && AreAllNewFixed()) newPartActions.allFixed.InvokeAll();
 		}
 
 		internal void NewPartFixed()
@@ -271,9 +325,6 @@ namespace MscModApi.Parts.ReplacePart
 
 			if (oldPartActions.anyInstalled.Count > 0) oldPartActions.anyInstalled.InvokeAll();
 			if (oldPartActions.allInstalled.Count > 0 && AreAllOldInstalled()) oldPartActions.allInstalled.InvokeAll();
-
-			// => wont work => if (oldPartActions.anyFixed.Count > 0 && AreAnyOldFixed()) oldPartActions.anyFixed.InvokeAll();
-			// => wont work => if (oldPartActions.allFixed.Count > 0 && AreAllOldFixed()) oldPartActions.allFixed.InvokeAll();
 		}
 
 		internal void OldPartUninstalled()
