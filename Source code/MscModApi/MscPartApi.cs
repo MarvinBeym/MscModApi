@@ -185,7 +185,7 @@ namespace MscModApi
 
 		private void InstantInstallDebug()
 		{
-			if (Camera.main == null) return;
+			if (Camera.main == null || !UserInteraction.EmptyHand()) return;
 			Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out RaycastHit hit, 1f,
 					1 << LayerMask.NameToLayer("Parts"));
 			if (hit.collider == null) return;
