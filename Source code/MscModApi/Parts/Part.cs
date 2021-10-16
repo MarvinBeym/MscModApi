@@ -117,6 +117,9 @@ namespace MscModApi.Parts
 			{
 				EnableScrewPlacementMode();
 			}
+
+			
+			partBaseInfo.AddToPartsList(this);
 		}
 
 		public Part(string id, string name, GameObject part, Part parentPart, Vector3 installPosition, Vector3 installRotation,
