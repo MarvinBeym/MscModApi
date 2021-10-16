@@ -40,7 +40,13 @@ namespace MscModApi.Parts
 
 		internal List<Action> preUninstallActions = new List<Action>();
 		internal List<Action> postUninstallActions = new List<Action>();
-		
+
+		internal List<Action> preFixedActions = new List<Action>();
+		internal List<Action> postFixedActions = new List<Action>();
+
+		internal List<Action> preUnfixedActions = new List<Action>();
+		internal List<Action> postUnfixedActions = new List<Action>();
+
 		internal bool screwPlacementMode;
 		private Vector3 defaultRotation = Vector3.zero;
 		private Vector3 defaultPosition = Vector3.zero;
@@ -87,7 +93,7 @@ namespace MscModApi.Parts
 			{
 				trigger = new TriggerWrapper(this, parentGameObject, disableCollisionWhenInstalled);
 			}
-
+			
 			if (partSave.installed) {
 				Install();
 			}
@@ -314,6 +320,26 @@ namespace MscModApi.Parts
 			postUninstallActions.Add(action);
 		}
 
+		public void AddPostFixedAction(Action action)
+		{
+			postFixedActions.Add(action);
+		}
+
+		public void AddPreFixedAction(Action action)
+		{
+			preFixedActions.Add(action);
+		}
+
+		public void AddPreUnfixedActions(Action action)
+		{
+			preUnfixedActions.Add(action);
+
+		}
+		public void AddPostUnfixedActions(Action action)
+		{
+			postUnfixedActions.Add(action);
+
+		}
 
 		public T AddWhenInstalledMono<T>() where T : MonoBehaviour
 		{

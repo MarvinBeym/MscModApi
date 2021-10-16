@@ -150,7 +150,9 @@ namespace MscModApi.Parts
 
 			if (tightness == maxTightness) {
 				if (part.partSave.screws.All(screw => screw.tightness == maxTightness) && !part.IsFixed()) {
+					part.preFixedActions.InvokeAll();
 					part.SetFixed(true);
+					part.preFixedActions.InvokeAll();
 				}
 			}
 		}
@@ -167,8 +169,11 @@ namespace MscModApi.Parts
 			gameObject.transform.Translate(0f, 0f, transformStep);
 			tightness--;
 
-			if (tightness < maxTightness) {
+			if (tightness < maxTightness)
+			{
+				part.preUnfixedActions.InvokeAll();
 				part.SetFixed(false);
+				part.postUnfixedActions.InvokeAll();
 			}
 		}
 

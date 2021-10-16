@@ -12,10 +12,12 @@ namespace MscModApi.Parts.ReplacePart
 		internal List<Action> allInstalled = new List<Action>();
 		internal List<Action> allUninstalled = new List<Action>();
 		internal List<Action> allFixed = new List<Action>();
+		internal List<Action> allUnfixed = new List<Action>();
 
 		internal List<Action> anyInstalled = new List<Action>();
 		internal List<Action> anyUninstalled = new List<Action>();
 		internal List<Action> anyFixed = new List<Action>();
+		internal List<Action> anyUnfixed = new List<Action>();
 	}
 	public class ReplacementPart
 	{
@@ -24,10 +26,12 @@ namespace MscModApi.Parts.ReplacePart
 			AnyInstalled,
 			AnyFixed,
 			AnyUninstalled,
+			AnyUnfixed,
 
 			AllInstalled,
 			AllFixed,
-			AllUninstalled
+			AllUninstalled,
+			AllUnfixed
 		}
 		public enum PartType
 		{
@@ -69,6 +73,9 @@ namespace MscModApi.Parts.ReplacePart
 			foreach (var newPart in newParts) {
 				newPart.AddPostInstallAction(NewPartInstalled);
 				newPart.AddPostUninstallAction(NewPartUninstalled);
+
+				newPart.AddPostFixedAction(NewPartFixed);
+				newPart.AddPostUnfixedActions(NewPartUnfixed);
 			}
 		}
 
@@ -140,7 +147,7 @@ namespace MscModApi.Parts.ReplacePart
 			return oldParts.Any(part => !part.IsInstalled());
 		}
 
-		public void AddInstalledAction(ActionType actionType, PartType partType, Action action)
+		public void AddAction(ActionType actionType, PartType partType, Action action)
 		{
 			var actions = new Actions();
 			var actionList = new List<Action>();
@@ -165,6 +172,9 @@ namespace MscModApi.Parts.ReplacePart
 				case ActionType.AllFixed:
 					actionList = actions.allFixed;
 					break;
+				case ActionType.AllUnfixed:
+					actionList = actions.allUnfixed;
+					break;
 				case ActionType.AnyInstalled:
 					actionList = actions.anyInstalled;
 					break;
@@ -173,6 +183,9 @@ namespace MscModApi.Parts.ReplacePart
 					break;
 				case ActionType.AnyFixed:
 					actionList = actions.anyFixed;
+					break;
+				case ActionType.AnyUnfixed:
+					actionList = actions.anyUnfixed;
 					break;
 			}
 
@@ -188,7 +201,6 @@ namespace MscModApi.Parts.ReplacePart
 			if(newPartActions.anyInstalled.Count > 0) newPartActions.anyInstalled.InvokeAll();
 			if (AreAllNewInstalled())
 			{
-				SetFakedInstallStatus(true);
 				if (newPartActions.allInstalled.Count > 0)
 				{
 					newPartActions.allInstalled.InvokeAll();
@@ -197,6 +209,30 @@ namespace MscModApi.Parts.ReplacePart
 
 			// => wont work => if(newPartActions.anyFixed.Count > 0 && AreAnyNewFixed()) newPartActions.anyFixed.InvokeAll();
 			// => wont work => if (newPartActions.allFixed.Count > 0 && AreAllNewFixed()) newPartActions.allFixed.InvokeAll();
+		}
+
+		internal void NewPartFixed()
+		{
+			if(newPartActions.anyFixed.Count > 0) newPartActions.anyFixed.InvokeAll();
+			if (AreAllNewFixed())
+			{
+				SetFakedInstallStatus(true);
+
+				if (newPartActions.allFixed.Count > 0) {
+					newPartActions.allFixed.InvokeAll();
+				}
+			}
+		}
+
+		internal void NewPartUnfixed()
+		{
+			if (AreAnyNewFixed())
+			{
+				SetFakedInstallStatus(false);
+				if (newPartActions.anyUnfixed.Count > 0) {
+					newPartActions.anyUnfixed.InvokeAll();
+				}
+			}
 		}
 
 		internal void NewPartUninstalled()
@@ -208,7 +244,7 @@ namespace MscModApi.Parts.ReplacePart
 
 			if (AreAnyNewUninstalled())
 			{
-				SetFakedInstallStatus(false);
+				
 				if (newPartActions.anyUninstalled.Count > 0) {
 					newPartActions.anyUninstalled.InvokeAll();
 				}
