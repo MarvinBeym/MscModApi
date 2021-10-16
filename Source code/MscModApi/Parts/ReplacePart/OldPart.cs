@@ -2,6 +2,7 @@
 using HutongGames.PlayMaker;
 using MSCLoader;
 using System.Linq;
+using MscModApi.Tools;
 using UnityEngine;
 
 namespace MscModApi.Parts.ReplacementPart
@@ -15,13 +16,15 @@ namespace MscModApi.Parts.ReplacementPart
 		private FsmBool bolted;
 		private PlayMakerFSM assembleFsm;
 		private PlayMakerFSM removalFsm;
+		private GameObject oldFsmGameObject;
 		private bool allowSettingFakedStatus;
 		internal bool justUninstalled = false;
 
 		public OldPart(GameObject oldFsmGameObject, bool allowSettingFakedStatus = true)
 		{
+			this.oldFsmGameObject = oldFsmGameObject;
 			this.allowSettingFakedStatus = allowSettingFakedStatus;
-			fsm = oldFsmGameObject.GetComponent<PlayMakerFSM>();
+			fsm = oldFsmGameObject.FindFsm("Data");
 			gameObject = fsm.FsmVariables.FindFsmGameObject("ThisPart").Value;
 			trigger = fsm.FsmVariables.FindFsmGameObject("Trigger").Value;
 			installed = fsm.FsmVariables.FindFsmBool("Installed");
@@ -66,6 +69,11 @@ namespace MscModApi.Parts.ReplacementPart
 			if (!allowSettingFakedStatus) return;
 			installed.Value = status;
 			bolted.Value = status;
+		}
+
+		internal void Setup(ReplacePart.ReplacementPart replacementPart)
+		{
+			FsmHook.FsmInject(oldFsmGameObject, "Save game", replacementPart.OnOldSave);
 		}
 
 		internal void SetInstallAction(Action installAction)

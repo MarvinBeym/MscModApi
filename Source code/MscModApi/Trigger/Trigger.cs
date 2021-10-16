@@ -21,7 +21,7 @@ namespace MscModApi.Trigger
 		private IEnumerator HandleUninstall()
 		{
 			while (part.IsInstalled()) {
-
+				
 				if (!part.IsFixed(false) && part.gameObject.IsLookingAt() && UserInteraction.EmptyHand() &&
 					!Tool.HasToolInHand()) {
 					if (part.screwPlacementMode) {

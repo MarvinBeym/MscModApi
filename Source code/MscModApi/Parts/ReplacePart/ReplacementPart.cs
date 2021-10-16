@@ -68,6 +68,7 @@ namespace MscModApi.Parts.ReplacePart
 			{
 				oldPart.SetInstallAction(OldPartInstalled);
 				oldPart.SetUninstallAction(OldPartUninstalled);
+				oldPart.Setup(this);
 				this.oldParts.Add(oldPart);
 			}
 			foreach (var newPart in newParts) {
@@ -76,6 +77,14 @@ namespace MscModApi.Parts.ReplacePart
 
 				newPart.AddPostFixedAction(NewPartFixed);
 				newPart.AddPostUnfixedActions(NewPartUnfixed);
+			}
+		}
+
+		internal void OnOldSave()
+		{
+			if (AreAnyOldInstalled())
+			{
+				SetFakedInstallStatus(false);
 			}
 		}
 

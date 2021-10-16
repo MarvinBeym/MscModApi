@@ -266,7 +266,7 @@ namespace MscModApi.Parts
 
 			screw.CreateScrewModel(index);
 
-			if (screwPlacementMode) {
+			if (!screwPlacementMode) {
 				screw.LoadTightness(savedScrews.ElementAtOrDefault(index));
 				screw.InBy(screw.tightness, false, true);
 			}
