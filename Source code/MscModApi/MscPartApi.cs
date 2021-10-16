@@ -35,6 +35,13 @@ namespace MscModApi
 		private Keybind instantInstallKeybind;
 #endif
 
+		internal static List<Mod> globalScrewPlacementModeEnabled = new List<Mod>();
+
+		public static void EnableScrewPlacementForAllParts(Mod mod)
+		{
+			globalScrewPlacementModeEnabled.Add(mod);
+		}
+
 		internal static bool ShowScrewSize => (bool) showBoltSizeSetting.Value;
 		private static bool loadedAssets = false;
 
@@ -185,7 +192,7 @@ namespace MscModApi
 
 		private void InstantInstallDebug()
 		{
-			if (Camera.main == null) return;
+			if (Camera.main == null || !UserInteraction.EmptyHand()) return;
 			Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out RaycastHit hit, 1f,
 					1 << LayerMask.NameToLayer("Parts"));
 			if (hit.collider == null) return;
@@ -206,7 +213,7 @@ namespace MscModApi
 				if (part != null) break;
 			}
 
-			if (part == null || !part.HasParent() || part.uninstallWhenParentUninstalls && !part.ParentInstalled()) return;
+			if (part == null || !part.HasParent() || part.IsInScrewPlacementMode() || part.uninstallWhenParentUninstalls && !part.ParentInstalled()) return;
 
 			if (part.IsInstallBlocked())
 			{

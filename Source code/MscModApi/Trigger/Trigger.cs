@@ -21,8 +21,8 @@ namespace MscModApi.Trigger
 		private IEnumerator HandleUninstall()
 		{
 			while (part.IsInstalled()) {
-
-				if (!part.IsFixed() && part.gameObject.IsLookingAt() && UserInteraction.EmptyHand() &&
+				
+				if (!part.IsFixed(false) && part.gameObject.IsLookingAt() && UserInteraction.EmptyHand() &&
 					!Tool.HasToolInHand()) {
 					if (part.screwPlacementMode) {
 						ScrewPlacementAssist.ShowPartInteraction(part);
@@ -106,6 +106,7 @@ namespace MscModApi.Trigger
 			}
 
 			part.SetScrewsActive(true);
+			//part.trigger.SetActive(false);
 
 			canBeInstalled = false;
 
@@ -136,6 +137,7 @@ namespace MscModApi.Trigger
 			}
 
 			part.SetScrewsActive(false);
+			//part.trigger.SetActive(true);
 
 			part.postUninstallActions.InvokeAll();
 		}

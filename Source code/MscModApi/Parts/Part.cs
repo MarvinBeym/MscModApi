@@ -40,7 +40,13 @@ namespace MscModApi.Parts
 
 		internal List<Action> preUninstallActions = new List<Action>();
 		internal List<Action> postUninstallActions = new List<Action>();
-		
+
+		internal List<Action> preFixedActions = new List<Action>();
+		internal List<Action> postFixedActions = new List<Action>();
+
+		internal List<Action> preUnfixedActions = new List<Action>();
+		internal List<Action> postUnfixedActions = new List<Action>();
+
 		internal bool screwPlacementMode;
 		private Vector3 defaultRotation = Vector3.zero;
 		private Vector3 defaultPosition = Vector3.zero;
@@ -87,7 +93,7 @@ namespace MscModApi.Parts
 			{
 				trigger = new TriggerWrapper(this, parentGameObject, disableCollisionWhenInstalled);
 			}
-
+			
 			if (partSave.installed) {
 				Install();
 			}
@@ -105,6 +111,11 @@ namespace MscModApi.Parts
 				{
 					{id, this}
 				});
+			}
+
+			if (MscModApi.globalScrewPlacementModeEnabled.Contains(partBaseInfo.mod))
+			{
+				EnableScrewPlacementMode();
 			}
 		}
 
@@ -153,6 +164,11 @@ namespace MscModApi.Parts
 
 		public void EnableScrewPlacementMode() => screwPlacementMode = true;
 
+		internal bool IsInScrewPlacementMode()
+		{
+			return screwPlacementMode;
+		}
+
 		public void SetPosition(Vector3 position)
 		{
 			if (!IsInstalled()) {
@@ -194,7 +210,7 @@ namespace MscModApi.Parts
 			return partSave.installed;
 		}
 
-		public bool IsFixed(bool ignoreUnsetScrews = false)
+		public bool IsFixed(bool ignoreUnsetScrews = true)
 		{
 			if (!ignoreUnsetScrews) {
 				return partFixed;
@@ -230,6 +246,19 @@ namespace MscModApi.Parts
 			}
 		}
 
+		public bool ParentFixed()
+		{
+			if (usingPartParent)
+			{
+				return parentPart.IsFixed(true);
+			}
+			else
+			{
+				//Todo: Implement normal msc parts fixed
+				return true;
+			}
+		}
+
 		private void LoadPartPositionAndRotation(GameObject gameObject, PartSave partSave)
 		{
 			SetPosition(partSave.position);
@@ -247,7 +276,7 @@ namespace MscModApi.Parts
 
 			screw.CreateScrewModel(index);
 
-			if (screwPlacementMode) {
+			if (!screwPlacementMode) {
 				screw.LoadTightness(savedScrews.ElementAtOrDefault(index));
 				screw.InBy(screw.tightness, false, true);
 			}
@@ -289,6 +318,10 @@ namespace MscModApi.Parts
 		public void AddPostInstallAction(Action action)
 		{
 			postInstallActions.Add(action);
+			if (IsInstalled())
+			{
+				postInstallActions.InvokeAll();
+			}
 		}
 
 		public void AddPreUninstallAction(Action action)
@@ -299,8 +332,40 @@ namespace MscModApi.Parts
 		public void AddPostUninstallAction(Action action)
 		{
 			postUninstallActions.Add(action);
+			if (!IsInstalled())
+			{
+				postUninstallActions.InvokeAll();
+			}
 		}
 
+		public void AddPostFixedAction(Action action)
+		{
+			postFixedActions.Add(action);
+			if (IsFixed())
+			{
+				postFixedActions.InvokeAll();
+			}
+		}
+
+		public void AddPreFixedAction(Action action)
+		{
+			preFixedActions.Add(action);
+		}
+
+		public void AddPreUnfixedActions(Action action)
+		{
+			preUnfixedActions.Add(action);
+
+		}
+		public void AddPostUnfixedActions(Action action)
+		{
+			postUnfixedActions.Add(action);
+			if (!IsFixed())
+			{
+				postUnfixedActions.InvokeAll();
+			}
+
+		}
 
 		public T AddWhenInstalledMono<T>() where T : MonoBehaviour
 		{
