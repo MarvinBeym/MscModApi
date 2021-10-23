@@ -5,7 +5,7 @@ using System.Linq;
 using MscModApi.Tools;
 using UnityEngine;
 
-namespace MscModApi.Parts.ReplacementPart
+namespace MscModApi.Parts.ReplacePart
 {
 	public class OldPart
 	{
