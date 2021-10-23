@@ -1,5 +1,4 @@
-﻿using MscModApi.Parts.ReplacementPart;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using MscModApi.Tools;
@@ -40,25 +39,25 @@ namespace MscModApi.Parts.ReplacePart
 		}
 
 
-		public List<Part> newParts = new List<Part>();
+		public List<NewPart> newParts = new List<NewPart>();
 		public List<OldPart> oldParts = new List<OldPart>();
 
 		internal Actions newPartActions = new Actions();
 		internal Actions oldPartActions = new Actions();
 
-		public ReplacementPart(OldPart oldPart, Part newPart) : this(new[] { oldPart }, new[] { newPart })
+		public ReplacementPart(OldPart oldPart, NewPart newPart) : this(new[] { oldPart }, new[] { newPart })
 		{
 		}
 
-		public ReplacementPart(OldPart[] oldParts, Part newPart) : this(oldParts, new[] { newPart })
+		public ReplacementPart(OldPart[] oldParts, NewPart newPart) : this(oldParts, new[] { newPart })
 		{
 		}
 
-		public ReplacementPart(OldPart oldPart, Part[] newParts) : this(new[] { oldPart }, newParts)
+		public ReplacementPart(OldPart oldPart, NewPart[] newParts) : this(new[] { oldPart }, newParts)
 		{
 		}
 
-		public ReplacementPart(OldPart[] oldParts, Part[] newParts)
+		public ReplacementPart(OldPart[] oldParts, NewPart[] newParts)
 		{
 			foreach (var newPart in newParts) {
 				this.newParts.Add(newPart);
@@ -78,16 +77,16 @@ namespace MscModApi.Parts.ReplacePart
 			}
 
 			foreach (var newPart in newParts) {
-				newPart.AddPostInstallAction(NewPartInstalled);
-				newPart.AddPostUninstallAction(NewPartUninstalled);
+				newPart.part.AddPostInstallAction(delegate { NewPartInstalled(newPart); });
+				newPart.part.AddPostUninstallAction(delegate { NewPartUninstalled(newPart); });
 
-				newPart.AddPostFixedAction(NewPartFixed);
-				newPart.AddPostUnfixedActions(NewPartUnfixed);
-			}
+				newPart.part.AddPostFixedAction(NewPartFixed);
+				newPart.part.AddPostUnfixedActions(NewPartUnfixed);
 
-			if (AreAnyNewInstalled())
-			{
-				NewPartInstalled();
+				if (newPart.IsInstalled())
+				{
+					NewPartInstalled(newPart);
+				}
 			}
 
 			if (AreAnyNewFixed())
@@ -258,10 +257,13 @@ namespace MscModApi.Parts.ReplacePart
 			}
 		}
 
-		internal void NewPartInstalled()
+		internal void NewPartInstalled(NewPart installedNewPart)
 		{
-			foreach (var oldPart in oldParts) {
-				oldPart.BlockInstall(true);
+			if (!installedNewPart.CanBeInstalledWithoutReplacing())
+			{
+				foreach (var oldPart in oldParts) {
+					oldPart.BlockInstall(true);
+				}
 			}
 
 			if(newPartActions.anyInstalled.Count > 0) newPartActions.anyInstalled.InvokeAll();
@@ -298,11 +300,14 @@ namespace MscModApi.Parts.ReplacePart
 			}
 		}
 
-		internal void NewPartUninstalled()
+		internal void NewPartUninstalled(NewPart uninstalledNewPart)
 		{
 			var allNewUninstalled = AreAllNewUninstalled();
-			foreach (var oldPart in oldParts) {
-				oldPart.BlockInstall(!allNewUninstalled);
+			if (!uninstalledNewPart.CanBeInstalledWithoutReplacing())
+			{
+				foreach (var oldPart in oldParts) {
+					oldPart.BlockInstall(!allNewUninstalled);
+				}
 			}
 
 			if (AreAnyNewUninstalled())
