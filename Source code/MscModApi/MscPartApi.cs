@@ -86,6 +86,7 @@ namespace MscModApi
 
 		private void Load()
 		{
+			ModConsole.Print($"<color=white>You are running <color=blue>{Name}</color> [<color=green>v{Version}</color>]</color>");
 			Logger.InitLogger(this);
 			tool = new Tool();
 			Shop.Init();
