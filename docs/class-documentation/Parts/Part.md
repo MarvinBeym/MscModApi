@@ -1,0 +1,3 @@
+# Part
+
+Namespace: ``MscModApi.Parts``

@@ -1,0 +1,3 @@
+# NewPart
+
+Namespace: ``MscModApi.ReplacePart``
