@@ -10,8 +10,33 @@
 	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/prismjs@1.25.0/themes/prism-tomorrow.css">
 	<style>
 		:root {
+			--sidebar-nav-pagelink-background-image: none;
+			--sidebar-nav-link-before-content: '';
 			--sidebar-width : 25rem;
 		}
+
+
+		.sidebar-nav ul > li.folder {
+			background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='7' height='11.2' viewBox='0 0 7 11.2'%3E%3Cpath d='M1.5 1.5l4 4.1 -4 4.1' stroke-width='1.5' stroke='rgb%28179, 179, 179%29' fill='none' stroke-linecap='square' stroke-linejoin='miter' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E");
+			background-repeat: no-repeat;
+			background-position: left calc(1em - 8px);
+			padding-left: 16px;
+		}
+
+		.sidebar-nav ul > li.folder.open {
+			background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11.2' height='7' viewBox='0 0 11.2 7'%3E%3Cpath d='M1.5 1.5l4.1 4 4.1-4' stroke-width='1.5' stroke='rgb%2811, 135, 218%29' fill='none' stroke-linecap='square' stroke-linejoin='miter' vector-effect='non-scaling-stroke'/%3E%3C/svg%3E");
+			background-position: left calc(1em - 6px);
+		}
+
+		.sidebar-nav li.folder > ul {
+			margin-left: 16px;
+		}
+
+		.sidebar-nav li.folder li.file > a {
+			padding-left: 16px;
+		}
+
+
 		.sidebar-nav>ul>li>ul>li>ul>li>a:before {
 			content: "" !important;
 		}
@@ -34,6 +59,9 @@
 		coverpage: "cover.md",
 		onlyCover: true,
 		loadSidebar: "sidebar.md",
+		alias: {
+			'/.*/sidebar.md': '/sidebar.md',
+		},
 		name: 'MscModApi',
 		notFoundPage: "404.md",
 		repo: 'https://github.com/MarvinBeym/MscModApi',
@@ -50,8 +78,7 @@
 <script src="//cdn.jsdelivr.net/npm/docsify"></script>
 <script src="//cdn.jsdelivr.net/npm/prismjs@1/components/prism-csharp.min.js"></script>
 <script src="//cdn.jsdelivr.net/npm/docsify/lib/plugins/search.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/docsify-tabs@1"></script>
 <script src="https://cdn.jsdelivr.net/npm/docsify-themeable@0/dist/js/docsify-themeable.min.js"></script>
-
+<script src="https://cdn.jsdelivr.net/npm/docsify-sidebar-collapse/dist/docsify-sidebar-collapse.min.js"></script>
 </body>
 </html>
