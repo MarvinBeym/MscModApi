@@ -2,6 +2,7 @@
 using HutongGames.PlayMaker;
 using MSCLoader;
 using System.Linq;
+using MSCLoader.Helper;
 using MscModApi.Tools;
 using UnityEngine;
 
@@ -32,6 +33,16 @@ namespace MscModApi.Parts.ReplacePart
 
 			assembleFsm = GetFsmByName(trigger, "Assembly");
 			removalFsm = GetFsmByName(gameObject, "Removal");
+
+			if (!assembleFsm.Fsm.Initialized)
+			{
+				assembleFsm.InitializeFSM();
+			}
+
+			if (!removalFsm.Fsm.Initialized)
+			{
+				removalFsm.InitializeFSM();
+			}
 		}
 
 		private static PlayMakerFSM GetFsmByName(GameObject gameObject, string fsmName)
