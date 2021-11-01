@@ -18,45 +18,83 @@ namespace MscModApi.Parts.ReplacePart
 		internal List<Action> anyFixed = new List<Action>();
 		internal List<Action> anyUnfixed = new List<Action>();
 	}
+
+	/// <summary>The ReplacementPart class</summary>
 	public class ReplacementPart
 	{
+		/// <summary>All available action types</summary>
 		public enum ActionType
 		{
-			AnyInstalled,
-			AnyFixed,
-			AnyUninstalled,
-			AnyUnfixed,
 
+			/// <summary>Any installed</summary>
+			AnyInstalled,
+			/// <summary>Any fixed</summary>
+			AnyFixed,
+			/// <summary>Any uninstalled</summary>
+			AnyUninstalled,
+			/// <summary>Any unfixed</summary>
+			AnyUnfixed,
+			/// <summary>All installed</summary>
 			AllInstalled,
+			/// <summary>All fixed</summary>
 			AllFixed,
+			/// <summary>All uninstalled</summary>
 			AllUninstalled,
+			/// <summary>All unfixed</summary>
 			AllUnfixed
 		}
+		/// <summary>The part the ActionType should be added to</summary>
 		public enum PartType
 		{
+			/// <summary>Add action to NewPart</summary>
 			NewPart,
+			/// <summary>Add action to OldPart</summary>
 			OldPart
 		}
 
-
+		/// <summary>All NewPart's</summary>
 		public List<NewPart> newParts = new List<NewPart>();
+		/// <summary>All OldPart's</summary>
 		public List<OldPart> oldParts = new List<OldPart>();
 
 		internal Actions newPartActions = new Actions();
 		internal Actions oldPartActions = new Actions();
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="ReplacementPart"/> class.
+		/// A single NewPart replaces a single OldPart
+		/// </summary>
+		/// <param name="oldPart">Single OldPart</param>
+		/// <param name="newPart">Single NewPart</param>
 		public ReplacementPart(OldPart oldPart, NewPart newPart) : this(new[] { oldPart }, new[] { newPart })
 		{
 		}
-
+		/// <summary>
+		/// Initializes a new instance of the <see cref="ReplacementPart"/> class.
+		/// A single NewPart replaces multiple OldPart's
+		/// </summary>
+		/// <param name="oldParts">Multiple OldPart's</param>
+		/// <param name="newPart">Single NewPart</param>
 		public ReplacementPart(OldPart[] oldParts, NewPart newPart) : this(oldParts, new[] { newPart })
 		{
 		}
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="ReplacementPart"/> class.
+		/// Multiple NewPart's replace a single OldPart
+		/// </summary>
+		/// <param name="oldPart">Single OldPart</param>
+		/// <param name="newParts">Multiple NewPart's</param>
 		public ReplacementPart(OldPart oldPart, NewPart[] newParts) : this(new[] { oldPart }, newParts)
 		{
 		}
 
+		/// <summary>
+		/// Initializes a new instance of the <see cref="ReplacementPart"/> class.
+		/// Multiple NewPart's replace multiple OldPart's
+		/// </summary>
+		/// <param name="oldParts">Multiple OldPart's</param>
+		/// <param name="newParts">Multiple NewPart's</param>
 		public ReplacementPart(OldPart[] oldParts, NewPart[] newParts)
 		{
 			foreach (var newPart in newParts) {
@@ -103,21 +141,30 @@ namespace MscModApi.Parts.ReplacePart
 			}
 		}
 
+		/// <summary>Are all new installed.</summary>
+		/// <returns>bool</returns>
 		public bool AreAllNewInstalled()
 		{
 			return newParts.All(part => part.IsInstalled());
 		}
 
+		/// <summary>Are all new uninstalled.</summary>
+		/// <returns></returns>
 		public bool AreAllNewUninstalled()
 		{
 			return newParts.All(part => !part.IsInstalled());
 		}
 
+		/// <summary>Are any new fixed.</summary>
+		/// <param name="ignoreUnsetScrews">if set to <c>true</c> [ignore unset/undefined screws].</param>
+		/// <returns>b</returns>
 		public bool AreAnyNewFixed(bool ignoreUnsetScrews = true)
 		{
 			return newParts.Any(part => part.IsFixed(ignoreUnsetScrews));
 		}
 
+		/// <summary>Sets the faked install status.</summary>
+		/// <param name="status">if set to <c>true</c> [status].</param>
 		public void SetFakedInstallStatus(bool status)
 		{
 			foreach (var oldPart in oldParts)
@@ -126,51 +173,72 @@ namespace MscModApi.Parts.ReplacePart
 			}
 		}
 
+		/// <summary>Are all new fixed.</summary>
+		/// <param name="ignoreUnsetScrews">if set to <c>true</c> [ignore unset/undefined screws].</param>
+		/// <returns></returns>
 		public bool AreAllNewFixed(bool ignoreUnsetScrews =  true)
 		{
 			return newParts.All(part => part.IsFixed(ignoreUnsetScrews));
 		}
 
+		/// <summary>Are any old fixed.</summary>
+		/// <returns></returns>
 		public bool AreAnyOldFixed()
 		{
 			return oldParts.Any(part => part.IsFixed());
 		}
 
+		/// <summary>Are all old fixed.</summary>
 		public bool AreAllOldFixed()
 		{
 			return oldParts.All(part => part.IsFixed());
 		}
 
+		/// <summary>Are any new installed.</summary>
 		public bool AreAnyNewInstalled()
 		{
 			return newParts.Any(part => part.IsInstalled());
 		}
 
+		/// <summary>Are any new uninstalled.</summary>
+		/// <returns></returns>
 		public bool AreAnyNewUninstalled()
 		{
 			return newParts.Any(part => !part.IsInstalled());
 		}
 
+		/// <summary>Are all old installed.</summary>
+		/// <returns></returns>
 		public bool AreAllOldInstalled()
 		{
 			return oldParts.All(part => part.IsInstalled());
 		}
 
+		/// <summary>Are all old uninstalled.</summary>
+		/// <returns></returns>
 		public bool AreAllOldUninstalled()
 		{
 			return oldParts.All(part => !part.IsInstalled());
 		}
 
+		/// <summary>Are any old installed.</summary>
+		/// <returns></returns>
 		public bool AreAnyOldInstalled()
 		{
 			return oldParts.Any(part => part.IsInstalled());
 		}
 
+		/// <summary>Are any old uninstalled.</summary>
+		/// <returns></returns>
 		public bool AreAnyOldUninstalled()
 		{
 			return oldParts.Any(part => !part.IsInstalled());
 		}
 
+		/// <summary>Adds the action.</summary>
+		/// <param name="actionType">Type of the action.</param>
+		/// <param name="partType">Part to add the action to.</param>
+		/// <param name="action">The action.</param>
 		public void AddAction(ActionType actionType, PartType partType, Action action)
 		{
 			var actions = new Actions();
