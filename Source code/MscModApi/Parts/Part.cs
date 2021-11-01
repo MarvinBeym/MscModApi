@@ -145,11 +145,10 @@ namespace MscModApi.Parts
 				uninstallWhenParentUninstalls, disableCollisionWhenInstalled, prefabName);
 		}
 
-		public Part(string id, string name, Vector3 installPosition, Vector3 installRotation,
-			PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls = true,
+		public Part(string id, string name, PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls = true,
 			bool disableCollisionWhenInstalled = true, string prefabName = null)
 		{
-			Setup(id, name, null, installPosition, installRotation, partBaseInfo,
+			Setup(id, name, null, Vector3.zero, Vector3.zero, partBaseInfo,
 				uninstallWhenParentUninstalls, disableCollisionWhenInstalled, prefabName);
 		}
 
@@ -221,7 +220,7 @@ namespace MscModApi.Parts
 			return partSave.screws.Count == 0 ? IsInstalled() : partFixed;
 		}
 
-		public void SetFixed(bool partFixed) => this.partFixed = partFixed;
+		internal void SetFixed(bool partFixed) => this.partFixed = partFixed;
 
 		public void Uninstall()
 		{
