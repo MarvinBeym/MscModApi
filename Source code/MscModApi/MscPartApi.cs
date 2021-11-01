@@ -10,6 +10,10 @@ using UnityEngine.UI;
 
 namespace MscModApi
 {
+	/// <summary>
+	/// The MscModApi mod class
+	/// </summary>
+	/// <seealso cref="MSCLoader.Mod" />
 	public class MscModApi : Mod
 	{
 		public override string ID => "MscModApi";
@@ -37,6 +41,8 @@ namespace MscModApi
 
 		internal static List<Mod> globalScrewPlacementModeEnabled = new List<Mod>();
 
+		/// <summary>Enables the screw placement for all parts.</summary>
+		/// <param name="mod">The mod.</param>
 		public static void EnableScrewPlacementForAllParts(Mod mod)
 		{
 			globalScrewPlacementModeEnabled.Add(mod);
