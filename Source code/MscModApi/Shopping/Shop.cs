@@ -24,16 +24,16 @@ namespace MscModApi.Shopping
 		{
 			public static class Teimo
 			{
-				public static Vector3 Backroom = new Vector3(-1551.568f, 5f, 1186.132f);
-				public static Vector3 Counter = new Vector3(-1551.135f, 5f, 1182.754f);
-				public static Vector3 Outside = new Vector3(-1553.865f, 4f, 1182.825f);
+				public static Vector3 Backroom { get; } = new Vector3(-1551.568f, 5f, 1186.132f);
+				public static Vector3 Counter { get; } = new Vector3(-1551.135f, 5f, 1182.754f);
+				public static Vector3 Outside { get; } = new Vector3(-1553.865f, 4f, 1182.825f);
 			}
 
 			public static class Fleetari
 			{
-				public static Vector3 Backroom = new Vector3(1558.975f, 5.2f, 741.894f);
-				public static Vector3 Counter = new Vector3(1555.082f, 6f, 737.622f);
-				public static Vector3 Outside = new Vector3(1552.154f, 5f, 732.755f);
+				public static Vector3 Backroom { get; } = new Vector3(1558.975f, 5.2f, 741.894f);
+				public static Vector3 Counter { get; } = new Vector3(1555.082f, 6f, 737.622f);
+				public static Vector3 Outside { get; } = new Vector3(1552.154f, 5f, 732.755f);
 
 			}
 		}

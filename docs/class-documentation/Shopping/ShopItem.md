@@ -1,0 +1,3 @@
+# Shop
+
+Namespace: ``MscModApi.Shopping``
