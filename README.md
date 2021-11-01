@@ -58,6 +58,6 @@
    - Further steps are explained based on **Visual Studio 2019 Enterprise**
 3. Add a new reference in your project
 4. Select the ``MscModApi.dll`` in the **\Mods** folder
-5. Continue on the wiki pages that explain how to use it and what can be done & how.  
-   [Mod maker wiki](https://github.com/MarvinBeym/MscModApi/wiki/Development-Mod-making-Using-the-api)
+5. Continue on the documentation that explain how to use it and what can be done & how.  
+   [API Documentation](https://marvinbeym.github.io/MscModApi/)
 ---
