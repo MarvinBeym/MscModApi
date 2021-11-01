@@ -4,9 +4,10 @@ Namespace: ``MscModApi.Parts.ReplacePart``
 
 ## CONSTRUCTOR
 > The OldPart constructor
-> * oldFsmGameObject:  The main GameObject that handles the part's logic 
-    * Example: ``Cache.Find("Racing Carburator"))``
-> * allowSettingFakedStatus: Will prevent the old part from being set to faked install
+> > | Parameter | Description | Example
+> > | --------- | ----------- | -------
+> > | oldFsmGameObject | The main GameObject that handles the part's logic | Cache.Find("Racing Carburator"))
+> > | allowSettingFakedStatus | Will prevent the old part from being set to faked install
 > ```csharp
 > public OldPart(GameObject oldFsmGameObject, bool allowSettingFakedStatus = true)
 > ```

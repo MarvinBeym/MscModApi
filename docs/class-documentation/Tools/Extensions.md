@@ -24,22 +24,30 @@ Namespace: ``MscModApi.Tools``
 
 ## CompareQuaternion
 > Compares two Quaternions (rotation)
-> ```csharp
-> public static bool CompareQuaternion(this Quaternion a, Quaternion b, float tolerance = 0).
-> ```
+> > | Parameter | Description
+> > | --------- | -----------
+> > | a | The first quaternion
+> > | b | The second quaternion to compare to
+> > | tolerance | Quaternion comparison need a tolerance as it is more<br>or less impossible for two quaternion's to be the same
+> > ```csharp
+> > public static bool CompareQuaternion(this Quaternion a, Quaternion b, float tolerance = 0).
+> > ```
 
 ## ToOnOff
 > Short form of [ToXY](#toxy) using **On** & **Off**
-> 
 > ```csharp
 > public static string ToOnOff(this bool value)
 > ```
 
 ## ToXY
 > Converts a **boolean** value to a **string** value using the passed **trueText** & **falseText**.
-> ```csharp
-> public static string ToXY(this bool value, string trueText, string falseText)
-> ```
+> > | Parameter | Description
+> > | --------- | -----------
+> > | trueText | Return string if the ``value`` is **true**
+> > | falseText | Return string if the ``value`` is **false**
+> > ```csharp
+> > public static string ToXY(this bool value, string trueText, string falseText)
+> > ```
 
 ## SetNameLayerTag
 > Allows setting GameObject's **Name**, tag & layer in one call.  
@@ -57,9 +65,14 @@ Namespace: ``MscModApi.Tools``
 
 ## CompareVector3
 > Compares two **Vector3+* (position/location).
-> ```csharp
-> public static bool CompareVector3(this Vector3 vector3, Vector3 other, float tolerance = 0.05f)
-> ```
+> > | Parameter | Description
+> > | --------- | -----------
+> > | vector3 | The first vector3
+> > | other | The vector3 to compare to
+> > | tolerance | It is nearly impossible for two ``Vector3`` to have the same position
+> > ```csharp
+> > public static bool CompareVector3(this Vector3 vector3, Vector3 other, float tolerance = 0.05f)
+> > ```
 
 ## FindFsm
 > Tries to find a PlayMaker FSM on a GameObject using its name.  

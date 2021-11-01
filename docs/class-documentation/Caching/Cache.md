@@ -9,14 +9,17 @@ Which is why caching can really help the game.
 
 ## Find
 > Replaces ```GameObject.Find()```
-> ```csharp
-> public static GameObject Find(string name)
-> ```
+> > | Parameter | Description
+> > | --------- | -----------
+> > | name | The GameObject name to search for (Same as GameObject.Find(name))
+> > ```csharp
+> > public static GameObject Find(string name)
+> > ```
 
 ## Clear
 > Clears the cached dictionary.  
 > There should rarely be a reason to clear the dictionary.  
 > Usage of this function is not recommended.
 > ```csharp
-> public static GameObject Find(string name)
+> public static void Clear()
 > ```
