@@ -220,7 +220,7 @@ namespace MscModApi.Parts
 			return partSave.screws.Count == 0 ? IsInstalled() : partFixed;
 		}
 
-		public void SetFixed(bool partFixed) => this.partFixed = partFixed;
+		internal void SetFixed(bool partFixed) => this.partFixed = partFixed;
 
 		public void Uninstall()
 		{
