@@ -28,7 +28,7 @@ namespace MscModApi.Parts
 		public TriggerWrapper trigger;
 
 		public Transform transform => gameObject.transform;
-		
+
 		private bool usingGameObjectInstantiation;
 		private GameObject gameObjectUsedForInstantiation;
 		private bool usingPartParent;
@@ -74,13 +74,17 @@ namespace MscModApi.Parts
 				gameObject = Helper.LoadPartAndSetName(partBaseInfo.assetBundle, prefabName ?? id, name);
 			}
 
-			if (!partBaseInfo.partsSave.TryGetValue(id, out partSave)) {
+			if (!partBaseInfo.partsSave.TryGetValue(id, out partSave))
+			{
 				partSave = new PartSave();
 			}
 
-			try {
+			try
+			{
 				CustomSaveLoading(partBaseInfo.mod, $"{id}_saveFile.json");
-			} catch {
+			}
+			catch
+			{
 				// ignored
 			}
 
@@ -93,20 +97,25 @@ namespace MscModApi.Parts
 			{
 				trigger = new TriggerWrapper(this, parentGameObject, disableCollisionWhenInstalled);
 			}
-			
-			if (partSave.installed) {
+
+			if (partSave.installed)
+			{
 				Install();
 			}
 
 			LoadPartPositionAndRotation(gameObject, partSave);
 
-			if (!MscModApi.modSaveFileMapping.ContainsKey(partBaseInfo.mod.ID)) {
+			if (!MscModApi.modSaveFileMapping.ContainsKey(partBaseInfo.mod.ID))
+			{
 				MscModApi.modSaveFileMapping.Add(partBaseInfo.mod.ID, partBaseInfo.saveFilePath);
 			}
 
-			if (MscModApi.modsParts.ContainsKey(partBaseInfo.mod.ID)) {
+			if (MscModApi.modsParts.ContainsKey(partBaseInfo.mod.ID))
+			{
 				MscModApi.modsParts[partBaseInfo.mod.ID].Add(id, this);
-			} else {
+			}
+			else
+			{
 				MscModApi.modsParts.Add(partBaseInfo.mod.ID, new Dictionary<string, Part>
 				{
 					{id, this}
@@ -173,14 +182,16 @@ namespace MscModApi.Parts
 
 		public void SetPosition(Vector3 position)
 		{
-			if (!IsInstalled()) {
+			if (!IsInstalled())
+			{
 				gameObject.transform.position = position;
 			}
 		}
 
 		internal void ResetScrews()
 		{
-			foreach (var screw in partSave.screws) {
+			foreach (var screw in partSave.screws)
+			{
 				screw.OutBy(screw.tightness);
 			}
 		}
@@ -197,7 +208,8 @@ namespace MscModApi.Parts
 
 		public void SetRotation(Quaternion rotation)
 		{
-			if (!IsInstalled()) {
+			if (!IsInstalled())
+			{
 				gameObject.transform.rotation = rotation;
 			}
 		}
@@ -214,7 +226,8 @@ namespace MscModApi.Parts
 
 		public bool IsFixed(bool ignoreUnsetScrews = true)
 		{
-			if (!ignoreUnsetScrews) {
+			if (!ignoreUnsetScrews)
+			{
 				return partFixed;
 			}
 			return partSave.screws.Count == 0 ? IsInstalled() : partFixed;
@@ -240,9 +253,12 @@ namespace MscModApi.Parts
 
 		internal bool ParentInstalled()
 		{
-			if (usingPartParent) {
+			if (usingPartParent)
+			{
 				return parentPart.IsInstalled();
-			} else {
+			}
+			else
+			{
 				//Todo: Implement normal msc parts installed/uninstalled
 				return true;
 			}
@@ -278,7 +294,8 @@ namespace MscModApi.Parts
 
 			screw.CreateScrewModel(index);
 
-			if (!screwPlacementMode) {
+			if (!screwPlacementMode)
+			{
 				screw.LoadTightness(savedScrews.ElementAtOrDefault(index));
 				screw.InBy(screw.tightness, false, true);
 			}
@@ -295,12 +312,15 @@ namespace MscModApi.Parts
 
 		public void AddScrews(Screw[] screws, float overrideScale = 0f, float overrideSize = 0f)
 		{
-			foreach (var screw in screws) {
-				if (overrideScale != 0f) {
+			foreach (var screw in screws)
+			{
+				if (overrideScale != 0f)
+				{
 					screw.scale = overrideScale;
 				}
-				
-				if (overrideSize != 0f) {
+
+				if (overrideSize != 0f)
+				{
 					screw.size = overrideSize;
 				}
 
