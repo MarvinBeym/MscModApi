@@ -1,9 +1,9 @@
-﻿using MscModApi.Tools;
+﻿using MSCLoader;
+using MscModApi.Tools;
 using MscModApi.Trigger;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using MSCLoader;
 using UnityEngine;
 
 namespace MscModApi.Parts
@@ -127,7 +127,7 @@ namespace MscModApi.Parts
 				EnableScrewPlacementMode();
 			}
 
-			
+
 			partBaseInfo.AddToPartsList(this);
 		}
 
@@ -389,37 +389,52 @@ namespace MscModApi.Parts
 
 		}
 
+		[Obsolete("Use AddWhenInstalledBehaviour instead. Will be removed in a later version")]
 		public T AddWhenInstalledMono<T>() where T : MonoBehaviour
 		{
-			var mono = AddComponent<T>();
-			mono.enabled = IsInstalled();
+			return AddWhenInstalledBehaviour<T>();
+		}
+
+		[Obsolete("Use AddWhenUninstalledBehaviour instead. Will be removed in a later version")]
+		public T AddWhenUninstalledMono<T>() where T : MonoBehaviour
+		{
+			return AddWhenUninstalledBehaviour<T>();
+		}
+
+		public T AddWhenInstalledBehaviour<T>() where T : Behaviour
+		{
+			var behaviour = AddComponent<T>();
+			behaviour.enabled = IsInstalled();
 
 			AddPostInstallAction(delegate
 			{
-				mono.enabled = true;
+				behaviour.enabled = true;
 			});
 
-			AddPostUninstallAction(delegate {
-				mono.enabled = false;
+			AddPostUninstallAction(delegate
+			{
+				behaviour.enabled = false;
 			});
-			return mono;
+			return behaviour;
 		}
 
-		public T AddWhenUninstalledMono<T>() where T : MonoBehaviour
+		public T AddWhenUninstalledBehaviour<T>() where T : Behaviour
 		{
-			var mono = AddComponent<T>();
-			mono.enabled = !IsInstalled();
+			var behaviour = AddComponent<T>();
+			behaviour.enabled = !IsInstalled();
 
-			AddPostInstallAction(delegate {
-				mono.enabled = false;
+			AddPostInstallAction(delegate
+			{
+				behaviour.enabled = false;
 			});
 
-			AddPostUninstallAction(delegate {
-				mono.enabled = true;
+			AddPostUninstallAction(delegate
+			{
+				behaviour.enabled = true;
 			});
-			return mono;
+			return behaviour;
 		}
-		
+
 		public T AddComponent<T>() where T : Component => gameObject.AddComponent(typeof(T)) as T;
 
 		public T GetComponent<T>() => gameObject.GetComponent<T>();
