@@ -1,12 +1,12 @@
 ManifestFileVersion: 0
-CRC: 3978724999
+CRC: 1086512836
 Hashes:
   AssetFileHash:
     serializedVersion: 2
-    Hash: bf0ba84a30b5785aed19792341dd0429
+    Hash: 879f912650e532ba25657c3e14e55a5e
   TypeTreeHash:
     serializedVersion: 2
-    Hash: d43d92a23e53643d58ea03558ca16049
+    Hash: d5b546d10363a11ce9289e4cd93aaa6e
 HashAppended: 0
 ClassTypes:
 - Class: 1
@@ -24,6 +24,8 @@ ClassTypes:
 - Class: 43
   Script: {instanceID: 0}
 - Class: 48
+  Script: {instanceID: 0}
+- Class: 54
   Script: {instanceID: 0}
 - Class: 65
   Script: {instanceID: 0}
@@ -82,6 +84,7 @@ Assets:
 - Assets/Shop/cart_item.prefab
 - Assets/Shop/shop_catalog.prefab
 - Assets/Materials/screw_material.mat
+- Assets/cardboard_box.prefab
 - Assets/Shop/part_panel.prefab
 - Assets/Shop/mod_panel.prefab
 - Assets/screw_normal.prefab
