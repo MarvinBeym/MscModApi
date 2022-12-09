@@ -58,7 +58,6 @@ namespace MscModApi.Tools
 ║ Author:       {mod.Author}
 ╠{GenerateHeader(" ModLoader ")}
 ║ Version:      {ModLoader.MSCLoader_Ver}
-║ Dev:          {ModLoader.devMode}
 ║ Experimental: {ModLoader.experimental}
 ╠{GenerateHeader(" Mods ")}
 ║
