@@ -83,7 +83,12 @@
     <Compile Include="Parts\ReplacePart\NewPart.cs" />
     <Compile Include="Parts\ReplacePart\OldPart.cs" />
     <Compile Include="Parts\ReplacePart\ReplacementPart.cs" />
+    <Compile Include="Shopping\Box.cs" />
+    <Compile Include="Shopping\BoxLogic.cs" />
+    <Compile Include="Shopping\Kit.cs" />
+    <Compile Include="Shopping\KitLogic.cs" />
     <Compile Include="Shopping\ModItem.cs" />
+    <Compile Include="Shopping\PartBox.cs" />
     <Compile Include="Shopping\ShopBaseInfo.cs" />
     <Compile Include="Shopping\Shop.cs" />
     <Compile Include="Shopping\ShopInterface.cs" />

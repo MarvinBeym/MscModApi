@@ -1,12 +1,9 @@
 ﻿using MSCLoader;
-using MscModApi.Tools;
-using System.Collections.Generic;
-using System.IO;
-using MscModApi.Caching;
 using MscModApi.Parts;
 using MscModApi.Shopping;
+using MscModApi.Tools;
+using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace MscModApi
 {
@@ -32,9 +29,10 @@ namespace MscModApi
 
 		internal static Dictionary<string, string> modSaveFileMapping;
 		internal static Dictionary<string, Dictionary<string, Part>> modsParts;
+		internal static List<PartBox> partBoxes = new List<PartBox>();
 		internal static Dictionary<string, Screw> screws;
 		private Screw previousScrew;
-		
+
 #if DEBUG
 		private Keybind instantInstallKeybind;
 #endif
@@ -100,7 +98,13 @@ namespace MscModApi
 
 		private void Save()
 		{
-			foreach (var modParts in modsParts) {
+			foreach (PartBox partBox in partBoxes)
+			{
+				partBox.CheckUnpackedOnSave();
+			}
+
+			foreach (var modParts in modsParts)
+			{
 				var mod = ModLoader.GetMod(modParts.Key);
 
 				if (!modSaveFileMapping.TryGetValue(mod.ID, out var saveFileName))
@@ -272,8 +276,6 @@ namespace MscModApi
 					part.partSave.screws.ForEach(delegate(Screw screw) { screw.OutBy(Screw.maxTightness); });
 				}
 			}
-
-			
 		}
 #endif
 		private Screw DetectScrew()
@@ -313,11 +315,12 @@ namespace MscModApi
 
 		private void LoadAssets()
 		{
-			
 			var assetBundle = Helper.LoadAssetBundle(this, assetsFile);
 			Screw.LoadAssets(assetBundle);
 			Part.LoadAssets(assetBundle);
 			Shop.LoadAssets(assetBundle);
+			Kit.LoadAssets(assetBundle);
+			Box.LoadAssets(assetBundle);
 
 			assetBundle.Unload(false);
 		}
