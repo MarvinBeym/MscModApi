@@ -134,5 +134,14 @@ namespace MscModApi.Tools
 			Logger.New("Unable to find base gameobject on supplied fsm gameobject", fsmGameObject.name + "fsmToUse: " + fsmToUse);
 			return null;
 		}
+
+		public static PlayMakerFSM FindFsmOnGameObject(GameObject gameObject, string fsmName)
+		{
+			foreach (PlayMakerFSM fSM in gameObject.GetComponents<PlayMakerFSM>())
+			{
+				if (fSM.FsmName == fsmName) { return fSM; }
+			}
+			return null;
+		}
 	}
 }
