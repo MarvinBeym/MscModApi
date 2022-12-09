@@ -1,8 +1,8 @@
-﻿using System;
+﻿using MscModApi.Parts;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using MscModApi.Parts;
 using UnityEngine;
 
 namespace MscModApi.Tools
@@ -81,12 +81,18 @@ namespace MscModApi.Tools
 		public static Screw[] CloneToNew(this Screw[] screws)
 		{
 			var newScrews = new Screw[screws.Length];
-			for (var i = 0; i < screws.Length; i++) {
+			for (var i = 0; i < screws.Length; i++)
+			{
 				var screw = screws[i];
 				newScrews[i] = screw.CloneToNew();
 			}
 
 			return newScrews;
+		}
+
+		public static string ToStringOrEmpty(this object value)
+		{
+			return value == null ? "" : value.ToString();
 		}
 	}
 }
