@@ -24,6 +24,8 @@ namespace MscModApi
 		public override bool UseAssetsFolder => true;
 		private static Settings showBoltSizeSetting = new Settings("showBoltSizeSetting", "Show screw size", false);
 
+		private static Settings enableInstantInstall =
+			new Settings("enableInstantInstall", "Enable Instant Part install", false);
 		private const string assetsFile = "msc-mod-api.unity3d";
 		private Tool tool;
 
@@ -67,6 +69,7 @@ namespace MscModApi
 			Keybind.AddHeader(this, "Developer area - Screw placement mode");
 #if DEBUG
 			instantInstallKeybind = Keybind.Add(this, "instant-install", "Instant install part looking at", KeyCode.UpArrow);
+			Settings.AddCheckBox(this, enableInstantInstall);
 #endif
 			ScrewPlacementAssist.ModSettings(this);
 		}
@@ -212,6 +215,11 @@ namespace MscModApi
 #if DEBUG
 		private void InstantInstallDebug()
 		{
+			if (!(bool)showBoltSizeSetting.Value)
+			{
+				return;
+			}
+
 			if (Camera.main == null || !UserInteraction.EmptyHand()) return;
 			Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out RaycastHit hit, 1f,
 				1 << LayerMask.NameToLayer("Parts"));
