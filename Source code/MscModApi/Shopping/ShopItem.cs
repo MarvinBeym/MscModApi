@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using MscModApi.Parts;
 using MscModApi.Tools;
 using UnityEngine;
@@ -32,6 +33,32 @@ namespace MscModApi.Shopping
 			Setup(name, prize, spawnLocation, imageAssetName);
 			this.onPurchaseAction = onPurchaseAction;
 		}
+
+		public ShopItem(string name, float prize, Vector3 spawnLocation, PartBox partBox, string imageAssetName = "")
+		{
+			Setup(name, prize, spawnLocation, imageAssetName);
+			foreach (Part part in partBox.GetParts())
+			{
+				part.SetDefaultPosition(spawnLocation);
+				part.SetActive(part.IsBought());
+			}
+
+			buyable = !partBox.GetParts().Any(part => part.IsBought());
+			onPurchaseAction = delegate
+			{
+				foreach (Part part in partBox.GetParts())
+				{
+					part.SetBought(true);
+					part.SetDefaultPosition(spawnLocation);
+
+				}
+
+				partBox.GetBoxGameObject().SetActive(true);
+				partBox.GetBoxGameObject().transform.position = spawnLocation;
+				partBox.GetBoxGameObject().transform.rotation = Quaternion.Euler(new Vector3(0, 0, 0));
+			};
+		}
+
 
 		public ShopItem(string name, float prize, Vector3 spawnLocation, Part part, string imageAssetName = "")
 		{
