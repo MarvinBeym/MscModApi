@@ -42,15 +42,8 @@ namespace MscModApi.Shopping
 			}
 
 			part.SetDefaultPosition(spawnLocation);
-
-			if (!part.IsBought())
-			{
-				part.SetActive(false);
-			}
-			else
-			{
-				buyable = false;
-			}
+			part.SetActive(part.IsBought());
+			buyable = !part.IsBought();
 
 			onPurchaseAction = delegate
 			{
@@ -124,11 +117,6 @@ namespace MscModApi.Shopping
 			cartItemGameObject.transform.localScale = new Vector3(1, 1, 1);
 		}
 
-		internal void SetActive(bool active)
-		{
-			partItemGameObject?.SetActive(active);
-		}
-
 		internal void IncreaseCount()
 		{
 			itemCount++;
@@ -161,6 +149,11 @@ namespace MscModApi.Shopping
 		public bool IsMultiPurchase()
 		{
 			return multiPurchase;
+		}
+
+		public void Show(bool show)
+		{
+			partItemGameObject?.SetActive(show);
 		}
 	}
 }

@@ -1,6 +1,7 @@
 ﻿using MscModApi.Tools;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using HutongGames.PlayMaker;
 using MSCLoader;
 using MscModApi.Caching;
@@ -67,20 +68,18 @@ namespace MscModApi.Shopping
 			partsPanel.SetActive(false);
 			moneyComp.text = Game.money.ToString();
 			gameObject.SetActive(true);
-
-			foreach (var keyValuePair in shopItems[shopLocation])
+			
+			foreach (ModItem modItem in shopItems[shopLocation])
 			{
-				keyValuePair.Key.SetActive(true);
+				modItem.Show(true);
 			}
 
-			foreach (var keyValuePair in shopItems)
+			foreach (var shopLocationModItems in shopItems)
 			{
-				if (keyValuePair.Key != shopLocation)
+				if (shopLocationModItems.Key == shopLocation) continue;
+				foreach (ModItem modItem in shopLocationModItems.Value)
 				{
-					foreach (var valuePair in keyValuePair.Value)
-					{
-						valuePair.Key.SetActive(false);
-					}
+					modItem.Show(false);
 				}
 			}
 
@@ -107,45 +106,17 @@ namespace MscModApi.Shopping
 			partsPanel.SetActive(false);
 		}
 
-		internal void OnOpenShop(ShopLocation shopLocation, ModItem modItem)
+		internal void OnOpenShop(ShopLocation shopLocation, ModItem modItemToOpen)
 		{
 			modsPanel.SetActive(false);
 			partsPanel.SetActive(true);
 
-			foreach (var keyValuePair in shopItems[shopLocation][modItem])
+			modItemToOpen.Open();
+
+
+			foreach (ModItem modItem in shopItems[shopLocation].Where(modItem => modItem != modItemToOpen))
 			{
-				var shopItem = keyValuePair.Value;
-				shopItem.SetActive(true);
-			}
-
-			SetShopItemsActiveForModItem(modItem, true);
-		}
-
-		private void SetShopItemsActiveForModItem(ModItem modItem, bool active)
-		{
-			foreach (var shopLocationMap in shopItems)
-			{
-				var location = shopLocationMap.Key;
-				var modItemMap = shopLocationMap.Value;
-				foreach (var valuePair in modItemMap)
-				{
-					var shopItemMap = valuePair.Value;
-					if (modItem == valuePair.Key)
-					{
-						foreach (var keyValuePair in shopItemMap) {
-							var shopItem = keyValuePair.Value;
-							shopItem.SetActive(active && shopItem.IsBuyable());
-						}
-					}
-					else
-					{
-						foreach (var keyValuePair in shopItemMap) {
-							var shopItem = keyValuePair.Value;
-							shopItem.SetActive(!active);
-						}
-					}
-
-				}
+				modItem.Close();
 			}
 		}
 
@@ -208,7 +179,6 @@ namespace MscModApi.Shopping
 				{
 					shopItem.DecreaseCount();
 				}
-				
 			}
 		}
 		internal void OnCheckout()

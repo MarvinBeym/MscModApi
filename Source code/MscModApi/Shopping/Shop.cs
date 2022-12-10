@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using MSCLoader;
 using MscModApi.Caching;
 using MscModApi.Tools;
@@ -11,8 +12,7 @@ namespace MscModApi.Shopping
 	{
 		private static ShopInterface shopInterface;
 
-		internal static Dictionary<ShopLocation, Dictionary<ModItem, Dictionary<string, ShopItem>>> shopItems =
-			new Dictionary<ShopLocation, Dictionary<ModItem, Dictionary<string, ShopItem>>>();
+		internal static Dictionary<ShopLocation, List<ModItem>> shopItems = new Dictionary<ShopLocation, List<ModItem>>();
 
 		public enum ShopLocation
 		{
@@ -54,8 +54,9 @@ namespace MscModApi.Shopping
 			shopCatalogs = new Dictionary<ShopLocation, GameObject>();
 			shopInterface = new ShopInterface();
 
-			foreach (var shopLocation in (ShopLocation[]) Enum.GetValues(typeof(ShopLocation))) {
-				shopItems[shopLocation] = new Dictionary<ModItem, Dictionary<string, ShopItem>>();
+			foreach (var shopLocation in (ShopLocation[]) Enum.GetValues(typeof(ShopLocation)))
+			{
+				shopItems[shopLocation] = new List<ModItem>();
 				GameObject shopCatalogParent = null;
 				Vector3 position = new Vector3(0, 0, 0);
 				Vector3 rotation = new Vector3(0, 0, 0);
@@ -99,28 +100,15 @@ namespace MscModApi.Shopping
 		public static void Add(ShopBaseInfo baseInfo, ShopLocation shopLocation, ShopItem shopItem)
 		{
 			shopItem.SetBaseInfo(baseInfo);
-			ModItem modItem = null;
-
-			foreach (var keyValuePair in shopItems[shopLocation])
-			{
-				if (keyValuePair.Key.mod == baseInfo.mod)
-				{
-					modItem = keyValuePair.Key;
-				}
-			}
+			ModItem modItem = shopItems[shopLocation].FirstOrDefault(modItemCached => modItemCached.mod == baseInfo.mod);
 
 			if (modItem == null)
 			{
 				modItem = new ModItem(shopLocation, shopInterface, baseInfo.mod);
-				shopItems[shopLocation].Add(modItem, new Dictionary<string, ShopItem>());
+				shopItems[shopLocation].Add(modItem);
 			}
 
-			if (shopItems[shopLocation][modItem].ContainsKey(shopItem.GetName()))
-			{
-				return;
-			}
-
-			shopItems[shopLocation][modItem].Add(shopItem.GetName(), shopItem);
+			modItem.Add(shopItem);
 
 			shopItem.Create(shopInterface);
 		}
