@@ -32,11 +32,13 @@ namespace MscModApi.Shopping
 		private FsmBool playerInMenu;
 		private FsmBool playerStop;
 		internal bool open = false;
+		private GameObject gameMenuGUI;
 
 		internal ShopInterface()
 		{
 			playerInMenu = FsmVariables.GlobalVariables.FindFsmBool("PlayerInMenu");
 			playerStop = FsmVariables.GlobalVariables.FindFsmBool("PlayerStop");
+			gameMenuGUI = Cache.Find("Systems/OptionsMenu");
 			gameObject = GameObject.Instantiate(Shop.Prefabs.shopInterface);
 			gameObject.SetActive(false);
 			partsPanel = gameObject.FindChild("panel/shop/parts_panel");
@@ -97,6 +99,7 @@ namespace MscModApi.Shopping
 			open = false;
 			playerInMenu.Value = false;
 			playerStop.Value = false;
+			gameMenuGUI.SetActive(false);
 
 			OnBack();
 			gameObject.SetActive(false);
