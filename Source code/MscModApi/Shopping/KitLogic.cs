@@ -10,14 +10,14 @@ namespace MscModApi.Shopping
 
 		void Update()
 		{
-			if (kit.spawnedCounter < kit.parts.Length && gameObject.IsLookingAt())
+			if (kit.spawnedCounter < kit.GetParts().Count && gameObject.IsLookingAt())
 			{
 				UserInteraction.GuiInteraction(
-					$"Press [{cInput.GetText("Use")}] to {"Unpack " + kit.parts[kit.spawnedCounter].gameObject.name.Replace("(Clone)", "")}"
+					$"Press [{cInput.GetText("Use")}] to {"Unpack " + kit.GetParts()[kit.spawnedCounter].gameObject.name.Replace("(Clone)", "")}"
 				);
 				if (UserInteraction.UseButtonDown)
 				{
-					Part part = kit.parts[kit.spawnedCounter];
+					Part part = kit.GetParts()[kit.spawnedCounter];
 
 					part.SetPosition(gameObject.transform.position + gameObject.transform.up * 0.3f);
 					part.SetActive(true);
@@ -25,7 +25,7 @@ namespace MscModApi.Shopping
 				}
 			}
 
-			if (kit.spawnedCounter >= kit.parts.Length)
+			if (kit.spawnedCounter >= kit.GetParts().Count)
 			{
 				gameObject.SetActive(false);
 			}

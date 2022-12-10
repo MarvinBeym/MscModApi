@@ -8,9 +8,7 @@ namespace MscModApi.Shopping
 {
 	public class Box : PartBox
 	{
-		public GameObject box;
 		public int spawnedCounter = 0;
-		public Part[] parts;
 		public BoxLogic logic;
 		private static GameObject boxModel;
 
@@ -60,28 +58,27 @@ namespace MscModApi.Shopping
 			bool uninstallWhenParentUninstalls, bool disableCollisionWhenInstalled)
 		{
 			PartBaseInfo partBaseInfo = parent.partBaseInfo;
-			this.box = box;
-
-			parts = new Part[numberOfParts];
+			SetBoxGameObject(box);
 
 			for (int i = 0; i < numberOfParts; i++)
 			{
 				int iOffset = i + 1;
 
-				parts[i] = new Part(
+				Part part = new Part(
 					$"{partId}_{i}", partName + " " + iOffset, partGameObject,
 					parent, installLocations[i], installRotations[i], partBaseInfo, uninstallWhenParentUninstalls,
 					disableCollisionWhenInstalled);
-				parts[i].SetDefaultPosition(defaultPosition);
-				if (!parts[i].IsBought())
+				part.SetDefaultPosition(defaultPosition);
+				if (!part.IsBought())
 				{
-					parts[i].Uninstall();
-					parts[i].SetActive(false);
+					part.Uninstall();
+					part.SetActive(false);
 				}
+				AddPart(part);
 			}
 
 			logic = box.AddComponent<BoxLogic>();
-			logic.Init(parts, "Unpack " + partName, this);
+			logic.Init("Unpack " + partName, this);
 		}
 
 		public Box(string partId, string partName, GameObject box, GameObject partGameObject, int numberOfParts,
@@ -110,9 +107,11 @@ namespace MscModApi.Shopping
 				return;
 			}
 
-			if (spawnedCounter < parts.Length)
+			GameObject box = GetBoxGameObject();
+
+			if (spawnedCounter < GetParts().Count)
 			{
-				foreach (Part part in parts)
+				foreach (Part part in GetParts())
 				{
 					if (part.IsInstalled() || part.gameObject.activeSelf) continue;
 					part.SetPosition(box.transform.position);
@@ -127,7 +126,7 @@ namespace MscModApi.Shopping
 
 		internal void AddScrews(Screw[] screws, float overrideScale = 0f, float overrideSize = 0f)
 		{
-			foreach (Part part in parts)
+			foreach (Part part in GetParts())
 			{
 				part.AddScrews(screws.CloneToNew(), overrideScale, overrideSize);
 			}
@@ -135,12 +134,12 @@ namespace MscModApi.Shopping
 
 		public bool IsBought()
 		{
-			return parts.All(part => part.IsBought());
+			return GetParts().All(part => part.IsBought());
 		}
 
 		public bool AnyBought()
 		{
-			return parts.Any(part => part.IsBought());
+			return GetParts().Any(part => part.IsBought());
 		}
 
 		internal static void LoadAssets(AssetBundle assetBundle)

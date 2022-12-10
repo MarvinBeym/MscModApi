@@ -9,8 +9,6 @@ namespace MscModApi.Shopping
 {
 	public class Kit : PartBox
 	{
-		public GameObject kitBox;
-		public Part[] parts;
 		private KitLogic logic;
 		public int spawnedCounter = 0;
 		private static GameObject boxModel;
@@ -36,10 +34,9 @@ namespace MscModApi.Shopping
 
 		private void Setup(string name, GameObject kitBox, Part[] parts)
 		{
-			this.kitBox = kitBox;
-			this.kitBox.SetNameLayerTag(name + "(Clone)");
+			kitBox.SetNameLayerTag(name + "(Clone)");
 
-			this.parts = parts;
+			SetParts(parts);
 			if (!AnyBought())
 			{
 				foreach (Part part in parts)
@@ -52,6 +49,8 @@ namespace MscModApi.Shopping
 
 			logic = kitBox.AddComponent<KitLogic>();
 			logic.Init(this);
+
+			SetBoxGameObject(kitBox);
 		}
 
 		internal override void CheckUnpackedOnSave()
@@ -61,34 +60,37 @@ namespace MscModApi.Shopping
 				return;
 			}
 
-			if (spawnedCounter < parts.Length)
+			GameObject box = GetBoxGameObject();
+
+			if (spawnedCounter < GetPartCount())
 			{
-				foreach (Part part in parts)
+				foreach (Part part in GetParts())
 				{
 					if (part.IsInstalled() || part.gameObject.activeSelf)
 					{
 						continue;
 					}
 
-					part.SetPosition(kitBox.transform.position);
+					part.SetPosition(box.transform.position);
 					part.SetActive(true);
 				}
 			}
 
-			kitBox.SetActive(false);
-			kitBox.transform.position = new Vector3(0, 0, 0);
-			kitBox.transform.localPosition = new Vector3(0, 0, 0);
+			box.SetActive(false);
+			box.transform.position = new Vector3(0, 0, 0);
+			box.transform.localPosition = new Vector3(0, 0, 0);
 		}
 
 		public bool IsBought()
 		{
-			return parts.All(part => part.IsBought());
+			return GetParts().All(part => part.IsBought());
 		}
 
 		public bool AnyBought()
 		{
-			return parts.Any(part => part.IsBought());
+			return GetParts().Any(part => part.IsBought());
 		}
+
 
 		internal static void LoadAssets(AssetBundle assetBundle)
 		{
