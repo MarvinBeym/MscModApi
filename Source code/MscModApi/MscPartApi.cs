@@ -47,24 +47,18 @@ namespace MscModApi
 		}
 
 		internal static bool ShowScrewSize => (bool)showBoltSizeSetting.Value;
-		private static bool loadedAssets = false;
 
 		public override void ModSetup()
 		{
 			SetupFunction(Setup.OnGUI, OnGui);
 			SetupFunction(Setup.OnLoad, Load);
+			SetupFunction(Setup.OnMenuLoad, MenuLoad);
 			SetupFunction(Setup.OnSave, Save);
 			SetupFunction(Setup.Update, Update);
 
 			modSaveFileMapping = new Dictionary<string, string>();
 			modsParts = new Dictionary<string, Dictionary<string, Part>>();
 			screws = new Dictionary<string, Screw>();
-
-			if (!loadedAssets)
-			{
-				LoadAssets();
-				loadedAssets = true;
-			}
 		}
 
 		public override void ModSettings()
@@ -87,11 +81,15 @@ namespace MscModApi
 			SaveLoad.SerializeSaveFile(mod, new Dictionary<string, PartSave>(), saveFileName);
 		}
 
+		private void MenuLoad()
+		{
+			ModConsole.Print($"<color=white>You are running <color=blue>{Name}</color> [<color=green>v{Version}</color>]</color>");
+			Logger.InitLogger(this);
+			LoadAssets();
+		}
+
 		private void Load()
 		{
-			ModConsole.Print(
-				$"<color=white>You are running <color=blue>{Name}</color> [<color=green>v{Version}</color>]</color>");
-			Logger.InitLogger(this);
 			tool = new Tool();
 			Shop.Init();
 		}
