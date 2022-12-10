@@ -46,7 +46,18 @@ namespace MscModApi.Caching
 
 			foreach(var gameObject in globalCache)
 			{
-				if (gameObject.name == name)
+				string nameToCompareTo = gameObject.name;
+
+				if (gameObject.name.Contains("OptionsMenu"))
+				{
+
+				}
+
+				if (name.Contains("/"))
+				{
+					nameToCompareTo = GetObjectPath(gameObject);
+				}
+				if (nameToCompareTo == name)
 				{
 					return gameObject;
 				}
@@ -57,6 +68,20 @@ namespace MscModApi.Caching
 		public static void Clear()
 		{
 			cachedGameObjects = new Dictionary<string, GameObject>();
+		}
+
+		private static string GetObjectPath(GameObject gameObject)
+		{
+			Transform currentTransform = gameObject.transform;
+			string path = currentTransform.name;
+
+			while (currentTransform.parent != null)
+			{
+				currentTransform = currentTransform.parent;
+				path = currentTransform.name + "/" + path;
+			}
+
+			return path;
 		}
 	}
 }
