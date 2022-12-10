@@ -53,6 +53,10 @@ namespace MscModApi.Shopping
 
 				}
 
+				if (!multiPurchase)
+				{
+					buyable = false;
+				}
 				partBox.GetBoxGameObject().SetActive(true);
 				partBox.GetBoxGameObject().transform.position = spawnLocation;
 				partBox.GetBoxGameObject().transform.rotation = Quaternion.Euler(new Vector3(0, 0, 0));
@@ -122,6 +126,11 @@ namespace MscModApi.Shopping
 			part.SetBought(true);
 			part.SetActive(true);
 			part.ResetToDefault();
+
+			if (!IsMultiPurchase())
+			{
+				buyable = false;
+			}
 		}
 
 		internal void AddToCart()

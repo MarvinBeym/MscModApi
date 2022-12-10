@@ -219,6 +219,15 @@ namespace MscModApi.Shopping
 				GameObject.Destroy(shopItem.cartItemGameObject);
 			}
 			shoppingCart.Clear();
+
+			foreach (var shopLocationItem in shopItems)
+			{
+				foreach (ModItem modItem in shopLocationItem.Value)
+				{
+					modItem.UpdatePartCount();
+				}
+			}
+
 			gameObject.PlayCheckout();
 			Close();
 		}
