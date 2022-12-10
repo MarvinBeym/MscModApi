@@ -68,6 +68,8 @@ namespace MscModApi.Shopping
 			partsPanel.SetActive(false);
 			moneyComp.text = Game.money.ToString();
 			gameObject.SetActive(true);
+
+			EmptyShoppingCart();
 			
 			foreach (ModItem modItem in shopItems[shopLocation])
 			{
@@ -157,6 +159,18 @@ namespace MscModApi.Shopping
 				btnBuyTextComp.color = Color.red;
 				btnBuyComp.enabled = false;
 			}
+		}
+
+		private void EmptyShoppingCart()
+		{
+			totalCost = 0;
+			totalCostComp.text = totalCost.ToString();
+			foreach (ShopItem item in shoppingCart)
+			{
+				GameObject.Destroy(item.cartItemGameObject);
+			}
+
+			shoppingCart.Clear();
 		}
 
 		internal void OnRemoveFromCart(ShopItem shopItem)
