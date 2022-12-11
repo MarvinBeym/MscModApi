@@ -3,6 +3,7 @@ using MscModApi.Parts;
 using MscModApi.Shopping;
 using MscModApi.Tools;
 using System.Collections.Generic;
+using MscModApi.PaintingSystem;
 using UnityEngine;
 
 namespace MscModApi
@@ -82,6 +83,7 @@ namespace MscModApi
 		public static void NewGameCleanUp(Mod mod, string saveFileName = "parts_saveFile.json")
 		{
 			SaveLoad.SerializeSaveFile(mod, new Dictionary<string, PartSave>(), saveFileName);
+			SaveLoad.SerializeSaveFile(mod, new Dictionary<string, SerializableColor>(), "color_saveFile.json");
 		}
 
 		private void MenuLoad()
@@ -94,6 +96,7 @@ namespace MscModApi
 		private void Load()
 		{
 			tool = new Tool();
+			PaintingSystem.PaintingSystem.Init();
 			Shop.Init();
 		}
 
@@ -103,6 +106,8 @@ namespace MscModApi
 			{
 				partBox.CheckUnpackedOnSave();
 			}
+
+			PaintingSystem.PaintingSystem.Save();
 
 			foreach (var modParts in modsParts)
 			{

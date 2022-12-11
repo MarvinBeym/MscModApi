@@ -80,6 +80,10 @@
     <Compile Include="Caching\Cache.cs" />
     <Compile Include="Caching\CarH.cs" />
     <Compile Include="Caching\Game.cs" />
+    <Compile Include="PaintingSystem\PaintingStorage.cs" />
+    <Compile Include="PaintingSystem\PaintingSystem.cs" />
+    <Compile Include="PaintingSystem\PaintingSystemLogic.cs" />
+    <Compile Include="PaintingSystem\SerializableColor.cs" />
     <Compile Include="Parts\ReplacePart\NewPart.cs" />
     <Compile Include="Parts\ReplacePart\OldPart.cs" />
     <Compile Include="Parts\ReplacePart\ReplacementPart.cs" />
@@ -112,20 +116,6 @@
     <None Include="..\.editorconfig">
       <Link>.editorconfig</Link>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="..\.gitattributes">
-      <Link>Project\.gitattributes</Link>
-    </Content>
-    <Content Include="..\.gitignore">
-      <Link>Project\.gitignore</Link>
-    </Content>
-    <Content Include="..\LICENSE">
-      <Link>Project\LICENSE</Link>
-    </Content>
-    <Content Include="..\README.md">
-      <Link>Project\README.md</Link>
-    </Content>
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
