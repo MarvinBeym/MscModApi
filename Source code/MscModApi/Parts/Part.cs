@@ -131,6 +131,14 @@ namespace MscModApi.Parts
 			partBaseInfo.AddToPartsList(this);
 		}
 
+		/// <summary>
+		/// Only used for DerivablePart class
+		/// </summary>
+		protected Part()
+		{
+
+		}
+
 		public Part(string id, string name, GameObject part, Part parentPart, Vector3 installPosition, Vector3 installRotation,
 			PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls = true,
 			bool disableCollisionWhenInstalled = true)
