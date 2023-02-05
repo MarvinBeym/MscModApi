@@ -10,8 +10,8 @@ namespace MscModApi.Parts
 {
 	public class Part
 	{
-		private int clampsAdded;
-		private bool partFixed;
+		protected int clampsAdded;
+		protected bool partFixed;
 
 		internal List<Part> childParts = new List<Part>();
 		public string id;
@@ -21,17 +21,17 @@ namespace MscModApi.Parts
 		internal Vector3 installPosition;
 		internal bool uninstallWhenParentUninstalls;
 		internal Vector3 installRotation;
-		private GameObject parentGameObject;
-		private Part parentPart;
-		private List<Screw> savedScrews;
+		protected GameObject parentGameObject;
+		protected Part parentPart;
+		protected List<Screw> savedScrews;
 		internal Collider collider;
 		public TriggerWrapper trigger;
 
 		public Transform transform => gameObject.transform;
 
-		private bool usingGameObjectInstantiation;
-		private GameObject gameObjectUsedForInstantiation;
-		private bool usingPartParent;
+		protected bool usingGameObjectInstantiation;
+		protected GameObject gameObjectUsedForInstantiation;
+		protected bool usingPartParent;
 
 		internal List<Action> preSaveActions = new List<Action>();
 
@@ -48,12 +48,12 @@ namespace MscModApi.Parts
 		internal List<Action> postUnfixedActions = new List<Action>();
 
 		internal bool screwPlacementMode;
-		private Vector3 defaultRotation = Vector3.zero;
-		private Vector3 defaultPosition = Vector3.zero;
-		private bool installBlocked;
-		private static GameObject clampModel;
+		protected Vector3 defaultRotation = Vector3.zero;
+		protected Vector3 defaultPosition = Vector3.zero;
+		protected bool installBlocked;
+		protected static GameObject clampModel;
 
-		private void Setup(string id, string name, GameObject parentGameObject, Vector3 installPosition,
+		protected void Setup(string id, string name, GameObject parentGameObject, Vector3 installPosition,
 			Vector3 installRotation, PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls,
 			bool disableCollisionWhenInstalled, string prefabName)
 		{
