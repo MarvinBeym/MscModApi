@@ -7,8 +7,8 @@ namespace MscModApi.Parts
 {
 	public class PartBaseInfo
 	{
-		internal Mod mod;
-		internal AssetBundle assetBundle;
+		public Mod mod;
+		public AssetBundle assetBundle;
 
 		internal string saveFilePath;
 		private List<Part> partsList;
