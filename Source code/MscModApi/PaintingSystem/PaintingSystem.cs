@@ -22,32 +22,31 @@ namespace MscModApi.PaintingSystem
 		private static FsmColor sprayCanColorFsm;
 		private static State state = State.NotPainting;
 
-		private static Dictionary<string, List<PaintingStorage>> storage =
-			new Dictionary<string, List<PaintingStorage>>();
+		private static Dictionary<Mod, List<PaintingStorage>> storage = new Dictionary<Mod, List<PaintingStorage>>();
 
 		private static Material[] availableMaterials = new Material[0];
 
-		private static Dictionary<string, Dictionary<string, SerializableColor>> modSave =
-			new Dictionary<string, Dictionary<string, SerializableColor>>();
+		private static Dictionary<Mod, Dictionary<string, SerializableColor>> modSave =
+			new Dictionary<Mod, Dictionary<string, SerializableColor>>();
 
 		public static PaintingStorage Setup(Mod mod, string id, GameObject paintDetector,
 			Dictionary<GameObject, List<string>> paintConfig)
 		{
-			if (!storage.ContainsKey(mod.ID))
+			if (!storage.ContainsKey(mod))
 			{
-				storage.Add(mod.ID, new List<PaintingStorage>());
+				storage.Add(mod, new List<PaintingStorage>());
 			}
 
 			Dictionary<string, SerializableColor> colorSave = new Dictionary<string, SerializableColor>();
-			if (!modSave.ContainsKey(mod.ID))
+			if (!modSave.ContainsKey(mod))
 			{
 				colorSave = Helper.LoadSaveOrReturnNew<Dictionary<string, SerializableColor>>(mod,
 					"color_saveFile.json");
-				modSave.Add(mod.ID, colorSave);
+				modSave.Add(mod, colorSave);
 			}
 			else
 			{
-				colorSave = modSave[mod.ID];
+				colorSave = modSave[mod];
 			}
 
 
@@ -96,7 +95,7 @@ namespace MscModApi.PaintingSystem
 				paintingStorage.SetColor(colorSave[id]);
 			}
 
-			storage[mod.ID].Add(paintingStorage);
+			storage[mod].Add(paintingStorage);
 			logic.Init(paintingStorage);
 
 			return paintingStorage;
@@ -189,20 +188,15 @@ namespace MscModApi.PaintingSystem
 
 		public static void Save()
 		{
-			Dictionary<string, SerializableColor> colorSave = new Dictionary<string, SerializableColor>();
-			Mod mod = null;
-			foreach (var storagePair in storage)
+			foreach (var modPaintData in storage)
 			{
-				foreach (var pair in storagePair.Value)
+				Dictionary<string, SerializableColor> colorSave = new Dictionary<string, SerializableColor>();
+				foreach (PaintingStorage paintingData in modPaintData.Value)
 				{
-					mod = pair.GetMod();
-					colorSave.Add(pair.GetPaintingId(), pair.GetCurrentColor());
+					colorSave.Add(paintingData.GetPaintingId(), paintingData.GetCurrentColor());
 				}
-			}
 
-			if (mod != null)
-			{
-				SaveLoad.SerializeSaveFile(mod, colorSave, "color_saveFile.json");
+				SaveLoad.SerializeSaveFile(modPaintData.Key, colorSave, "paintingSystem_saveFile.json");
 			}
 		}
 	}
