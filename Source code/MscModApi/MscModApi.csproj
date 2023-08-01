@@ -99,6 +99,7 @@
     <Compile Include="Shopping\ShopInterface.cs" />
     <Compile Include="Shopping\ShopItem.cs" />
     <Compile Include="Tools\Extensions.cs" />
+    <Compile Include="Tools\LoggedMod.cs" />
     <Compile Include="Tools\Logger.cs" />
     <Compile Include="Tools\ScrewPlacementAssist.cs" />
     <Compile Include="Tool.cs" />
@@ -127,7 +128,7 @@ copy "$(TargetDir)$(TargetName).pdb" "S:\Spiele\Steam\steamapps\common\My Summer
 cd "S:\Spiele\Steam\steamapps\common\My Summer Car\Mods"
 call "S:\Spiele\Steam\steamapps\common\My Summer Car\Mods\debug.bat"
 ) ELSE (
-copy "$(TargetPath)" "M:\My Summer Car Modding\Mods\MscModApi\Current version" /y
+copy "$(TargetPath)" "D:\Programmierung\My Summer Car Modding\MscModApi\project files\Current version" /y
 copy "$(TargetPath)" "S:\Spiele\Steam\steamapps\common\My Summer Car\Mods" /y
 )</PostBuildEvent>
   </PropertyGroup>

@@ -1,35 +1,92 @@
 ﻿using MSCLoader;
 using System;
+using System.Collections.Generic;
 using System.Globalization;
 using System.IO;
 using UnityEngine;
+using System.Reflection;
+using System.Collections;
+using Microsoft.Win32;
+using System.Runtime.InteropServices;
 
 namespace MscModApi.Tools
 {
 	public static class Logger
 	{
-		private static Mod mod;
-		private const string fileName = "logs.log";
-		private static string filePath = "";
 		private static int maxLineLength = 62;
-		internal static void InitLogger(Mod mod)
+
+		private static Dictionary<string, LoggedMod> loggedModsMap = new Dictionary<string, LoggedMod>();
+		private static List<string> initLoggerNotCalledByAssemblyCache = new List<string>();
+
+		public static void InitLogger(Mod mod, string fileName)
 		{
-			Logger.mod = mod;
-			filePath = Helper.CombinePaths(ModLoader.GetModSettingsFolder(mod), fileName);
-			InitFile();
+			Assembly callingAssembly = Assembly.GetCallingAssembly();
+			Setup(callingAssembly.GetName().Name, mod, fileName);
 		}
 
-		public static string GetLogFilePath()
+		public static void InitLogger(Mod mod)
 		{
-			return filePath;
+			Assembly callingAssembly = Assembly.GetCallingAssembly();
+
+			Setup(callingAssembly.GetName().Name, mod, mod.ID + ".log");
 		}
 
-		public static void New(string message) => New(message, "", null);
-		public static void New(string message, string additionalInfo) => New(message, additionalInfo, null);
-		public static void New(string message, Exception ex) => New(message, "", ex);
+		private static void Setup(string callingAssembly, Mod mod, string fileName)
+		{
+			if (loggedModsMap.ContainsKey(mod.ID))
+			{
+				ModConsole.Warning("Logger already initialized for mod with ID '" + mod.ID + "'");
+				return;
+			}
+
+			LoggedMod loggedMod = new LoggedMod(mod, fileName);
+			loggedModsMap.Add(callingAssembly, loggedMod);
+			InitFile(loggedMod);
+		}
+
+		public static void New(string message)
+		{
+			Assembly callingAssembly = Assembly.GetCallingAssembly();
+			WriteLogEntry(callingAssembly.GetName().Name, message, "", null);
+		}
+
+		public static void New(string message, string additionalInfo)
+		{
+			Assembly callingAssembly = Assembly.GetCallingAssembly();
+			WriteLogEntry(callingAssembly.GetName().Name, message, additionalInfo, null);
+		}
+
+		public static void New(string message, Exception ex)
+		{
+			Assembly callingAssembly = Assembly.GetCallingAssembly();
+			WriteLogEntry(callingAssembly.GetName().Name, message, "", null);
+		}
+
 		public static void New(string message, string additionalInfo, Exception ex)
 		{
-			using (var sw = new StreamWriter(filePath, true)) {
+			Assembly callingAssembly = Assembly.GetCallingAssembly();
+			WriteLogEntry(callingAssembly.GetName().Name, message, additionalInfo, ex);
+		}
+
+		private static void WriteLogEntry(string callingAssemblyName, string message, string additionalInfo,
+			Exception ex)
+		{
+			//If InitLogger wasn't called, warn once and default to printing message to ModConsole
+			if (!loggedModsMap.TryGetValue(callingAssemblyName, out LoggedMod loggedMod))
+			{
+				if (!initLoggerNotCalledByAssemblyCache.Contains(callingAssemblyName))
+				{
+					initLoggerNotCalledByAssemblyCache.Add(callingAssemblyName);
+					ModConsole.Error("Logger was not initialized by assembly with name '" + callingAssemblyName +
+					                 "'. Logging will default to printing limited info to ModConsole!");
+				}
+
+				ModConsole.Error(message);
+				return;
+			}
+
+			using (var sw = new StreamWriter(loggedMod.FilePath, true))
+			{
 				var errorLogLine = AddBaseLogLine(message);
 				if (additionalInfo != "")
 				{
@@ -40,12 +97,13 @@ namespace MscModApi.Tools
 				{
 					errorLogLine = AddExceptionLine(errorLogLine, ex);
 				}
+
 				errorLogLine += Environment.NewLine;
 				sw.Write(errorLogLine);
 			}
 		}
 
-		private static void InitFile()
+		private static void InitFile(LoggedMod loggedMod)
 		{
 			var modsInstalled = GetModsInstalled();
 			var baseInformation =
@@ -53,9 +111,9 @@ namespace MscModApi.Tools
 ║ Steam:        {ModLoader.CheckSteam().ToXY("Yes", "No")}
 ║ OS:           {GetOperatingSystem()}
 ╠{GenerateHeader(" Mod ")}
-║ Name:         {mod.Name}
-║ Version:      {mod.Version}
-║ Author:       {mod.Author}
+║ Name:         {loggedMod.Mod.Name}
+║ Version:      {loggedMod.Mod.Version}
+║ Author:       {loggedMod.Mod.Author}
 ╠{GenerateHeader(" ModLoader ")}
 ║ Version:      {ModLoader.MSCLoader_Ver}
 ║ Experimental: {ModLoader.experimental}
@@ -64,10 +122,12 @@ namespace MscModApi.Tools
 {modsInstalled}
 ╚{GenerateHeader("")}
 ";
-			using (var streamWriter = new StreamWriter(filePath, false)) {
+			using (var streamWriter = new StreamWriter(loggedMod.FilePath, false))
+			{
 				streamWriter.Write(baseInformation);
 			}
 		}
+
 		private static string GenerateHeader(string description, char headerLine = '═')
 		{
 			var header = "════";
@@ -78,22 +138,21 @@ namespace MscModApi.Tools
 
 		private static string GetOperatingSystem()
 		{
-			var operatingSystem = SystemInfo.operatingSystem;
-			var build = int.Parse(operatingSystem.Split('(')[1].Split(')')[0].Split('.')[2]);
-			if (build <= 9600) return operatingSystem;
-			operatingSystem = $"Windows 10 (10.0.{build})";
+			RegistryKey registryKey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion");
 
-			if (SystemInfo.operatingSystem.Contains("64bit")) {
-				operatingSystem += " 64bit";
+			if (registryKey == null)
+			{
+				return "Unavailable";
 			}
 
-			return operatingSystem;
+			return "Build: " + registryKey.GetValue("CurrentBuildNumber").ToString();
 		}
 
 		private static string GetModsInstalled()
 		{
 			var modsInstalled = "";
-			foreach (var mod in ModLoader.LoadedMods) {
+			foreach (var mod in ModLoader.LoadedMods)
+			{
 				// Ignore MSCLoader.
 				if (mod.ID == "MSCLoader_Console" || mod.ID == "MSCLoader_Settings")
 					continue;
@@ -103,7 +162,7 @@ namespace MscModApi.Tools
 					mod.ID,
 					mod.Name,
 					mod.Version
-					);
+				);
 				modsInstalled += modLine;
 				if (maxLineLength < modLine.Length)
 				{
@@ -114,6 +173,7 @@ namespace MscModApi.Tools
 			modsInstalled += "║";
 			return modsInstalled;
 		}
+
 		private static string AddBaseLogLine(string message)
 		{
 			DateTime dateTime = DateTime.Now;
@@ -130,7 +190,8 @@ namespace MscModApi.Tools
 
 		private static string AddExceptionLine(string errorLogLine, Exception ex)
 		{
-			if (ex != null) {
+			if (ex != null)
+			{
 				errorLogLine += $"{Environment.NewLine}=> Exception message: {ex.Message}";
 			}
 
