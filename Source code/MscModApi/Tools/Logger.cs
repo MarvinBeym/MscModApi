@@ -158,7 +158,7 @@ namespace MscModApi.Tools
 					continue;
 				var modLine = string.Format(
 					"║ [{0}] ID: {1} Name: {2} Version: {3}" + Environment.NewLine,
-					mod.isDisabled.ToXY("DISABLED", " ACTIVE "),
+					mod.isDisabled.ToXY(" DISABLED ", " ACTIVE "),
 					mod.ID,
 					mod.Name,
 					mod.Version
