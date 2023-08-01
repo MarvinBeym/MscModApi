@@ -21,6 +21,7 @@
     <DefineConstants>DEBUG;TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Debug\MscModApi.xml</DocumentationFile>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>none</DebugType>
@@ -29,6 +30,7 @@
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
+    <DocumentationFile>bin\Release\MscModApi.xml</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Assembly-CSharp">
@@ -78,10 +80,20 @@
     <Compile Include="Caching\Cache.cs" />
     <Compile Include="Caching\CarH.cs" />
     <Compile Include="Caching\Game.cs" />
+    <Compile Include="PaintingSystem\PaintingStorage.cs" />
+    <Compile Include="PaintingSystem\PaintingSystem.cs" />
+    <Compile Include="PaintingSystem\PaintingSystemLogic.cs" />
+    <Compile Include="PaintingSystem\SerializableColor.cs" />
+    <Compile Include="Parts\DerivablePart.cs" />
     <Compile Include="Parts\ReplacePart\NewPart.cs" />
     <Compile Include="Parts\ReplacePart\OldPart.cs" />
     <Compile Include="Parts\ReplacePart\ReplacementPart.cs" />
+    <Compile Include="Shopping\Box.cs" />
+    <Compile Include="Shopping\BoxLogic.cs" />
+    <Compile Include="Shopping\Kit.cs" />
+    <Compile Include="Shopping\KitLogic.cs" />
     <Compile Include="Shopping\ModItem.cs" />
+    <Compile Include="Shopping\PartBox.cs" />
     <Compile Include="Shopping\ShopBaseInfo.cs" />
     <Compile Include="Shopping\Shop.cs" />
     <Compile Include="Shopping\ShopInterface.cs" />
@@ -93,7 +105,7 @@
     <Compile Include="Trigger\TriggerWrapper.cs" />
     <Compile Include="Tools\UserInteraction.cs" />
     <Compile Include="Tools\Helper.cs" />
-    <Compile Include="MscPartApi.cs" />
+    <Compile Include="MscModApi.cs" />
     <Compile Include="Parts\Part.cs" />
     <Compile Include="Parts\PartBaseInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -105,20 +117,6 @@
     <None Include="..\.editorconfig">
       <Link>.editorconfig</Link>
     </None>
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="..\.gitattributes">
-      <Link>Project\.gitattributes</Link>
-    </Content>
-    <Content Include="..\.gitignore">
-      <Link>Project\.gitignore</Link>
-    </Content>
-    <Content Include="..\LICENSE">
-      <Link>Project\LICENSE</Link>
-    </Content>
-    <Content Include="..\README.md">
-      <Link>Project\README.md</Link>
-    </Content>
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

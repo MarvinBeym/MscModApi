@@ -45,11 +45,7 @@ namespace MscModApi.Trigger
 
 		private IEnumerator VerifyInstalled()
 		{
-			var keepVerifying = part.gameObject.transform.parent != parentGameObject.transform
-								|| part.gameObject.transform.localPosition.CompareVector3(part.installPosition)
-								|| part.gameObject.transform.localRotation.eulerAngles.CompareVector3(part.installRotation);
-
-			while (part.IsInstalled() && keepVerifying) {
+			while (part.IsInstalled() && part.gameObject.transform.parent != parentGameObject.transform) {
 				rigidBody.isKinematic = true;
 				part.gameObject.transform.parent = parentGameObject.transform;
 				part.gameObject.transform.localPosition = part.installPosition;
@@ -155,10 +151,13 @@ namespace MscModApi.Trigger
 		private void OnTriggerEnter(Collider collider)
 		{
 			if (
-				!(part.uninstallWhenParentUninstalls && part.ParentInstalled()) 
+				(part.uninstallWhenParentUninstalls && !part.ParentInstalled()) 
 			    || !collider.gameObject.IsHolding()
 			    || collider.gameObject != part.gameObject
-			    || part.IsInstallBlocked()) return;
+			    || part.IsInstallBlocked()
+			){
+				return;
+			}
 
 			UserInteraction.GuiInteraction(UserInteraction.Type.Assemble, $"Install {part.gameObject.name}");
 			canBeInstalled = true;

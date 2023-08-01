@@ -214,6 +214,7 @@ namespace MscModApi.Tools
 
 		public static bool UseButtonDown => cInput.GetKeyDown("Use");
 
+		public static bool ThrottleDown => cInput.GetKey("Throttle");
 
 		public static class MouseScrollWheel
 		{

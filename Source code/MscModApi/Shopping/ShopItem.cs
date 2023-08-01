@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Linq;
 using MscModApi.Parts;
 using MscModApi.Tools;
 using UnityEngine;
@@ -33,6 +34,36 @@ namespace MscModApi.Shopping
 			this.onPurchaseAction = onPurchaseAction;
 		}
 
+		public ShopItem(string name, float prize, Vector3 spawnLocation, PartBox partBox, string imageAssetName = "")
+		{
+			Setup(name, prize, spawnLocation, imageAssetName);
+			foreach (Part part in partBox.GetParts())
+			{
+				part.SetDefaultPosition(spawnLocation);
+				part.SetActive(part.IsBought());
+			}
+
+			buyable = !partBox.GetParts().Any(part => part.IsBought());
+			onPurchaseAction = delegate
+			{
+				foreach (Part part in partBox.GetParts())
+				{
+					part.SetBought(true);
+					part.SetDefaultPosition(spawnLocation);
+
+				}
+
+				if (!multiPurchase)
+				{
+					buyable = false;
+				}
+				partBox.GetBoxGameObject().SetActive(true);
+				partBox.GetBoxGameObject().transform.position = spawnLocation;
+				partBox.GetBoxGameObject().transform.rotation = Quaternion.Euler(new Vector3(0, 0, 0));
+			};
+		}
+
+
 		public ShopItem(string name, float prize, Vector3 spawnLocation, Part part, string imageAssetName = "")
 		{
 			Setup(name, prize, spawnLocation, imageAssetName);
@@ -42,15 +73,8 @@ namespace MscModApi.Shopping
 			}
 
 			part.SetDefaultPosition(spawnLocation);
-
-			if (!part.IsBought())
-			{
-				part.SetActive(false);
-			}
-			else
-			{
-				buyable = false;
-			}
+			part.SetActive(part.IsBought());
+			buyable = !part.IsBought();
 
 			onPurchaseAction = delegate
 			{
@@ -102,6 +126,11 @@ namespace MscModApi.Shopping
 			part.SetBought(true);
 			part.SetActive(true);
 			part.ResetToDefault();
+
+			if (!IsMultiPurchase())
+			{
+				buyable = false;
+			}
 		}
 
 		internal void AddToCart()
@@ -122,11 +151,6 @@ namespace MscModApi.Shopping
 
 			cartItemGameObject.transform.SetParent(shopInterface.cartList.transform);
 			cartItemGameObject.transform.localScale = new Vector3(1, 1, 1);
-		}
-
-		internal void SetActive(bool active)
-		{
-			partItemGameObject?.SetActive(active);
 		}
 
 		internal void IncreaseCount()
@@ -161,6 +185,11 @@ namespace MscModApi.Shopping
 		public bool IsMultiPurchase()
 		{
 			return multiPurchase;
+		}
+
+		public void Show(bool show)
+		{
+			partItemGameObject?.SetActive(show);
 		}
 	}
 }

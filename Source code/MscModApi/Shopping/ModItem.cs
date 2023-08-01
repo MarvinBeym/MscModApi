@@ -1,6 +1,7 @@
 ﻿using MSCLoader;
 using MscModApi.Tools;
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using static MscModApi.Shopping.Shop;
@@ -14,6 +15,7 @@ namespace MscModApi.Shopping
 		internal Mod mod;
 		private GameObject gameObject;
 		private Text partCountComp;
+		private List<ShopItem> items = new List<ShopItem>();
 
 		internal ModItem(ShopLocation shopLocation, ShopInterface shopInterface, Mod mod)
 		{
@@ -39,14 +41,56 @@ namespace MscModApi.Shopping
 			gameObject.transform.localScale = new Vector3(1, 1, 1);
 		}
 
-		internal void SetPartCount(int count)
+		internal void UpdatePartCount()
 		{
-			partCountComp.text = count.ToString();
+			partCountComp.text = GetAvailablePartCount().ToString();
 		}
 
-		internal void SetActive(bool active)
+		internal int GetAvailablePartCount()
 		{
-			gameObject.SetActive(active);
+			int count = 0;
+			foreach (ShopItem item in items)
+			{
+				count += item.IsBuyable() ? 1 : 0;
+			}
+			return  count;
+		}
+
+		internal int GetTotalPartCount()
+		{
+			return items.Count;
+		}
+
+		public void Add(ShopItem shopItem)
+		{
+			GetItems().Add(shopItem);
+		}
+
+		public void Show(bool show)
+		{
+			UpdatePartCount();
+			gameObject.SetActive(show);
+		}
+
+		public void Open()
+		{
+			foreach (ShopItem item in GetItems())
+			{
+				item.Show(item.IsBuyable());
+			}
+		}
+
+		public void Close()
+		{
+			foreach (ShopItem item in GetItems())
+			{
+				item.Show(false);
+			}
+		}
+
+		public List<ShopItem> GetItems()
+		{
+			return items;
 		}
 	}
 }

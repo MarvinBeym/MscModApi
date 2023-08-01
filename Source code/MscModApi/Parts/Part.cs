@@ -1,17 +1,17 @@
-﻿using MscModApi.Tools;
+﻿using MSCLoader;
+using MscModApi.Tools;
 using MscModApi.Trigger;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using MSCLoader;
 using UnityEngine;
 
 namespace MscModApi.Parts
 {
 	public class Part
 	{
-		private int clampsAdded;
-		private bool partFixed;
+		protected int clampsAdded;
+		protected bool partFixed;
 
 		internal List<Part> childParts = new List<Part>();
 		public string id;
@@ -21,17 +21,17 @@ namespace MscModApi.Parts
 		internal Vector3 installPosition;
 		internal bool uninstallWhenParentUninstalls;
 		internal Vector3 installRotation;
-		private GameObject parentGameObject;
-		private Part parentPart;
-		private List<Screw> savedScrews;
+		protected GameObject parentGameObject;
+		protected Part parentPart;
+		protected List<Screw> savedScrews;
 		internal Collider collider;
 		public TriggerWrapper trigger;
 
 		public Transform transform => gameObject.transform;
-		
-		private bool usingGameObjectInstantiation;
-		private GameObject gameObjectUsedForInstantiation;
-		private bool usingPartParent;
+
+		protected bool usingGameObjectInstantiation;
+		protected GameObject gameObjectUsedForInstantiation;
+		protected bool usingPartParent;
 
 		internal List<Action> preSaveActions = new List<Action>();
 
@@ -48,12 +48,12 @@ namespace MscModApi.Parts
 		internal List<Action> postUnfixedActions = new List<Action>();
 
 		internal bool screwPlacementMode;
-		private Vector3 defaultRotation = Vector3.zero;
-		private Vector3 defaultPosition = Vector3.zero;
-		private bool installBlocked;
-		private static GameObject clampModel;
+		protected Vector3 defaultRotation = Vector3.zero;
+		protected Vector3 defaultPosition = Vector3.zero;
+		protected bool installBlocked;
+		protected static GameObject clampModel;
 
-		private void Setup(string id, string name, GameObject parentGameObject, Vector3 installPosition,
+		protected void Setup(string id, string name, GameObject parentGameObject, Vector3 installPosition,
 			Vector3 installRotation, PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls,
 			bool disableCollisionWhenInstalled, string prefabName)
 		{
@@ -74,13 +74,17 @@ namespace MscModApi.Parts
 				gameObject = Helper.LoadPartAndSetName(partBaseInfo.assetBundle, prefabName ?? id, name);
 			}
 
-			if (!partBaseInfo.partsSave.TryGetValue(id, out partSave)) {
+			if (!partBaseInfo.partsSave.TryGetValue(id, out partSave))
+			{
 				partSave = new PartSave();
 			}
 
-			try {
+			try
+			{
 				CustomSaveLoading(partBaseInfo.mod, $"{id}_saveFile.json");
-			} catch {
+			}
+			catch
+			{
 				// ignored
 			}
 
@@ -93,20 +97,25 @@ namespace MscModApi.Parts
 			{
 				trigger = new TriggerWrapper(this, parentGameObject, disableCollisionWhenInstalled);
 			}
-			
-			if (partSave.installed) {
+
+			if (partSave.installed)
+			{
 				Install();
 			}
 
 			LoadPartPositionAndRotation(gameObject, partSave);
 
-			if (!MscModApi.modSaveFileMapping.ContainsKey(partBaseInfo.mod.ID)) {
+			if (!MscModApi.modSaveFileMapping.ContainsKey(partBaseInfo.mod.ID))
+			{
 				MscModApi.modSaveFileMapping.Add(partBaseInfo.mod.ID, partBaseInfo.saveFilePath);
 			}
 
-			if (MscModApi.modsParts.ContainsKey(partBaseInfo.mod.ID)) {
+			if (MscModApi.modsParts.ContainsKey(partBaseInfo.mod.ID))
+			{
 				MscModApi.modsParts[partBaseInfo.mod.ID].Add(id, this);
-			} else {
+			}
+			else
+			{
 				MscModApi.modsParts.Add(partBaseInfo.mod.ID, new Dictionary<string, Part>
 				{
 					{id, this}
@@ -118,8 +127,16 @@ namespace MscModApi.Parts
 				EnableScrewPlacementMode();
 			}
 
-			
+
 			partBaseInfo.AddToPartsList(this);
+		}
+
+		/// <summary>
+		/// Only used for DerivablePart class
+		/// </summary>
+		protected Part()
+		{
+
 		}
 
 		public Part(string id, string name, GameObject part, Part parentPart, Vector3 installPosition, Vector3 installRotation,
@@ -173,14 +190,16 @@ namespace MscModApi.Parts
 
 		public void SetPosition(Vector3 position)
 		{
-			if (!IsInstalled()) {
+			if (!IsInstalled())
+			{
 				gameObject.transform.position = position;
 			}
 		}
 
 		internal void ResetScrews()
 		{
-			foreach (var screw in partSave.screws) {
+			foreach (var screw in partSave.screws)
+			{
 				screw.OutBy(screw.tightness);
 			}
 		}
@@ -197,7 +216,8 @@ namespace MscModApi.Parts
 
 		public void SetRotation(Quaternion rotation)
 		{
-			if (!IsInstalled()) {
+			if (!IsInstalled())
+			{
 				gameObject.transform.rotation = rotation;
 			}
 		}
@@ -214,7 +234,8 @@ namespace MscModApi.Parts
 
 		public bool IsFixed(bool ignoreUnsetScrews = true)
 		{
-			if (!ignoreUnsetScrews) {
+			if (!ignoreUnsetScrews)
+			{
 				return partFixed;
 			}
 			return partSave.screws.Count == 0 ? IsInstalled() : partFixed;
@@ -240,9 +261,12 @@ namespace MscModApi.Parts
 
 		internal bool ParentInstalled()
 		{
-			if (usingPartParent) {
+			if (usingPartParent)
+			{
 				return parentPart.IsInstalled();
-			} else {
+			}
+			else
+			{
 				//Todo: Implement normal msc parts installed/uninstalled
 				return true;
 			}
@@ -278,7 +302,8 @@ namespace MscModApi.Parts
 
 			screw.CreateScrewModel(index);
 
-			if (!screwPlacementMode) {
+			if (!screwPlacementMode)
+			{
 				screw.LoadTightness(savedScrews.ElementAtOrDefault(index));
 				screw.InBy(screw.tightness, false, true);
 			}
@@ -295,12 +320,15 @@ namespace MscModApi.Parts
 
 		public void AddScrews(Screw[] screws, float overrideScale = 0f, float overrideSize = 0f)
 		{
-			foreach (var screw in screws) {
-				if (overrideScale != 0f) {
+			foreach (var screw in screws)
+			{
+				if (overrideScale != 0f)
+				{
 					screw.scale = overrideScale;
 				}
-				
-				if (overrideSize != 0f) {
+
+				if (overrideSize != 0f)
+				{
 					screw.size = overrideSize;
 				}
 
@@ -369,37 +397,52 @@ namespace MscModApi.Parts
 
 		}
 
+		[Obsolete("Use AddWhenInstalledBehaviour instead. Will be removed in a later version")]
 		public T AddWhenInstalledMono<T>() where T : MonoBehaviour
 		{
-			var mono = AddComponent<T>();
-			mono.enabled = IsInstalled();
+			return AddWhenInstalledBehaviour<T>();
+		}
+
+		[Obsolete("Use AddWhenUninstalledBehaviour instead. Will be removed in a later version")]
+		public T AddWhenUninstalledMono<T>() where T : MonoBehaviour
+		{
+			return AddWhenUninstalledBehaviour<T>();
+		}
+
+		public T AddWhenInstalledBehaviour<T>() where T : Behaviour
+		{
+			var behaviour = AddComponent<T>();
+			behaviour.enabled = IsInstalled();
 
 			AddPostInstallAction(delegate
 			{
-				mono.enabled = true;
+				behaviour.enabled = true;
 			});
 
-			AddPostUninstallAction(delegate {
-				mono.enabled = false;
+			AddPostUninstallAction(delegate
+			{
+				behaviour.enabled = false;
 			});
-			return mono;
+			return behaviour;
 		}
 
-		public T AddWhenUninstalledMono<T>() where T : MonoBehaviour
+		public T AddWhenUninstalledBehaviour<T>() where T : Behaviour
 		{
-			var mono = AddComponent<T>();
-			mono.enabled = !IsInstalled();
+			var behaviour = AddComponent<T>();
+			behaviour.enabled = !IsInstalled();
 
-			AddPostInstallAction(delegate {
-				mono.enabled = false;
+			AddPostInstallAction(delegate
+			{
+				behaviour.enabled = false;
 			});
 
-			AddPostUninstallAction(delegate {
-				mono.enabled = true;
+			AddPostUninstallAction(delegate
+			{
+				behaviour.enabled = true;
 			});
-			return mono;
+			return behaviour;
 		}
-		
+
 		public T AddComponent<T>() where T : Component => gameObject.AddComponent(typeof(T)) as T;
 
 		public T GetComponent<T>() => gameObject.GetComponent<T>();

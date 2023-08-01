@@ -1,8 +1,8 @@
-﻿using System;
+﻿using MscModApi.Parts;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
-using MscModApi.Parts;
 using UnityEngine;
 
 namespace MscModApi.Tools
@@ -17,6 +17,11 @@ namespace MscModApi.Tools
 		public static string ToOnOff(this bool value)
 		{
 			return value.ToXY("On", "Off");
+		}
+
+		public static float Map(this float value, float from1, float to1, float from2, float to2)
+		{
+			return (value - from1) / (to1 - from1) * (to2 - from2) + from2;
 		}
 
 		public static string ToXY(this bool value, string trueText, string falseText)
@@ -76,12 +81,18 @@ namespace MscModApi.Tools
 		public static Screw[] CloneToNew(this Screw[] screws)
 		{
 			var newScrews = new Screw[screws.Length];
-			for (var i = 0; i < screws.Length; i++) {
+			for (var i = 0; i < screws.Length; i++)
+			{
 				var screw = screws[i];
 				newScrews[i] = screw.CloneToNew();
 			}
 
 			return newScrews;
+		}
+
+		public static string ToStringOrEmpty(this object value)
+		{
+			return value == null ? "" : value.ToString();
 		}
 	}
 }

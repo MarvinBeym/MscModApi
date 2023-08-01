@@ -1,6 +1,7 @@
 ﻿using MscModApi.Tools;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using HutongGames.PlayMaker;
 using MSCLoader;
 using MscModApi.Caching;
@@ -31,11 +32,13 @@ namespace MscModApi.Shopping
 		private FsmBool playerInMenu;
 		private FsmBool playerStop;
 		internal bool open = false;
+		private GameObject gameMenuGUI;
 
 		internal ShopInterface()
 		{
 			playerInMenu = FsmVariables.GlobalVariables.FindFsmBool("PlayerInMenu");
 			playerStop = FsmVariables.GlobalVariables.FindFsmBool("PlayerStop");
+			gameMenuGUI = Cache.Find("Systems/OptionsMenu");
 			gameObject = GameObject.Instantiate(Shop.Prefabs.shopInterface);
 			gameObject.SetActive(false);
 			partsPanel = gameObject.FindChild("panel/shop/parts_panel");
@@ -68,19 +71,19 @@ namespace MscModApi.Shopping
 			moneyComp.text = Game.money.ToString();
 			gameObject.SetActive(true);
 
-			foreach (var keyValuePair in shopItems[shopLocation])
+			EmptyShoppingCart();
+			
+			foreach (ModItem modItem in shopItems[shopLocation])
 			{
-				keyValuePair.Key.SetActive(true);
+				modItem.Show(true);
 			}
 
-			foreach (var keyValuePair in shopItems)
+			foreach (var shopLocationModItems in shopItems)
 			{
-				if (keyValuePair.Key != shopLocation)
+				if (shopLocationModItems.Key == shopLocation) continue;
+				foreach (ModItem modItem in shopLocationModItems.Value)
 				{
-					foreach (var valuePair in keyValuePair.Value)
-					{
-						valuePair.Key.SetActive(false);
-					}
+					modItem.Show(false);
 				}
 			}
 
@@ -96,6 +99,7 @@ namespace MscModApi.Shopping
 			open = false;
 			playerInMenu.Value = false;
 			playerStop.Value = false;
+			gameMenuGUI.SetActive(false);
 
 			OnBack();
 			gameObject.SetActive(false);
@@ -107,45 +111,17 @@ namespace MscModApi.Shopping
 			partsPanel.SetActive(false);
 		}
 
-		internal void OnOpenShop(ShopLocation shopLocation, ModItem modItem)
+		internal void OnOpenShop(ShopLocation shopLocation, ModItem modItemToOpen)
 		{
 			modsPanel.SetActive(false);
 			partsPanel.SetActive(true);
 
-			foreach (var keyValuePair in shopItems[shopLocation][modItem])
+			modItemToOpen.Open();
+
+
+			foreach (ModItem modItem in shopItems[shopLocation].Where(modItem => modItem != modItemToOpen))
 			{
-				var shopItem = keyValuePair.Value;
-				shopItem.SetActive(true);
-			}
-
-			SetShopItemsActiveForModItem(modItem, true);
-		}
-
-		private void SetShopItemsActiveForModItem(ModItem modItem, bool active)
-		{
-			foreach (var shopLocationMap in shopItems)
-			{
-				var location = shopLocationMap.Key;
-				var modItemMap = shopLocationMap.Value;
-				foreach (var valuePair in modItemMap)
-				{
-					var shopItemMap = valuePair.Value;
-					if (modItem == valuePair.Key)
-					{
-						foreach (var keyValuePair in shopItemMap) {
-							var shopItem = keyValuePair.Value;
-							shopItem.SetActive(active && shopItem.IsBuyable());
-						}
-					}
-					else
-					{
-						foreach (var keyValuePair in shopItemMap) {
-							var shopItem = keyValuePair.Value;
-							shopItem.SetActive(!active);
-						}
-					}
-
-				}
+				modItem.Close();
 			}
 		}
 
@@ -188,6 +164,18 @@ namespace MscModApi.Shopping
 			}
 		}
 
+		private void EmptyShoppingCart()
+		{
+			totalCost = 0;
+			totalCostComp.text = totalCost.ToString();
+			foreach (ShopItem item in shoppingCart)
+			{
+				GameObject.Destroy(item.cartItemGameObject);
+			}
+
+			shoppingCart.Clear();
+		}
+
 		internal void OnRemoveFromCart(ShopItem shopItem)
 		{
 			totalCost -= shopItem.baseItemPrize;
@@ -208,7 +196,6 @@ namespace MscModApi.Shopping
 				{
 					shopItem.DecreaseCount();
 				}
-				
 			}
 		}
 		internal void OnCheckout()
@@ -232,6 +219,15 @@ namespace MscModApi.Shopping
 				GameObject.Destroy(shopItem.cartItemGameObject);
 			}
 			shoppingCart.Clear();
+
+			foreach (var shopLocationItem in shopItems)
+			{
+				foreach (ModItem modItem in shopLocationItem.Value)
+				{
+					modItem.UpdatePartCount();
+				}
+			}
+
 			gameObject.PlayCheckout();
 			Close();
 		}
