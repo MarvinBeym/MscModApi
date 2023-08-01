@@ -151,10 +151,13 @@ namespace MscModApi.Trigger
 		private void OnTriggerEnter(Collider collider)
 		{
 			if (
-				!(part.uninstallWhenParentUninstalls && part.ParentInstalled()) 
+				(part.uninstallWhenParentUninstalls && !part.ParentInstalled()) 
 			    || !collider.gameObject.IsHolding()
 			    || collider.gameObject != part.gameObject
-			    || part.IsInstallBlocked()) return;
+			    || part.IsInstallBlocked()
+			){
+				return;
+			}
 
 			UserInteraction.GuiInteraction(UserInteraction.Type.Assemble, $"Install {part.gameObject.name}");
 			canBeInstalled = true;
