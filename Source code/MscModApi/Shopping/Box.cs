@@ -12,12 +12,13 @@ namespace MscModApi.Shopping
 		public BoxLogic logic;
 		private static GameObject boxModel;
 
-		public Box(string partId, string partName, GameObject partGameObject, int numberOfParts,
+		public Box(string boxName, string partId, string partName, GameObject partGameObject, int numberOfParts,
 			Part parent, Vector3[] installLocations, Vector3[] installRotations, Vector3 defaultPosition,
 			bool uninstallWhenParentUninstalls = true, bool disableCollisionWhenInstalled = true)
 
 		{
 			Setup(
+				boxName,
 				partId,
 				partName,
 				GameObject.Instantiate(boxModel),
@@ -32,14 +33,15 @@ namespace MscModApi.Shopping
 			);
 		}
 
-		public Box(string partId, string partName, GameObject box, GameObject partGameObject, int numberOfParts,
+		public Box(string boxName, string partId, string partName, GameObject customBoxModel, GameObject partGameObject, int numberOfParts,
 			Part parent, Vector3[] installLocations, Vector3[] installRotations, Vector3 defaultPosition,
 			bool uninstallWhenParentUninstalls = true, bool disableCollisionWhenInstalled = true)
 		{
 			Setup(
+				boxName,
 				partId,
 				partName,
-				box,
+				customBoxModel,
 				partGameObject,
 				numberOfParts,
 				parent,
@@ -51,13 +53,13 @@ namespace MscModApi.Shopping
 			);
 		}
 
-		private void Setup(string partId, string partName, GameObject box, GameObject partGameObject, int numberOfParts,
+		private void Setup(string boxName, string partId, string partName, GameObject boxModel, GameObject partGameObject, int numberOfParts,
 			Part parent,
 			Vector3[] installLocations, Vector3[] installRotations, Vector3 defaultPosition,
 			bool uninstallWhenParentUninstalls, bool disableCollisionWhenInstalled)
 		{
 			PartBaseInfo partBaseInfo = parent.partBaseInfo;
-			SetBoxGameObject(box);
+			boxModel.SetNameLayerTag(boxName + "(Clone)");
 
 			for (int i = 0; i < numberOfParts; i++)
 			{
@@ -76,8 +78,10 @@ namespace MscModApi.Shopping
 				AddPart(part);
 			}
 
-			logic = box.AddComponent<BoxLogic>();
+			logic = boxModel.AddComponent<BoxLogic>();
 			logic.Init("Unpack " + partName, this);
+
+			SetBoxGameObject(boxModel);
 		}
 
 		internal override void CheckUnpackedOnSave()
