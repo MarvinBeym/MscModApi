@@ -32,16 +32,15 @@ namespace MscModApi.Shopping
 			);
 		}
 
-		public Box(string partId, string partName, int numberOfParts,
+		public Box(string partId, string partName, GameObject box, GameObject partGameObject, int numberOfParts,
 			Part parent, Vector3[] installLocations, Vector3[] installRotations, Vector3 defaultPosition,
 			bool uninstallWhenParentUninstalls = true, bool disableCollisionWhenInstalled = true)
-
 		{
 			Setup(
 				partId,
 				partName,
-				GameObject.Instantiate(boxModel),
-				parent.partBaseInfo.assetBundle.LoadAsset<GameObject>("fuel_injector.prefab"),
+				box,
+				partGameObject,
 				numberOfParts,
 				parent,
 				installLocations,
@@ -79,25 +78,6 @@ namespace MscModApi.Shopping
 
 			logic = box.AddComponent<BoxLogic>();
 			logic.Init("Unpack " + partName, this);
-		}
-
-		public Box(string partId, string partName, GameObject box, GameObject partGameObject, int numberOfParts,
-			Part parent, Vector3[] installLocations, Vector3[] installRotations, Vector3 defaultPosition,
-			bool uninstallWhenParentUninstalls = true, bool disableCollisionWhenInstalled = true)
-		{
-			Setup(
-				partId,
-				partName,
-				box,
-				partGameObject,
-				numberOfParts,
-				parent,
-				installLocations,
-				installRotations,
-				defaultPosition,
-				uninstallWhenParentUninstalls,
-				disableCollisionWhenInstalled
-			);
 		}
 
 		internal override void CheckUnpackedOnSave()
