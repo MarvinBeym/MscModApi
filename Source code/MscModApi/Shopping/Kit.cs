@@ -27,14 +27,14 @@ namespace MscModApi.Shopping
 			Setup(name, kitBox, parts);
 		}
 
-		public Kit(string name, GameObject kitBox, Part[] parts)
+		public Kit(string name, GameObject customBoxModel, Part[] parts)
 		{
-			Setup(name, kitBox, parts);
+			Setup(name, customBoxModel, parts);
 		}
 
-		private void Setup(string name, GameObject kitBox, Part[] parts)
+		private void Setup(string name, GameObject boxModel, Part[] parts)
 		{
-			kitBox.SetNameLayerTag(name + "(Clone)");
+			boxModel.SetNameLayerTag(name + "(Clone)");
 
 			SetParts(parts);
 			if (!AnyBought())
@@ -44,13 +44,13 @@ namespace MscModApi.Shopping
 					part.Uninstall();
 					part.SetActive(false);
 				}
-				kitBox.SetActive(false);
+				boxModel.SetActive(false);
 			}
 
-			logic = kitBox.AddComponent<KitLogic>();
+			logic = boxModel.AddComponent<KitLogic>();
 			logic.Init(this);
 
-			SetBoxGameObject(kitBox);
+			SetBoxGameObject(boxModel);
 		}
 
 		internal override void CheckUnpackedOnSave()
