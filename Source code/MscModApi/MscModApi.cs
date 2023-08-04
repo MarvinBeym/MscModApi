@@ -246,10 +246,10 @@ namespace MscModApi
 				if (part != null) break;
 			}
 
-			if (part == null || !part.HasParent() || part.IsInScrewPlacementMode() ||
-			    part.uninstallWhenParentUninstalls && !part.ParentInstalled()) return;
+			if (part == null || !part.hasParent || part.IsInScrewPlacementMode() ||
+			    part.uninstallWhenParentUninstalls && !part.parentInstalled) return;
 
-			if (part.IsInstallBlocked())
+			if (part.installBlocked)
 			{
 				UserInteraction.GuiInteraction("Installation is blocked");
 				return;
@@ -258,7 +258,7 @@ namespace MscModApi
 
 			if (!part.IsFixed())
 			{
-				if (part.IsInstalled())
+				if (part.installed)
 				{
 					UserInteraction.GuiInteraction("Tighten all screws");
 					if (instantInstallKeybind.GetKeybindDown())
@@ -317,7 +317,7 @@ namespace MscModApi
 			if (hitObject == null || !hitObject.name.Contains("_screw_")) return null;
 
 			if (!screws.TryGetValue(hitObject.name, out var screw)) return null;
-			if (!screw.part.IsInstalled()) return null;
+			if (!screw.part.installed) return null;
 
 			previousScrew = screw;
 

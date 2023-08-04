@@ -121,7 +121,7 @@ namespace MscModApi.Parts.ReplacePart
 				newPart.part.AddPostFixedAction(NewPartFixed);
 				newPart.part.AddPostUnfixedActions(NewPartUnfixed);
 
-				if (newPart.IsInstalled())
+				if (newPart.installed)
 				{
 					NewPartInstalled(newPart);
 				}
@@ -145,14 +145,14 @@ namespace MscModApi.Parts.ReplacePart
 		/// <returns>bool</returns>
 		public bool AreAllNewInstalled()
 		{
-			return newParts.All(part => part.IsInstalled());
+			return newParts.All(part => part.installed);
 		}
 
 		/// <summary>Are all new uninstalled.</summary>
 		/// <returns></returns>
 		public bool AreAllNewUninstalled()
 		{
-			return newParts.All(part => !part.IsInstalled());
+			return newParts.All(part => !part.installed);
 		}
 
 		/// <summary>Are any new fixed.</summary>
@@ -169,7 +169,7 @@ namespace MscModApi.Parts.ReplacePart
 		{
 			foreach (var oldPart in oldParts)
 			{
-				oldPart.SetFakedInstallStatus(status);
+				oldPart.installed = status;
 			}
 		}
 
@@ -197,42 +197,42 @@ namespace MscModApi.Parts.ReplacePart
 		/// <summary>Are any new installed.</summary>
 		public bool AreAnyNewInstalled()
 		{
-			return newParts.Any(part => part.IsInstalled());
+			return newParts.Any(part => part.installed);
 		}
 
 		/// <summary>Are any new uninstalled.</summary>
 		/// <returns></returns>
 		public bool AreAnyNewUninstalled()
 		{
-			return newParts.Any(part => !part.IsInstalled());
+			return newParts.Any(part => !part.installed);
 		}
 
 		/// <summary>Are all old installed.</summary>
 		/// <returns></returns>
 		public bool AreAllOldInstalled()
 		{
-			return oldParts.All(part => part.IsInstalled());
+			return oldParts.All(part => part.installed);
 		}
 
 		/// <summary>Are all old uninstalled.</summary>
 		/// <returns></returns>
 		public bool AreAllOldUninstalled()
 		{
-			return oldParts.All(part => !part.IsInstalled());
+			return oldParts.All(part => !part.installed);
 		}
 
 		/// <summary>Are any old installed.</summary>
 		/// <returns></returns>
 		public bool AreAnyOldInstalled()
 		{
-			return oldParts.Any(part => part.IsInstalled());
+			return oldParts.Any(part => part.installed);
 		}
 
 		/// <summary>Are any old uninstalled.</summary>
 		/// <returns></returns>
 		public bool AreAnyOldUninstalled()
 		{
-			return oldParts.Any(part => !part.IsInstalled());
+			return oldParts.Any(part => !part.installed);
 		}
 
 		/// <summary>Adds the action.</summary>
@@ -327,10 +327,10 @@ namespace MscModApi.Parts.ReplacePart
 
 		internal void NewPartInstalled(NewPart installedNewPart)
 		{
-			if (!installedNewPart.CanBeInstalledWithoutReplacing())
+			if (!installedNewPart.canBeInstalledWithoutReplacing)
 			{
 				foreach (var oldPart in oldParts) {
-					oldPart.BlockInstall(true);
+					oldPart.installBlocked = true;
 				}
 			}
 
@@ -371,10 +371,10 @@ namespace MscModApi.Parts.ReplacePart
 		internal void NewPartUninstalled(NewPart uninstalledNewPart)
 		{
 			var allNewUninstalled = AreAllNewUninstalled();
-			if (!uninstalledNewPart.CanBeInstalledWithoutReplacing())
+			if (!uninstalledNewPart.canBeInstalledWithoutReplacing)
 			{
 				foreach (var oldPart in oldParts) {
-					oldPart.BlockInstall(!allNewUninstalled);
+					oldPart.installBlocked = !allNewUninstalled;
 				}
 			}
 
@@ -393,7 +393,7 @@ namespace MscModApi.Parts.ReplacePart
 		internal void OldPartInstalled()
 		{
 			foreach (var newPart in newParts) {
-				newPart.BlockInstall(true);
+				newPart.installBlocked = true;
 			}
 
 			if (oldPartActions.anyInstalled.Count > 0) oldPartActions.anyInstalled.InvokeAll();
@@ -404,7 +404,7 @@ namespace MscModApi.Parts.ReplacePart
 		{
 			var allOldUninstalled = AreAllOldUninstalled();
 			foreach (var newPart in newParts) {
-				newPart.BlockInstall(!allOldUninstalled);
+				newPart.installBlocked = !allOldUninstalled;
 			}
 
 			if (oldPartActions.anyUninstalled.Count > 0 && AreAnyOldUninstalled()) oldPartActions.anyUninstalled.InvokeAll();

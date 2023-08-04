@@ -113,7 +113,7 @@ namespace MscModApi.Parts
 
 			if (hasPartsToUnpack)
 			{
-				foreach (var part in parts.Where(part => !part.IsInstalled() && !part.gameObject.activeSelf))
+				foreach (var part in parts.Where(part => !part.installed && !part.gameObject.activeSelf))
 				{
 					part.position = boxModel.transform.position;
 					part.active = active;

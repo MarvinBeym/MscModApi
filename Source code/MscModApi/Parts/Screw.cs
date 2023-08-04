@@ -138,7 +138,7 @@ namespace MscModApi.Parts
 
 		public void In(bool useAudio = true)
 		{
-			if (tightness >= maxTightness || !part.IsInstalled()) return;
+			if (tightness >= maxTightness || !part.installed) return;
 
 			if (useAudio) {
 				AudioSource.PlayClipAtPoint(soundClip, gameObject.transform.position);
@@ -159,7 +159,7 @@ namespace MscModApi.Parts
 
 		public void Out(bool useAudio = true)
 		{
-			if (!part.IsInstalled() || tightness == 0) return;
+			if (!part.installed || tightness == 0) return;
 
 			if (useAudio) {
 				AudioSource.PlayClipAtPoint(soundClip, gameObject.transform.position);

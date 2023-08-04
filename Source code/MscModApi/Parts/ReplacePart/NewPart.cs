@@ -7,10 +7,9 @@ using UnityEngine;
 
 namespace MscModApi.Parts.ReplacePart
 {
-	public class NewPart
+	public class NewPart : BasicPart
 	{
 		public Part part;
-		private readonly bool canBeInstalledWithoutReplacing;
 
 		public NewPart(Part part, bool canBeInstalledWithoutReplacing = false)
 		{
@@ -18,24 +17,67 @@ namespace MscModApi.Parts.ReplacePart
 			this.canBeInstalledWithoutReplacing = canBeInstalledWithoutReplacing;
 		}
 
-		public bool IsInstalled()
-		{
-			return part.IsInstalled();
-		}
+		public bool installed => part.installed;
 
 		public bool IsFixed(bool ignoreUnsetScrews = true)
 		{
 			return part.IsFixed(ignoreUnsetScrews);
 		}
 
-		public void BlockInstall(bool block)
+		public bool canBeInstalledWithoutReplacing
 		{
-			if (!canBeInstalledWithoutReplacing)
+			get;
+			protected set;
+		}
+
+		public override bool bought
+		{
+			get => part.bought;
+			set => part.bought = value;
+		}
+
+		public override Vector3 position
+		{
+			get => part.position;
+			set => part.position = value;
+		}
+
+		public override Vector3 rotation
+		{
+			get => part.rotation;
+			set => part.rotation = value;
+		}
+
+		public override bool active
+		{
+			get => part.active;
+			set => part.active = value;
+		}
+
+		public override void ResetToDefault(bool uninstall = false)
+		{
+			part.ResetToDefault(uninstall);
+		}
+
+		public bool installBlocked
+		{
+			get => part.installBlocked;
+			set
 			{
-				part.BlockInstall(block);
+				if (!canBeInstalledWithoutReplacing)
+				{
+					part.installBlocked = value;
+				}
 			}
 		}
 
+		[Obsolete("Use 'installBlocked' property instead")]
+		public void BlockInstall(bool block)
+		{
+			installBlocked = block;
+		}
+
+		[Obsolete("Use 'canBeInstalledWithoutReplacing' property instead")]
 		public bool CanBeInstalledWithoutReplacing()
 		{
 			return canBeInstalledWithoutReplacing;

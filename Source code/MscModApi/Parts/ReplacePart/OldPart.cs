@@ -8,18 +8,18 @@ using UnityEngine;
 
 namespace MscModApi.Parts.ReplacePart
 {
-	public class OldPart
+	public class OldPart : BasicPart
 	{
-		private PlayMakerFSM fsm;
-		private GameObject gameObject;
-		private GameObject trigger;
-		private FsmBool installed;
-		private FsmBool bolted;
-		private PlayMakerFSM assembleFsm;
-		private PlayMakerFSM removalFsm;
-		private GameObject oldFsmGameObject;
-		private bool allowSettingFakedStatus;
-		internal bool justUninstalled = false;
+		protected PlayMakerFSM fsm;
+		protected GameObject gameObject;
+		protected GameObject trigger;
+		protected FsmBool installedFsm;
+		protected FsmBool bolted;
+		protected PlayMakerFSM assembleFsm;
+		protected PlayMakerFSM removalFsm;
+		protected GameObject oldFsmGameObject;
+		protected bool allowSettingFakedStatus;
+		protected bool justUninstalled = false;
 
 		public OldPart(GameObject oldFsmGameObject, bool allowSettingFakedStatus = true)
 		{
@@ -28,7 +28,7 @@ namespace MscModApi.Parts.ReplacePart
 			fsm = oldFsmGameObject.FindFsm("Data");
 			gameObject = fsm.FsmVariables.FindFsmGameObject("ThisPart").Value;
 			trigger = fsm.FsmVariables.FindFsmGameObject("Trigger").Value;
-			installed = fsm.FsmVariables.FindFsmBool("Installed");
+			installedFsm = fsm.FsmVariables.FindFsmBool("Installed");
 			bolted = fsm.FsmVariables.FindFsmBool("Bolted");
 
 			assembleFsm = GetFsmByName(trigger, "Assembly");
@@ -45,42 +45,38 @@ namespace MscModApi.Parts.ReplacePart
 			}
 		}
 
-		private static PlayMakerFSM GetFsmByName(GameObject gameObject, string fsmName)
+		public bool installBlocked
 		{
-			return gameObject.GetComponents<PlayMakerFSM>().FirstOrDefault(comp => comp.FsmName == fsmName);
+			get => !assembleFsm.enabled;
+			set => assembleFsm.enabled = !value;
 		}
 
-		public bool IsInstallBlocked()
+		public bool installed
 		{
-			return !assembleFsm.enabled;
-		}
-
-		public void BlockInstall(bool blocked)
-		{
-			assembleFsm.enabled = !blocked;
-		}
-
-		public bool IsInstalled()
-		{
-			if (justUninstalled)
+			get
 			{
-				justUninstalled = false;
-				return false;
-			}
+				if (justUninstalled)
+				{
+					justUninstalled = false;
+					return false;
+				}
 
-			return installed.Value;
+				return installedFsm.Value;
+			}
+			set
+			{
+				if (!allowSettingFakedStatus)
+				{
+					return;
+				}
+				installedFsm.Value = value;
+				bolted.Value = value;
+			}
 		}
 
-		public bool IsFixed() => IsInstalled() && bolted.Value;
+		public bool IsFixed() => installed && bolted.Value;
 
 		public void Uninstall() => removalFsm.SendEvent("REMOVE");
-
-		internal void SetFakedInstallStatus(bool status)
-		{
-			if (!allowSettingFakedStatus) return;
-			installed.Value = status;
-			bolted.Value = status;
-		}
 
 		internal void Setup(ReplacePart.ReplacementPart replacementPart)
 		{
@@ -99,6 +95,64 @@ namespace MscModApi.Parts.ReplacePart
 				justUninstalled = true;
 				uninstallAction.Invoke();
 			});
+		}
+
+		public override bool bought
+		{
+			get => true;
+			set => throw new NotImplementedException();
+		}
+
+		public override Vector3 position
+		{
+			get => gameObject.transform.position;
+			set => gameObject.transform.position = value;
+		}
+
+		public override Vector3 rotation
+		{
+			get => gameObject.transform.rotation.eulerAngles;
+			set => gameObject.transform.rotation = Quaternion.Euler(value);
+		}
+
+		public override bool active
+		{
+			get => gameObject.activeSelf;
+			set => gameObject.SetActive(value);
+		}
+
+		private static PlayMakerFSM GetFsmByName(GameObject gameObject, string fsmName)
+		{
+			return gameObject.GetComponents<PlayMakerFSM>().FirstOrDefault(comp => comp.FsmName == fsmName);
+		}
+
+		public override void ResetToDefault(bool uninstall = false)
+		{
+			//Don't implement
+		}
+
+		[Obsolete("Use 'installed' property instead")]
+		internal void SetFakedInstallStatus(bool status)
+		{
+			installed = status;
+		}
+
+		[Obsolete("Use 'installBlocked' property instead")]
+		public bool IsInstallBlocked()
+		{
+			return installBlocked;
+		}
+
+		[Obsolete("Use 'installBlocked' property instead")]
+		public void BlockInstall(bool blocked)
+		{
+			installBlocked = blocked;
+		}
+
+		[Obsolete("Use 'installed' property instead")]
+		public bool IsInstalled()
+		{
+			return installed;
 		}
 	}
 }
