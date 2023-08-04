@@ -104,8 +104,10 @@ namespace MscModApi.Parts
 			Vector3[] installLocations, Vector3[] installRotations, Vector3 defaultPosition,
 			bool uninstallWhenParentUninstalls, bool disableCollisionWhenInstalled)
 		{
-			PartBaseInfo partBaseInfo = parent.partBaseInfo;
 			boxModel.SetNameLayerTag(boxName + "(Clone)");
+			this.boxModel = boxModel;
+
+			PartBaseInfo partBaseInfo = parent.partBaseInfo;
 
 			for (int i = 0; i < numberOfParts; i++)
 			{
@@ -124,10 +126,9 @@ namespace MscModApi.Parts
 				AddPart(part);
 			}
 
-			logic = boxModel.AddComponent<BoxLogic>();
+			active = false;
+			logic = this.boxModel.AddComponent<BoxLogic>();
 			logic.Init("Unpack " + partName, this);
-
-			this.boxModel = boxModel;
 		}
 
 		/// <summary>

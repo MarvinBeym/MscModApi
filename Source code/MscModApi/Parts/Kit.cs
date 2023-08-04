@@ -31,6 +31,7 @@ namespace MscModApi.Parts
 		private void Setup(string name, GameObject boxModel, Part[] parts)
 		{
 			boxModel.SetNameLayerTag(name + "(Clone)");
+			this.boxModel = boxModel;
 
 			AddParts(parts); 
 			
@@ -42,13 +43,11 @@ namespace MscModApi.Parts
 					part.active = false;
 				}
 
-				active = false;
 			}
 
-			logic = boxModel.AddComponent<KitLogic>();
+			active = false;
+			logic = this.boxModel.AddComponent<KitLogic>();
 			logic.Init(this);
-
-			this.boxModel = boxModel;
 		}
 
 		internal static void LoadAssets(AssetBundle assetBundle)
