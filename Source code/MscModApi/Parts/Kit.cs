@@ -33,8 +33,8 @@ namespace MscModApi.Parts
 			boxModel.SetNameLayerTag(name + "(Clone)");
 			this.boxModel = boxModel;
 
-			AddParts(parts); 
-			
+			AddParts(parts);
+
 			if (!bought)
 			{
 				foreach (Part part in this.parts)
@@ -42,7 +42,6 @@ namespace MscModApi.Parts
 					part.Uninstall();
 					part.active = false;
 				}
-
 			}
 
 			active = false;

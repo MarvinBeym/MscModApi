@@ -69,6 +69,7 @@ namespace MscModApi.Parts.ReplacePart
 				{
 					return;
 				}
+
 				installedFsm.Value = value;
 				bolted.Value = value;
 			}

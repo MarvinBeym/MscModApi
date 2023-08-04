@@ -24,11 +24,7 @@ namespace MscModApi.Parts.ReplacePart
 			return part.IsFixed(ignoreUnsetScrews);
 		}
 
-		public bool canBeInstalledWithoutReplacing
-		{
-			get;
-			protected set;
-		}
+		public bool canBeInstalledWithoutReplacing { get; protected set; }
 
 		public override bool bought
 		{

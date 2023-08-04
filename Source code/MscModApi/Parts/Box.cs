@@ -48,7 +48,6 @@ namespace MscModApi.Parts
 		}
 
 
-
 		/// <summary>
 		/// Constructor for a new Box
 		/// </summary>
@@ -64,7 +63,8 @@ namespace MscModApi.Parts
 		/// <param name="defaultPosition">The default position for both the box and all parts (where to place after purchase or when reset)</param>
 		/// <param name="uninstallWhenParentUninstalls">Should the part uninstall from the parent if the parent is uninstalled</param>
 		/// <param name="disableCollisionWhenInstalled">Disables the collider of the part when installed to the parent (reduces lag, avoids problematic collisions)</param>
-		public Box(string boxName, string partId, string partName, GameObject customBoxModel, GameObject partGameObject, int numberOfParts,
+		public Box(string boxName, string partId, string partName, GameObject customBoxModel, GameObject partGameObject,
+			int numberOfParts,
 			Part parent, Vector3[] installLocations, Vector3[] installRotations, Vector3 defaultPosition,
 			bool uninstallWhenParentUninstalls = true, bool disableCollisionWhenInstalled = true)
 		{
@@ -99,7 +99,8 @@ namespace MscModApi.Parts
 		/// <param name="defaultPosition">The default position for both the box and all parts (where to place after purchase or when reset)</param>
 		/// <param name="uninstallWhenParentUninstalls">Should the part uninstall from the parent if the parent is uninstalled</param>
 		/// <param name="disableCollisionWhenInstalled">Disables the collider of the part when installed to the parent (reduces lag, avoids problematic collisions)</param>
-		protected void Setup(string boxName, string partId, string partName, GameObject boxModel, GameObject partGameObject, int numberOfParts,
+		protected void Setup(string boxName, string partId, string partName, GameObject boxModel,
+			GameObject partGameObject, int numberOfParts,
 			Part parent,
 			Vector3[] installLocations, Vector3[] installRotations, Vector3 defaultPosition,
 			bool uninstallWhenParentUninstalls, bool disableCollisionWhenInstalled)
@@ -123,6 +124,7 @@ namespace MscModApi.Parts
 					part.Uninstall();
 					part.active = false;
 				}
+
 				AddPart(part);
 			}
 

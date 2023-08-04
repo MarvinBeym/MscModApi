@@ -11,57 +11,33 @@ namespace MscModApi.Parts
 		/// <summary>
 		/// The default position, used for example when resetting.
 		/// </summary>
-		public Vector3 defaultPosition
-		{
-			get;
-			set;
-		} = Vector3.zero;
+		public Vector3 defaultPosition { get; set; } = Vector3.zero;
 
 		/// <summary>
 		/// The default rotation, used for example when resetting.
 		/// </summary>
-		public Vector3 defaultRotation
-		{
-			get;
-			set;
-		} = Vector3.zero;
+		public Vector3 defaultRotation { get; set; } = Vector3.zero;
 
 		/// <summary>
 		/// Is the part bought
 		/// </summary>
-		public abstract bool bought
-		{
-			get;
-			set;
-		}
+		public abstract bool bought { get; set; }
 
 		/// <summary>
 		/// The position of the part
 		/// </summary>
-		public abstract Vector3 position
-		{
-			get;
-			set;
-		}
+		public abstract Vector3 position { get; set; }
 
 		/// <summary>
 		/// The rotation of the part.
 		/// </summary>
-		public abstract Vector3 rotation
-		{
-			get;
-			set;
-		}
+		public abstract Vector3 rotation { get; set; }
 
 
 		/// <summary>
 		/// Is the part gameObject active
 		/// </summary>
-		public abstract bool active
-		{
-			get;
-			set;
-		}
+		public abstract bool active { get; set; }
 
 		/// <summary>
 		/// Resets the part to its defaultPosition & defaultRotation

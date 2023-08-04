@@ -13,11 +13,7 @@ namespace MscModApi.Parts
 		/// <summary>
 		/// Returns internal unpacked counter (starting at 0)
 		/// </summary>
-		public int partsUnpackedCount
-		{
-			get;
-			protected set;
-		} = 0;
+		public int partsUnpackedCount { get; protected set; } = 0;
 
 		internal void IncrementUnpackedCount()
 		{
@@ -25,6 +21,7 @@ namespace MscModApi.Parts
 			{
 				return;
 			}
+
 			partsUnpackedCount++;
 		}
 
@@ -36,20 +33,12 @@ namespace MscModApi.Parts
 		/// <summary>
 		/// Returns the box GameObject model
 		/// </summary>
-		public GameObject boxModel
-		{
-			get;
-			protected set;
-		}
+		public GameObject boxModel { get; protected set; }
 
 		/// <summary>
 		/// Returns the list of parts contained in this box
 		/// </summary>
-		public List<Part> parts
-		{
-			get;
-			protected set;
-		} = new List<Part>();
+		public List<Part> parts { get; protected set; } = new List<Part>();
 
 		/// <summary>
 		/// Returns the number of parts contained in this box
@@ -79,10 +68,7 @@ namespace MscModApi.Parts
 		/// </summary>
 		public override bool bought
 		{
-			get
-			{
-				return parts.Any(part => part.bought);
-			}
+			get { return parts.Any(part => part.bought); }
 			set
 			{
 				foreach (Part part in parts)

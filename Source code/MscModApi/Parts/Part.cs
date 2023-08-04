@@ -15,57 +15,25 @@ namespace MscModApi.Parts
 		protected int clampsAdded;
 		protected bool partFixed;
 
-		public List<Part> childParts
-		{
-			get;
-			protected set;
-		} = new List<Part>();
+		public List<Part> childParts { get; protected set; } = new List<Part>();
 
-		public string id
-		{
-			get;
-			protected set;
-		}
+		public string id { get; protected set; }
 
-		public PartBaseInfo partBaseInfo
-		{
-			get;
-			protected set;
-		}
+		public PartBaseInfo partBaseInfo { get; protected set; }
 
-		public GameObject gameObject
-		{
-			get;
-			protected set;
-		}
+		public GameObject gameObject { get; protected set; }
 		internal PartSave partSave;
 
-		public Vector3 installPosition
-		{
-			get;
-			protected set;
-		}
-		public Vector3 installRotation
-		{
-			get;
-			protected set;
-		}
+		public Vector3 installPosition { get; protected set; }
+		public Vector3 installRotation { get; protected set; }
 
-		public bool uninstallWhenParentUninstalls
-		{
-			get;
-			protected set;
-		}
+		public bool uninstallWhenParentUninstalls { get; protected set; }
 		protected GameObject parentGameObject;
 		protected Part parentPart;
 		protected List<Screw> savedScrews;
 		internal Collider collider;
 
-		public TriggerWrapper trigger
-		{
-			get;
-			protected set;
-		}
+		public TriggerWrapper trigger { get; protected set; }
 
 		public Transform transform => gameObject.transform;
 
@@ -91,11 +59,7 @@ namespace MscModApi.Parts
 
 		public bool hasParent => trigger != null;
 
-		public bool installBlocked
-		{
-			get;
-			set;
-		}
+		public bool installBlocked { get; set; }
 
 		public List<Screw> screws => partSave.screws;
 
@@ -238,7 +202,7 @@ namespace MscModApi.Parts
 			{
 				MscModApi.modsParts.Add(partBaseInfo.mod.ID, new Dictionary<string, Part>
 				{
-					{id, this}
+					{ id, this }
 				});
 			}
 
@@ -256,10 +220,10 @@ namespace MscModApi.Parts
 		/// </summary>
 		protected Part()
 		{
-
 		}
 
-		public Part(string id, string name, GameObject part, Part parentPart, Vector3 installPosition, Vector3 installRotation,
+		public Part(string id, string name, GameObject part, Part parentPart, Vector3 installPosition,
+			Vector3 installRotation,
 			PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls = true,
 			bool disableCollisionWhenInstalled = true)
 		{
@@ -327,7 +291,7 @@ namespace MscModApi.Parts
 
 		internal void SetScrewsActive(bool active)
 		{
-			partSave.screws.ForEach(delegate (Screw screw) { screw.gameObject.SetActive(active); });
+			partSave.screws.ForEach(delegate(Screw screw) { screw.gameObject.SetActive(active); });
 		}
 
 		public void Install()
@@ -347,9 +311,10 @@ namespace MscModApi.Parts
 			{
 				return partFixed;
 			}
+
 			return partSave.screws.Count == 0 ? installed : partFixed;
 		}
-		
+
 		internal void SetFixed(bool partFixed)
 		{
 			this.partFixed = partFixed;
@@ -440,6 +405,7 @@ namespace MscModApi.Parts
 		{
 			preSaveActions.Add(action);
 		}
+
 		public void AddPreInstallAction(Action action)
 		{
 			preInstallActions.Add(action);
@@ -485,8 +451,8 @@ namespace MscModApi.Parts
 		public void AddPreUnfixedActions(Action action)
 		{
 			preUnfixedActions.Add(action);
-
 		}
+
 		public void AddPostUnfixedActions(Action action)
 		{
 			postUnfixedActions.Add(action);
@@ -494,7 +460,6 @@ namespace MscModApi.Parts
 			{
 				postUnfixedActions.InvokeAll();
 			}
-
 		}
 
 		[Obsolete("Use AddWhenInstalledBehaviour instead. Will be removed in a later version")]
@@ -514,15 +479,9 @@ namespace MscModApi.Parts
 			var behaviour = AddComponent<T>();
 			behaviour.enabled = installed;
 
-			AddPostInstallAction(delegate
-			{
-				behaviour.enabled = true;
-			});
+			AddPostInstallAction(delegate { behaviour.enabled = true; });
 
-			AddPostUninstallAction(delegate
-			{
-				behaviour.enabled = false;
-			});
+			AddPostUninstallAction(delegate { behaviour.enabled = false; });
 			return behaviour;
 		}
 
@@ -531,15 +490,9 @@ namespace MscModApi.Parts
 			var behaviour = AddComponent<T>();
 			behaviour.enabled = !installed;
 
-			AddPostInstallAction(delegate
-			{
-				behaviour.enabled = false;
-			});
+			AddPostInstallAction(delegate { behaviour.enabled = false; });
 
-			AddPostUninstallAction(delegate
-			{
-				behaviour.enabled = true;
-			});
+			AddPostUninstallAction(delegate { behaviour.enabled = true; });
 			return behaviour;
 		}
 
