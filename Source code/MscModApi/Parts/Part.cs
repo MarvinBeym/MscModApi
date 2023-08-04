@@ -430,12 +430,14 @@ namespace MscModApi.Parts
 
 		public T GetComponent<T>() => gameObject.GetComponent<T>();
 
+		/// <inheritdoc />
 		public override bool bought
 		{
 			get => partSave.bought == PartSave.BoughtState.Yes; 
 			set => partSave.bought = value ? PartSave.BoughtState.Yes : PartSave.BoughtState.No;
 		}
 
+		/// <inheritdoc />
 		public override Vector3 position
 		{
 			get => gameObject.transform.position;
@@ -448,6 +450,7 @@ namespace MscModApi.Parts
 			}
 		}
 
+		/// <inheritdoc />
 		public override Vector3 rotation
 		{
 			get => gameObject.transform.rotation.eulerAngles;
@@ -460,6 +463,7 @@ namespace MscModApi.Parts
 			}
 		}
 
+		/// <inheritdoc />
 		public override bool active
 		{
 			get => gameObject.activeSelf; 
