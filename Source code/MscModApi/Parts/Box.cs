@@ -130,7 +130,7 @@ namespace MscModApi.Parts
 
 			active = false;
 			logic = this.boxModel.AddComponent<BoxLogic>();
-			logic.Init("Unpack " + partName, this);
+			logic.Init(this);
 		}
 
 		/// <summary>

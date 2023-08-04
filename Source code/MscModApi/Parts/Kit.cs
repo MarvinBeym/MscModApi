@@ -6,7 +6,7 @@ namespace MscModApi.Parts
 {
 	public class Kit : PartBox
 	{
-		private KitLogic logic;
+		private BoxLogic logic;
 		private static GameObject boxTemplateModel;
 
 		public Kit(string name, Part[] parts)
@@ -45,7 +45,7 @@ namespace MscModApi.Parts
 			}
 
 			active = false;
-			logic = this.boxModel.AddComponent<KitLogic>();
+			logic = this.boxModel.AddComponent<BoxLogic>();
 			logic.Init(this);
 		}
 
