@@ -94,7 +94,7 @@
     <Compile Include="Parts\Kit.cs" />
     <Compile Include="Parts\KitLogic.cs" />
     <Compile Include="Shopping\ModItem.cs" />
-    <Compile Include="Shopping\PartBox.cs" />
+    <Compile Include="Parts\PartBox.cs" />
     <Compile Include="Shopping\ShopBaseInfo.cs" />
     <Compile Include="Shopping\Shop.cs" />
     <Compile Include="Shopping\ShopInterface.cs" />
