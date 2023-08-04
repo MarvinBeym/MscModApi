@@ -46,6 +46,11 @@ namespace MscModApi.Parts
 		{
 			get;
 		}
+		
+		/// <summary>
+		/// Returns a clean name of the part (Removing '(Clone)')
+		/// </summary>
+		public string cleanName => name.Replace("(Clone)", "");
 
 		/// <summary>
 		/// Resets the part to its defaultPosition & defaultRotation
