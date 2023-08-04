@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using MscModApi.Parts;
 using UnityEngine;
 
-namespace MscModApi.Shopping
+namespace MscModApi.Parts
 {
 	/// <summary>
 	/// The base class for every object acting as a "box" (objects that contain Part objects)

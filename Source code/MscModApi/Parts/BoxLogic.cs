@@ -1,10 +1,7 @@
-﻿using System.Collections.Generic;
-using MscModApi.Parts;
-using MscModApi.Tools;
+﻿using MscModApi.Tools;
 using UnityEngine;
 
-
-namespace MscModApi.Shopping
+namespace MscModApi.Parts
 {
 	public class BoxLogic : MonoBehaviour
 	{

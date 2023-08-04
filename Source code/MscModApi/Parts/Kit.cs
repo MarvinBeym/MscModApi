@@ -1,11 +1,8 @@
-﻿using MscModApi.Parts;
+﻿using MscModApi.Shopping;
 using MscModApi.Tools;
-using System;
-using System.Linq;
 using UnityEngine;
-using static MscModApi.Shopping.Shop;
 
-namespace MscModApi.Shopping
+namespace MscModApi.Parts
 {
 	public class Kit : PartBox
 	{

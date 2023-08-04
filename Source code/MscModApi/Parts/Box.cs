@@ -1,11 +1,8 @@
-﻿using System;
-using MscModApi.Parts;
+﻿using MscModApi.Shopping;
 using MscModApi.Tools;
-using System.Linq;
 using UnityEngine;
 
-
-namespace MscModApi.Shopping
+namespace MscModApi.Parts
 {
 	/// <summary>
 	/// A box that contains multiple parts that are the same. Adds a numeric index to the part name and automatically creates the parts
