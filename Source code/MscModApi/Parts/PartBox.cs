@@ -15,6 +15,11 @@ namespace MscModApi.Parts
 		/// </summary>
 		public int partsUnpackedCount { get; protected set; } = 0;
 
+		/// <summary>
+		/// Returns the name of the box model
+		/// </summary>
+		public override string name => boxModel.name;
+
 		internal void IncrementUnpackedCount()
 		{
 			if (!hasPartsToUnpack)

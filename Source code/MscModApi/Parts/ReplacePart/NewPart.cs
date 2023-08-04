@@ -17,6 +17,9 @@ namespace MscModApi.Parts.ReplacePart
 			this.canBeInstalledWithoutReplacing = canBeInstalledWithoutReplacing;
 		}
 
+		/// <inheritdoc />
+		public override string name => part.name;
+
 		public bool installed => part.installed;
 
 		public bool IsFixed(bool ignoreUnsetScrews = true)

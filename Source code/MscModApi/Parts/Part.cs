@@ -65,76 +65,51 @@ namespace MscModApi.Parts
 
 		public bool installed => partSave.installed;
 
-		public bool parentInstalled
-		{
-			get
-			{
-				if (usingPartParent)
-				{
-					return parentPart.installed;
-				}
-				else
-				{
-					//Todo: Implement normal msc parts installed/uninstalled
-					return true;
-				}
-			}
-		}
-
-		public bool parentFixed
-		{
-			get
-			{
-				if (usingPartParent)
-				{
-					return parentPart.IsFixed(true);
-				}
-				else
-				{
-					//Todo: Implement normal msc parts fixed
-					return true;
-				}
-			}
-		}
-
 		/// <inheritdoc />
-		public override bool bought
+		protected Part()
 		{
-			get => partSave.bought == PartSave.BoughtState.Yes;
-			set => partSave.bought = value ? PartSave.BoughtState.Yes : PartSave.BoughtState.No;
 		}
 
-		/// <inheritdoc />
-		public override Vector3 position
+		public Part(string id, string name, GameObject part, Part parentPart, Vector3 installPosition,
+			Vector3 installRotation,
+			PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls = true,
+			bool disableCollisionWhenInstalled = true)
 		{
-			get => gameObject.transform.position;
-			set
-			{
-				if (!installed)
-				{
-					gameObject.transform.position = value;
-				}
-			}
+			usingGameObjectInstantiation = true;
+			gameObjectUsedForInstantiation = part;
+
+			usingPartParent = true;
+			this.parentPart = parentPart;
+
+			Setup(id, name, parentPart.gameObject, installPosition, installRotation, partBaseInfo,
+				uninstallWhenParentUninstalls, disableCollisionWhenInstalled, null);
+			parentPart.childParts.Add(this);
 		}
 
-		/// <inheritdoc />
-		public override Vector3 rotation
+		public Part(string id, string name, GameObject parent, Vector3 installPosition, Vector3 installRotation,
+			PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls = true,
+			bool disableCollisionWhenInstalled = true, string prefabName = null)
 		{
-			get => gameObject.transform.rotation.eulerAngles;
-			set
-			{
-				if (!installed)
-				{
-					gameObject.transform.rotation = Quaternion.Euler(value);
-				}
-			}
+			Setup(id, name, parent, installPosition, installRotation, partBaseInfo,
+				uninstallWhenParentUninstalls, disableCollisionWhenInstalled, prefabName);
 		}
 
-		/// <inheritdoc />
-		public override bool active
+		public Part(string id, string name, PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls = true,
+			bool disableCollisionWhenInstalled = true, string prefabName = null)
 		{
-			get => gameObject.activeSelf;
-			set => gameObject.SetActive(value);
+			Setup(id, name, null, Vector3.zero, Vector3.zero, partBaseInfo,
+				uninstallWhenParentUninstalls, disableCollisionWhenInstalled, prefabName);
+		}
+
+		public Part(string id, string name, Part parentPart, Vector3 installPosition, Vector3 installRotation,
+			PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls = true,
+			bool disableCollisionWhenInstalled = true, string prefabName = null)
+		{
+			usingPartParent = true;
+			this.parentPart = parentPart;
+			Setup(id, name, parentPart.gameObject, installPosition, installRotation, partBaseInfo,
+				uninstallWhenParentUninstalls, disableCollisionWhenInstalled, prefabName);
+			parentPart.childParts.Add(this);
 		}
 
 		protected void Setup(string id, string name, GameObject parentGameObject, Vector3 installPosition,
@@ -215,55 +190,82 @@ namespace MscModApi.Parts
 			partBaseInfo.AddToPartsList(this);
 		}
 
-		/// <summary>
-		/// Only used for DerivablePart class
-		/// </summary>
-		protected Part()
+		public override string name
 		{
+			get => gameObject.name;
 		}
 
-		public Part(string id, string name, GameObject part, Part parentPart, Vector3 installPosition,
-			Vector3 installRotation,
-			PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls = true,
-			bool disableCollisionWhenInstalled = true)
+		public bool parentInstalled
 		{
-			usingGameObjectInstantiation = true;
-			gameObjectUsedForInstantiation = part;
-
-			usingPartParent = true;
-			this.parentPart = parentPart;
-
-			Setup(id, name, parentPart.gameObject, installPosition, installRotation, partBaseInfo,
-				uninstallWhenParentUninstalls, disableCollisionWhenInstalled, null);
-			parentPart.childParts.Add(this);
+			get
+			{
+				if (usingPartParent)
+				{
+					return parentPart.installed;
+				}
+				else
+				{
+					//Todo: Implement normal msc parts installed/uninstalled
+					return true;
+				}
+			}
 		}
 
-		public Part(string id, string name, GameObject parent, Vector3 installPosition, Vector3 installRotation,
-			PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls = true,
-			bool disableCollisionWhenInstalled = true, string prefabName = null)
+		public bool parentFixed
 		{
-			Setup(id, name, parent, installPosition, installRotation, partBaseInfo,
-				uninstallWhenParentUninstalls, disableCollisionWhenInstalled, prefabName);
+			get
+			{
+				if (usingPartParent)
+				{
+					return parentPart.IsFixed(true);
+				}
+				else
+				{
+					//Todo: Implement normal msc parts fixed
+					return true;
+				}
+			}
 		}
 
-		public Part(string id, string name, PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls = true,
-			bool disableCollisionWhenInstalled = true, string prefabName = null)
+		/// <inheritdoc />
+		public override bool bought
 		{
-			Setup(id, name, null, Vector3.zero, Vector3.zero, partBaseInfo,
-				uninstallWhenParentUninstalls, disableCollisionWhenInstalled, prefabName);
+			get => partSave.bought == PartSave.BoughtState.Yes;
+			set => partSave.bought = value ? PartSave.BoughtState.Yes : PartSave.BoughtState.No;
 		}
 
-		public Part(string id, string name, Part parentPart, Vector3 installPosition, Vector3 installRotation,
-			PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls = true,
-			bool disableCollisionWhenInstalled = true, string prefabName = null)
+		/// <inheritdoc />
+		public override Vector3 position
 		{
-			usingPartParent = true;
-			this.parentPart = parentPart;
-			Setup(id, name, parentPart.gameObject, installPosition, installRotation, partBaseInfo,
-				uninstallWhenParentUninstalls, disableCollisionWhenInstalled, prefabName);
-			parentPart.childParts.Add(this);
+			get => gameObject.transform.position;
+			set
+			{
+				if (!installed)
+				{
+					gameObject.transform.position = value;
+				}
+			}
 		}
 
+		/// <inheritdoc />
+		public override Vector3 rotation
+		{
+			get => gameObject.transform.rotation.eulerAngles;
+			set
+			{
+				if (!installed)
+				{
+					gameObject.transform.rotation = Quaternion.Euler(value);
+				}
+			}
+		}
+
+		/// <inheritdoc />
+		public override bool active
+		{
+			get => gameObject.activeSelf;
+			set => gameObject.SetActive(value);
+		}
 
 		public void EnableScrewPlacementMode()
 		{

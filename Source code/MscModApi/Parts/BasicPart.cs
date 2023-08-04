@@ -40,6 +40,14 @@ namespace MscModApi.Parts
 		public abstract bool active { get; set; }
 
 		/// <summary>
+		/// Returns the name of the part
+		/// </summary>
+		public abstract string name
+		{
+			get;
+		}
+
+		/// <summary>
 		/// Resets the part to its defaultPosition & defaultRotation
 		/// </summary>
 		/// <param name="uninstall">Should an installed part be uninstalled prior to resetting</param>
