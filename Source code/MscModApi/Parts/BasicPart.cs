@@ -42,15 +42,22 @@ namespace MscModApi.Parts
 		/// <summary>
 		/// Returns the name of the part
 		/// </summary>
-		public abstract string name
-		{
-			get;
-		}
-		
+		public abstract string name { get; }
+
 		/// <summary>
 		/// Returns a clean name of the part (Removing '(Clone)')
 		/// </summary>
 		public string cleanName => name.Replace("(Clone)", "");
+
+		/// <summary>
+		/// Returns if the player is currently looking at this part
+		/// </summary>
+		public abstract bool isLookingAt { get; }
+		
+		/// <summary>
+		/// Returns if the player is currently holding this part
+		/// </summary>
+		public abstract bool isHolding { get; }
 
 		/// <summary>
 		/// Resets the part to its defaultPosition & defaultRotation

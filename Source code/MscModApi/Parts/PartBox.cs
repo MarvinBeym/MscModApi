@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using MscModApi.Tools;
 using UnityEngine;
 
 namespace MscModApi.Parts
@@ -19,6 +20,16 @@ namespace MscModApi.Parts
 		/// Returns the name of the box model
 		/// </summary>
 		public override string name => boxModel.name;
+
+		/// <summary>
+		/// Returns if the player is currently looking at the box
+		/// </summary>
+		public override bool isLookingAt => boxModel.IsLookingAt();
+
+		/// <summary>
+		/// Returns if the player is currently holding the box
+		/// </summary>
+		public override bool isHolding => boxModel.IsHolding();
 
 		internal void IncrementUnpackedCount()
 		{

@@ -18,6 +18,12 @@ namespace MscModApi.Parts.ReplacePart
 		}
 
 		/// <inheritdoc />
+		public override bool isLookingAt => part.isLookingAt;
+
+		/// <inheritdoc />
+		public override bool isHolding => part.isHolding;
+
+		/// <inheritdoc />
 		public override string name => part.name;
 
 		public bool installed => part.installed;

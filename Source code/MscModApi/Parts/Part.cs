@@ -190,10 +190,17 @@ namespace MscModApi.Parts
 			partBaseInfo.AddToPartsList(this);
 		}
 
-		public override string name
-		{
-			get => gameObject.name;
-		}
+		/// <inheritdoc />
+		public override string name => gameObject.name;
+
+		/// <inheritdoc />
+		public override bool isLookingAt => gameObject.IsLookingAt();
+
+
+		/// <inheritdoc />
+		public override bool isHolding => gameObject.IsHolding();
+
+
 
 		public bool parentInstalled
 		{

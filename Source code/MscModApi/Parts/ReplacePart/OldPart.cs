@@ -46,6 +46,12 @@ namespace MscModApi.Parts.ReplacePart
 		}
 
 		/// <inheritdoc />
+		public override bool isHolding => gameObject.IsHolding();
+
+		/// <inheritdoc />
+		public override bool isLookingAt => gameObject.IsLookingAt();
+
+		/// <inheritdoc />
 		public override string name => gameObject.name;
 
 		public bool installBlocked
