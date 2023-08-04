@@ -10,18 +10,17 @@ namespace MscModApi.Shopping
 	public class Kit : PartBox
 	{
 		private KitLogic logic;
-		public int spawnedCounter = 0;
-		private static GameObject boxModel;
+		private static GameObject boxTemplateModel;
 
 		public Kit(string name, Part[] parts)
 		{
-			GameObject kitBox = GameObject.Instantiate(boxModel);
+			GameObject kitBox = GameObject.Instantiate(boxTemplateModel);
 			Setup(name, kitBox, parts);
 		}
 
 		public Kit(string name, Vector3 scale, Part[] parts)
 		{
-			GameObject kitBox = GameObject.Instantiate(boxModel);
+			GameObject kitBox = GameObject.Instantiate(boxTemplateModel);
 			kitBox.GetComponent<BoxCollider>().size = scale;
 			kitBox.transform.FindChild("default").localScale = scale;
 			Setup(name, kitBox, parts);
@@ -36,65 +35,28 @@ namespace MscModApi.Shopping
 		{
 			boxModel.SetNameLayerTag(name + "(Clone)");
 
-			SetParts(parts);
-			if (!AnyBought())
+			AddParts(parts); 
+			
+			if (!bought)
 			{
-				foreach (Part part in parts)
+				foreach (Part part in this.parts)
 				{
 					part.Uninstall();
-					part.SetActive(false);
+					part.active = false;
 				}
-				boxModel.SetActive(false);
+
+				active = false;
 			}
 
 			logic = boxModel.AddComponent<KitLogic>();
 			logic.Init(this);
 
-			SetBoxGameObject(boxModel);
+			this.boxModel = boxModel;
 		}
-
-		internal override void CheckUnpackedOnSave()
-		{
-			if (!AnyBought())
-			{
-				return;
-			}
-
-			GameObject box = GetBoxGameObject();
-
-			if (spawnedCounter < GetPartCount())
-			{
-				foreach (Part part in GetParts())
-				{
-					if (part.IsInstalled() || part.gameObject.activeSelf)
-					{
-						continue;
-					}
-
-					part.SetPosition(box.transform.position);
-					part.SetActive(true);
-				}
-			}
-
-			box.SetActive(false);
-			box.transform.position = new Vector3(0, 0, 0);
-			box.transform.localPosition = new Vector3(0, 0, 0);
-		}
-
-		public bool IsBought()
-		{
-			return GetParts().All(part => part.IsBought());
-		}
-
-		public bool AnyBought()
-		{
-			return GetParts().Any(part => part.IsBought());
-		}
-
 
 		internal static void LoadAssets(AssetBundle assetBundle)
 		{
-			boxModel = assetBundle.LoadAsset<GameObject>("cardboard_box.prefab");
+			boxTemplateModel = assetBundle.LoadAsset<GameObject>("cardboard_box.prefab");
 		}
 	}
 }

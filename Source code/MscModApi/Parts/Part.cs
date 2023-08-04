@@ -8,7 +8,7 @@ using UnityEngine;
 
 namespace MscModApi.Parts
 {
-	public class Part
+	public class Part : BasicPart
 	{
 		protected int clampsAdded;
 		protected bool partFixed;
@@ -48,8 +48,6 @@ namespace MscModApi.Parts
 		internal List<Action> postUnfixedActions = new List<Action>();
 
 		internal bool screwPlacementMode;
-		protected Vector3 defaultRotation = Vector3.zero;
-		protected Vector3 defaultPosition = Vector3.zero;
 		protected bool installBlocked;
 		protected static GameObject clampModel;
 
@@ -188,14 +186,6 @@ namespace MscModApi.Parts
 			return screwPlacementMode;
 		}
 
-		public void SetPosition(Vector3 position)
-		{
-			if (!IsInstalled())
-			{
-				gameObject.transform.position = position;
-			}
-		}
-
 		internal void ResetScrews()
 		{
 			foreach (var screw in partSave.screws)
@@ -212,14 +202,6 @@ namespace MscModApi.Parts
 		internal void SetScrewsActive(bool active)
 		{
 			partSave.screws.ForEach(delegate (Screw screw) { screw.gameObject.SetActive(active); });
-		}
-
-		public void SetRotation(Quaternion rotation)
-		{
-			if (!IsInstalled())
-			{
-				gameObject.transform.rotation = rotation;
-			}
 		}
 
 		public void Install()
@@ -287,8 +269,9 @@ namespace MscModApi.Parts
 
 		private void LoadPartPositionAndRotation(GameObject gameObject, PartSave partSave)
 		{
-			SetPosition(partSave.position);
-			SetRotation(partSave.rotation);
+			position = partSave.position;
+			Quaternion tmpRotation = (partSave.rotation);
+			rotation = tmpRotation.eulerAngles;
 		}
 
 		public void AddScrew(Screw screw)
@@ -447,39 +430,52 @@ namespace MscModApi.Parts
 
 		public T GetComponent<T>() => gameObject.GetComponent<T>();
 
-		public void SetBought(bool bought)
+		public override bool bought
 		{
-			partSave.bought = bought ? PartSave.BoughtState.Yes : PartSave.BoughtState.No;
+			get => partSave.bought == PartSave.BoughtState.Yes; 
+			set => partSave.bought = value ? PartSave.BoughtState.Yes : PartSave.BoughtState.No;
 		}
 
-		public bool IsBought()
+		public override Vector3 position
 		{
-			return partSave.bought == PartSave.BoughtState.Yes;
+			get => gameObject.transform.position;
+			set
+			{
+				if (!IsInstalled())
+				{
+					gameObject.transform.position = value;
+				}
+			}
 		}
 
-		public void SetActive(bool active)
+		public override Vector3 rotation
 		{
-			gameObject.SetActive(active);
+			get => gameObject.transform.rotation.eulerAngles;
+			set
+			{
+				if (!IsInstalled())
+				{
+					gameObject.transform.rotation = Quaternion.Euler(value);
+				}
+			}
 		}
 
-		public void SetDefaultPosition(Vector3 defaultPosition)
+		public override bool active
 		{
-			this.defaultPosition = defaultPosition;
+			get => gameObject.activeSelf; 
+			set => gameObject.SetActive(value);
 		}
 
-		public void SetDefaultRotation(Vector3 defaultRotation)
-		{
-			this.defaultRotation = defaultRotation;
-		}
-
-		public void ResetToDefault(bool uninstall = false)
+		/// <inheritdoc />
+		public override void ResetToDefault(bool uninstall = false)
 		{
 			if (uninstall && IsInstalled())
 			{
 				Uninstall();
 			}
-			SetPosition(defaultPosition);
-			SetRotation(Quaternion.Euler(defaultRotation));
+
+			position = defaultPosition;
+			rotation = defaultRotation;
 		}
 
 		public void BlockInstall(bool block)

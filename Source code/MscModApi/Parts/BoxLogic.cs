@@ -13,21 +13,20 @@ namespace MscModApi.Shopping
 
 		void Update()
 		{
-			if (gameObject.IsLookingAt() && box.spawnedCounter < box.GetParts().Count)
+			if (gameObject.IsLookingAt() && box.hasPartsToUnpack)
 			{
 				UserInteraction.GuiInteraction($"Press [{cInput.GetText("Use")}] to {actionToDisplay}");
 				if (UserInteraction.UseButtonDown)
 				{
-					Part part = box.GetParts()[box.spawnedCounter];
+					Part part = box.parts[box.partsUnpackedCount];
 
-					part.SetPosition(gameObject.transform.position + gameObject.transform.up * 0.3f);
-
-					part.SetActive(true);
-					box.spawnedCounter++;
+					part.position = gameObject.transform.position + gameObject.transform.up * 0.3f;
+					part.active = true;
+					box.IncrementUnpackedCount();
 				}
 			}
 
-			if (box.spawnedCounter >= box.GetParts().Count)
+			if (!box.hasPartsToUnpack)
 			{
 				this.gameObject.SetActive(false);
 			}
