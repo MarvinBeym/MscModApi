@@ -151,14 +151,14 @@ namespace MscModApi.Parts
 			
 			if (changingToFixedState)
 			{
-				part.preFixedActions.InvokeAll();
+				part.GetEvents(Part.EventTime.Pre, Part.EventType.Fixed).InvokeAll();
 			}
 
 			tightness++;
 			
 			if (changingToFixedState)
 			{
-				part.postFixedActions.InvokeAll();
+				part.GetEvents(Part.EventTime.Post, Part.EventType.Fixed).InvokeAll();
 			}
 		}
 
@@ -177,14 +177,14 @@ namespace MscModApi.Parts
 			
 			if (changingToUnfixed)
 			{
-				part.preUnfixedActions.InvokeAll();
+				part.GetEvents(Part.EventTime.Pre, Part.EventType.Unfixed).InvokeAll();
 			}
 
 			tightness--;
 
 			if (changingToUnfixed)
 			{
-				part.postUnfixedActions.InvokeAll();
+				part.GetEvents(Part.EventTime.Post, Part.EventType.Unfixed).InvokeAll();
 			}
 		}
 

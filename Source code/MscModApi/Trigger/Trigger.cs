@@ -70,7 +70,7 @@ namespace MscModApi.Trigger
 
 		internal void Install()
 		{
-			part.preInstallActions.InvokeAll();
+			part.GetEvents(Part.EventTime.Pre, Part.EventType.Install).InvokeAll();
 
 			if (part.installBlocked)
 			{
@@ -106,12 +106,12 @@ namespace MscModApi.Trigger
 
 			canBeInstalled = false;
 
-			part.postInstallActions.InvokeAll();
+			part.GetEvents(Part.EventTime.Post, Part.EventType.Install).InvokeAll();
 		}
 
 		internal void Uninstall()
 		{
-			part.preUninstallActions.InvokeAll();
+			part.GetEvents(Part.EventTime.Pre, Part.EventType.Uninstall).InvokeAll();
 
 			part.ResetScrews();
 
@@ -135,7 +135,7 @@ namespace MscModApi.Trigger
 			part.SetScrewsActive(false);
 			//part.trigger.SetActive(true);
 
-			part.postUninstallActions.InvokeAll();
+			part.GetEvents(Part.EventTime.Post, Part.EventType.Uninstall).InvokeAll();
 		}
 
 		private void OnTriggerStay(Collider collider)
