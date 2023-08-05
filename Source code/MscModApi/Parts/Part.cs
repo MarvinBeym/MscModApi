@@ -356,7 +356,7 @@ namespace MscModApi.Parts
 			}
 		}
 
-		[Obsolete("Use 'screws' property instead")]
+		[Obsolete("Use 'screws' property instead", true)]
 		public List<Screw> GetScrews()
 		{
 			return screws;
@@ -372,7 +372,7 @@ namespace MscModApi.Parts
 			trigger?.Install();
 		}
 
-		[Obsolete("Use 'installed' property instead")]
+		[Obsolete("Use 'installed' property instead", true)]
 		public bool IsInstalled()
 		{
 			return installed;
@@ -413,13 +413,13 @@ namespace MscModApi.Parts
 		}
 
 
-		[Obsolete("Use 'parentInstalled' property instead")]
+		[Obsolete("Use 'parentInstalled' property instead", true)]
 		internal bool ParentInstalled()
 		{
 			return parentInstalled;
 		}
 
-		[Obsolete("Use 'parentFixed' property instead")]
+		[Obsolete("Use 'parentFixed' property instead", true)]
 		public bool ParentFixed()
 		{
 			return parentFixed;
@@ -517,13 +517,13 @@ namespace MscModApi.Parts
 		}
 
 
-		[Obsolete("Use cleaner 'AddEventListener' method instead")]
+		[Obsolete("Use cleaner 'AddEventListener' method instead", true)]
 		public void AddPreSaveAction(Action action)
 		{
 			AddEventListener(EventTime.Pre, EventType.Save, action);
 		}
 
-		[Obsolete("Use cleaner 'AddEventListener' method instead")]
+		[Obsolete("Use cleaner 'AddEventListener' method instead", true)]
 		public void AddPreInstallAction(Action action)
 		{
 			AddEventListener(EventTime.Pre, EventType.Install, action);
@@ -535,49 +535,49 @@ namespace MscModApi.Parts
 			AddEventListener(EventTime.Post, EventType.Install, action);
 		}
 
-		[Obsolete("Use cleaner 'AddEventListener' method instead")]
+		[Obsolete("Use cleaner 'AddEventListener' method instead", true)]
 		public void AddPreUninstallAction(Action action)
 		{
 			AddEventListener(EventTime.Pre, EventType.Uninstall, action);
 		}
 
-		[Obsolete("Use cleaner 'AddEventListener' method instead")]
+		[Obsolete("Use cleaner 'AddEventListener' method instead", true)]
 		public void AddPostUninstallAction(Action action)
 		{
 			AddEventListener(EventTime.Post, EventType.Uninstall, action);
 		}
 
-		[Obsolete("Use cleaner 'AddEventListener' method instead")]
+		[Obsolete("Use cleaner 'AddEventListener' method instead", true)]
 		public void AddPostFixedAction(Action action)
 		{
 			AddEventListener(EventTime.Post, EventType.Fixed, action);
 		}
 
-		[Obsolete("Use cleaner 'AddEventListener' method instead")]
+		[Obsolete("Use cleaner 'AddEventListener' method instead", true)]
 		public void AddPreFixedAction(Action action)
 		{
 			AddEventListener(EventTime.Pre, EventType.Fixed, action);
 		}
 
-		[Obsolete("Use cleaner 'AddEventListener' method instead")]
+		[Obsolete("Use cleaner 'AddEventListener' method instead", true)]
 		public void AddPreUnfixedActions(Action action)
 		{
 			AddEventListener(EventTime.Pre, EventType.Unfixed, action);
 		}
 
-		[Obsolete("Use cleaner 'AddEventListener' method instead")]
+		[Obsolete("Use cleaner 'AddEventListener' method instead", true)]
 		public void AddPostUnfixedActions(Action action)
 		{
 			AddEventListener(EventTime.Post, EventType.Unfixed, action);
 		}
 
-		[Obsolete("Use AddWhenInstalledBehaviour instead. Will be removed in a later version")]
+		[Obsolete("Use AddWhenInstalledBehaviour instead. Will be removed in a later version", true)]
 		public T AddWhenInstalledMono<T>() where T : MonoBehaviour
 		{
 			return AddWhenInstalledBehaviour<T>();
 		}
 
-		[Obsolete("Use AddWhenUninstalledBehaviour instead. Will be removed in a later version")]
+		[Obsolete("Use AddWhenUninstalledBehaviour instead. Will be removed in a later version", true)]
 		public T AddWhenUninstalledMono<T>() where T : MonoBehaviour
 		{
 			return AddWhenUninstalledBehaviour<T>();
@@ -622,31 +622,31 @@ namespace MscModApi.Parts
 			rotation = defaultRotation;
 		}
 
-		[Obsolete("Use 'installBlocked' property instead")]
+		[Obsolete("Use 'installBlocked' property instead", true)]
 		public void BlockInstall(bool block)
 		{
 			installBlocked = block;
 		}
 
-		[Obsolete("Use 'installBlocked' property instead")]
+		[Obsolete("Use 'installBlocked' property instead", true)]
 		public bool IsInstallBlocked()
 		{
 			return installBlocked;
 		}
 
-		[Obsolete("Use 'hasParent' property instead")]
+		[Obsolete("Use 'hasParent' property instead", true)]
 		public bool HasParent()
 		{
 			return hasParent;
 		}
 
-		[Obsolete("Use 'screwPlacementMode' property instead")]
+		[Obsolete("Use 'screwPlacementMode' property instead", true)]
 		public void EnableScrewPlacementMode()
 		{
 			screwPlacementMode = true;
 		}
 
-		[Obsolete("Use 'screwPlacementMode' property instead")]
+		[Obsolete("Use 'screwPlacementMode' property instead", true)]
 		internal bool IsInScrewPlacementMode()
 		{
 			return screwPlacementMode;

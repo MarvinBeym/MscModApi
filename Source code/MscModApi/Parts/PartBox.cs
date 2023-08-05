@@ -172,43 +172,43 @@ namespace MscModApi.Parts
 			}
 		}
 
-		[Obsolete("Use 'AddParts' method instead, this method actually doesn't set but Add parts")]
+		[Obsolete("Use 'AddParts' method instead, this method actually doesn't set but Add parts", true)]
 		protected void SetParts(IEnumerable<Part> parts)
 		{
 			AddParts(parts);
 		}
 
-		[Obsolete("Use 'parts' property instead")]
+		[Obsolete("Use 'parts' property instead", true)]
 		public List<Part> GetParts()
 		{
 			return parts;
 		}
 
-		[Obsolete("Use 'partsCount' property instead")]
+		[Obsolete("Use 'partsCount' property instead", true)]
 		public int GetPartCount()
 		{
 			return parts.Count;
 		}
 
-		[Obsolete("Use 'boxModel' property instead")]
+		[Obsolete("Use 'boxModel' property instead", true)]
 		public GameObject GetBoxGameObject()
 		{
 			return boxModel;
 		}
 
-		[Obsolete("Use 'boxModel' property instead")]
+		[Obsolete("Use 'boxModel' property instead", true)]
 		internal void SetBoxGameObject(GameObject box)
 		{
 			boxModel = box;
 		}
 
-		[Obsolete("Use 'bought' property instead.")]
+		[Obsolete("Use 'bought' property instead.", true)]
 		public bool AnyBought()
 		{
 			return bought;
 		}
 
-		[Obsolete("Use 'bought' property instead.")]
+		[Obsolete("Use 'bought' property instead.", true)]
 		public bool IsBought()
 		{
 			return bought;

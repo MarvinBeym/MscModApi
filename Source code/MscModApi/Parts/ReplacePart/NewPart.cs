@@ -76,13 +76,13 @@ namespace MscModApi.Parts.ReplacePart
 			}
 		}
 
-		[Obsolete("Use 'installBlocked' property instead")]
+		[Obsolete("Use 'installBlocked' property instead", true)]
 		public void BlockInstall(bool block)
 		{
 			installBlocked = block;
 		}
 
-		[Obsolete("Use 'canBeInstalledWithoutReplacing' property instead")]
+		[Obsolete("Use 'canBeInstalledWithoutReplacing' property instead", true)]
 		public bool CanBeInstalledWithoutReplacing()
 		{
 			return canBeInstalledWithoutReplacing;
