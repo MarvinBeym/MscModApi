@@ -42,6 +42,8 @@ namespace MscModApi
 		private Keybind instantInstallKeybind;
 #endif
 
+		private bool updateLocked = true;
+
 		/// <summary>Enables the screw placement for all parts.</summary>
 		/// <param name="mod">The mod.</param>
 		[Obsolete("Only kept for compatibility, use part.screwPlacementMode = true/false instead. Won't do anything!", true)]
@@ -98,6 +100,7 @@ namespace MscModApi
 
 		private void Load()
 		{
+			updateLocked = false;
 			tool = new Tool();
 			PaintingSystem.PaintingSystem.Init();
 			Shop.Init();
@@ -152,6 +155,10 @@ namespace MscModApi
 
 		private new void Update()
 		{
+			if (updateLocked)
+			{
+				return;
+			}
 			Shop.Handle();
 #if DEBUG
 			InstantInstallDebug();
