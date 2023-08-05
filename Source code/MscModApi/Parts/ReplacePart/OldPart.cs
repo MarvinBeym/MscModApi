@@ -141,25 +141,25 @@ namespace MscModApi.Parts.ReplacePart
 			//Don't implement
 		}
 
-		[Obsolete("Use 'installed' property instead")]
+		[Obsolete("Use 'installed' property instead", true)]
 		internal void SetFakedInstallStatus(bool status)
 		{
 			installed = status;
 		}
 
-		[Obsolete("Use 'installBlocked' property instead")]
+		[Obsolete("Use 'installBlocked' property instead", true)]
 		public bool IsInstallBlocked()
 		{
 			return installBlocked;
 		}
 
-		[Obsolete("Use 'installBlocked' property instead")]
+		[Obsolete("Use 'installBlocked' property instead", true)]
 		public void BlockInstall(bool blocked)
 		{
 			installBlocked = blocked;
 		}
 
-		[Obsolete("Use 'installed' property instead")]
+		[Obsolete("Use 'installed' property instead", true)]
 		public bool IsInstalled()
 		{
 			return installed;

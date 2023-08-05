@@ -44,7 +44,7 @@ namespace MscModApi
 
 		/// <summary>Enables the screw placement for all parts.</summary>
 		/// <param name="mod">The mod.</param>
-		[Obsolete("Only kept for compatibility, use part.screwPlacementMode = true/false instead. Won't do anything!")]
+		[Obsolete("Only kept for compatibility, use part.screwPlacementMode = true/false instead. Won't do anything!", true)]
 		public static void EnableScrewPlacementForAllParts(Mod mod)
 		{
 			//Don't do anything
