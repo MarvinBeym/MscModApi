@@ -246,7 +246,7 @@ namespace MscModApi
 				if (part != null) break;
 			}
 
-			if (part == null || !part.hasParent || part.IsInScrewPlacementMode() ||
+			if (part == null || !part.hasParent || part.screwPlacementMode ||
 			    part.uninstallWhenParentUninstalls && !part.parentInstalled) return;
 
 			if (part.installBlocked)

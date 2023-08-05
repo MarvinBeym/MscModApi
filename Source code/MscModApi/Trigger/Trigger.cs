@@ -25,7 +25,7 @@ namespace MscModApi.Trigger
 				if (!part.IsFixed(false) && part.gameObject.IsLookingAt() && UserInteraction.EmptyHand() &&
 					!Tool.HasToolInHand()) {
 					if (part.screwPlacementMode) {
-						ScrewPlacementAssist.ShowPartInteraction(part);
+						ScrewPlacementAssist.HandlePartInteraction(part);
 					} else {
 						UserInteraction.GuiInteraction(UserInteraction.Type.Disassemble, $"Uninstall {part.gameObject.name}");
 

@@ -87,24 +87,35 @@ namespace MscModApi.Tools
 			windowRect = GUILayout.Window(0, windowRect, ScrewPlacementAssist.CreateWindow, "Screw placement mode", GUILayout.ExpandWidth(true));
 		}
 
-		internal static void ShowPartInteraction(Part part)
+		internal static void HandlePartInteraction(Part part)
 		{
-			UserInteraction.GuiInteraction($"Press [{keySelectPart.Key}] to {(selectedPart == null ? "select" : "deselect")} part"
+			UserInteraction.GuiInteraction(
+				$"Press [{keySelectPart.Key}] to {(selectedPart == null ? "select" : "deselect")} part"
 			);
 
 			if (keySelectPart.GetKeybindDown()) {
-				if (selectedPart == null) {
-					selectedPart = part;
-					screws = selectedPart.partSave.screws.OrderBy(screw => screw.gameObject.name).ToArray();
+				if (selectedPart == null)
+				{
+					ShowPartInteraction(part);
 				} else {
-					selectedPart = null;
-					screws = new Screw[0];
+					HidePartInteraction();
 				}
-
 
 			} else {
 				windowRect = new Rect(windowRect.xMin, windowRect.yMin, 200, 50);
 			}
+		}
+
+		internal static void ShowPartInteraction(Part part)
+		{
+			selectedPart = part;
+			screws = selectedPart.partSave.screws.OrderBy(screw => screw.gameObject.name).ToArray();
+		}
+
+		public static void HidePartInteraction()
+		{
+			selectedPart = null;
+			screws = new Screw[0];
 		}
 
 		private static void CopyToClipBoard(this string value)
