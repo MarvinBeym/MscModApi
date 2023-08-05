@@ -137,7 +137,7 @@ namespace MscModApi
 						// ignored
 					}
 
-					part.preSaveActions.InvokeAll();
+					part.GetEvents(Part.EventTime.Pre, Part.EventType.Save).InvokeAll();
 
 					var partSave = part.partSave;
 					partSave.position = part.gameObject.transform.position;

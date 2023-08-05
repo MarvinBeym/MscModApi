@@ -10,6 +10,21 @@ namespace MscModApi.Parts
 {
 	public class Part : BasicPart
 	{
+		public enum EventTime
+		{
+			Pre,
+			Post
+		}
+
+		public enum EventType
+		{
+			Save,
+			Install,
+			Uninstall,
+			Fixed,
+			Unfixed
+		}
+
 		protected static GameObject clampModel;
 
 		protected int clampsAdded;
@@ -40,19 +55,11 @@ namespace MscModApi.Parts
 		protected GameObject gameObjectUsedForInstantiation;
 		protected bool usingPartParent;
 
-		internal List<Action> preSaveActions = new List<Action>();
-
-		internal List<Action> preInstallActions = new List<Action>();
-		internal List<Action> postInstallActions = new List<Action>();
-
-		internal List<Action> preUninstallActions = new List<Action>();
-		internal List<Action> postUninstallActions = new List<Action>();
-
-		internal List<Action> preFixedActions = new List<Action>();
-		internal List<Action> postFixedActions = new List<Action>();
-
-		internal List<Action> preUnfixedActions = new List<Action>();
-		internal List<Action> postUnfixedActions = new List<Action>();
+		/// <summary>
+		/// Stores all events that a developer may have added to this part object
+		/// </summary>
+		protected Dictionary<EventTime, Dictionary<EventType, List<Action>>> events =
+			new Dictionary<EventTime, Dictionary<EventType, List<Action>>>();
 
 		protected Dictionary<Screw, int> preScrewPlacementModeEnableTightnessMap = new Dictionary<Screw, int>();
 
@@ -72,7 +79,7 @@ namespace MscModApi.Parts
 				if (!injectedScrewPlacementDisablePreUninstall)
 				{
 					injectedScrewPlacementDisablePreUninstall = true;
-					AddPreUninstallAction(() =>
+					AddEventListener(EventTime.Pre, EventType.Uninstall, () =>
 					{
 						this.screwPlacementMode = false;
 					});
@@ -171,6 +178,9 @@ namespace MscModApi.Parts
 			Vector3 installRotation, PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls,
 			bool disableCollisionWhenInstalled, string prefabName)
 		{
+			InitEventStorage();
+
+
 			this.id = id;
 			this.partBaseInfo = partBaseInfo;
 			this.installPosition = installPosition;
@@ -237,6 +247,21 @@ namespace MscModApi.Parts
 			}
 
 			partBaseInfo.AddToPartsList(this);
+		}
+
+		private void InitEventStorage()
+		{
+			foreach (EventTime eventTime in Enum.GetValues(typeof(EventTime)))
+			{
+				Dictionary<EventType, List<Action>> eventTypeDict = new Dictionary<EventType, List<Action>>();
+
+				foreach (EventType eventType in Enum.GetValues(typeof(EventType)))
+				{
+					eventTypeDict.Add(eventType, new List<Action>());
+				}
+
+				events.Add(eventTime, eventTypeDict);
+			}
 		}
 
 		/// <inheritdoc />
@@ -449,65 +474,101 @@ namespace MscModApi.Parts
 			}
 		}
 
+		public void AddEventListener(EventTime eventTime, EventType eventType, Action action)
+		{
+			events[eventTime][eventType].Add(action);
+
+			if (eventTime == EventTime.Post)
+			{
+				switch (eventType)
+				{
+					//ToDo: check if invoking just the newly added action is enough of if all have to be invoked
+					case EventType.Install:
+						if (installed)
+						{
+							action.Invoke();
+						}
+						break;
+					case EventType.Uninstall:
+						if (!installed)
+						{
+							action.Invoke();
+						}
+						break;
+					case EventType.Fixed:
+						if (IsFixed())
+						{
+							action.Invoke();
+						}
+						break;
+					case EventType.Unfixed:
+						if (!IsFixed())
+						{
+							action.Invoke();
+						}
+						break;
+				}
+			}
+		}
+
+		public List<Action> GetEvents(EventTime eventTime, EventType eventType)
+		{
+			return events[eventTime][eventType];
+		}
+
+
+		[Obsolete("Use cleaner 'AddEventListener' method instead")]
 		public void AddPreSaveAction(Action action)
 		{
-			preSaveActions.Add(action);
+			AddEventListener(EventTime.Pre, EventType.Save, action);
 		}
 
+		[Obsolete("Use cleaner 'AddEventListener' method instead")]
 		public void AddPreInstallAction(Action action)
 		{
-			preInstallActions.Add(action);
+			AddEventListener(EventTime.Pre, EventType.Install, action);
 		}
 
+		[Obsolete("Use cleaner 'AddEventListener' method instead", true)]
 		public void AddPostInstallAction(Action action)
 		{
-			postInstallActions.Add(action);
-			if (installed)
-			{
-				postInstallActions.InvokeAll();
-			}
+			AddEventListener(EventTime.Post, EventType.Install, action);
 		}
 
+		[Obsolete("Use cleaner 'AddEventListener' method instead")]
 		public void AddPreUninstallAction(Action action)
 		{
-			preUninstallActions.Add(action);
+			AddEventListener(EventTime.Pre, EventType.Uninstall, action);
 		}
 
+		[Obsolete("Use cleaner 'AddEventListener' method instead")]
 		public void AddPostUninstallAction(Action action)
 		{
-			postUninstallActions.Add(action);
-			if (!installed)
-			{
-				postUninstallActions.InvokeAll();
-			}
+			AddEventListener(EventTime.Post, EventType.Uninstall, action);
 		}
 
+		[Obsolete("Use cleaner 'AddEventListener' method instead")]
 		public void AddPostFixedAction(Action action)
 		{
-			postFixedActions.Add(action);
-			if (IsFixed())
-			{
-				postFixedActions.InvokeAll();
-			}
+			AddEventListener(EventTime.Post, EventType.Fixed, action);
 		}
 
+		[Obsolete("Use cleaner 'AddEventListener' method instead")]
 		public void AddPreFixedAction(Action action)
 		{
-			preFixedActions.Add(action);
+			AddEventListener(EventTime.Pre, EventType.Fixed, action);
 		}
 
+		[Obsolete("Use cleaner 'AddEventListener' method instead")]
 		public void AddPreUnfixedActions(Action action)
 		{
-			preUnfixedActions.Add(action);
+			AddEventListener(EventTime.Pre, EventType.Unfixed, action);
 		}
 
+		[Obsolete("Use cleaner 'AddEventListener' method instead")]
 		public void AddPostUnfixedActions(Action action)
 		{
-			postUnfixedActions.Add(action);
-			if (!IsFixed())
-			{
-				postUnfixedActions.InvokeAll();
-			}
+			AddEventListener(EventTime.Post, EventType.Unfixed, action);
 		}
 
 		[Obsolete("Use AddWhenInstalledBehaviour instead. Will be removed in a later version")]
@@ -527,9 +588,10 @@ namespace MscModApi.Parts
 			var behaviour = AddComponent<T>();
 			behaviour.enabled = installed;
 
-			AddPostInstallAction(delegate { behaviour.enabled = true; });
 
-			AddPostUninstallAction(delegate { behaviour.enabled = false; });
+			AddEventListener(EventTime.Post, EventType.Install, delegate { behaviour.enabled = true; });
+
+			AddEventListener(EventTime.Post, EventType.Uninstall, delegate { behaviour.enabled = false; });
 			return behaviour;
 		}
 
@@ -538,9 +600,9 @@ namespace MscModApi.Parts
 			var behaviour = AddComponent<T>();
 			behaviour.enabled = !installed;
 
-			AddPostInstallAction(delegate { behaviour.enabled = false; });
+			AddEventListener(EventTime.Post, EventType.Install, delegate { behaviour.enabled = false; });
 
-			AddPostUninstallAction(delegate { behaviour.enabled = true; });
+			AddEventListener(EventTime.Post, EventType.Uninstall, delegate { behaviour.enabled = true; });
 			return behaviour;
 		}
 
