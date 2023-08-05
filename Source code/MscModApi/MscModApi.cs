@@ -1,8 +1,10 @@
-﻿using MSCLoader;
+﻿using System;
+using MSCLoader;
 using MscModApi.Parts;
 using MscModApi.Shopping;
 using MscModApi.Tools;
 using System.Collections.Generic;
+using MscModApi.Commands;
 using MscModApi.PaintingSystem;
 using UnityEngine;
 
@@ -40,13 +42,12 @@ namespace MscModApi
 		private Keybind instantInstallKeybind;
 #endif
 
-		internal static List<Mod> globalScrewPlacementModeEnabled = new List<Mod>();
-
 		/// <summary>Enables the screw placement for all parts.</summary>
 		/// <param name="mod">The mod.</param>
+		[Obsolete("Only kept for compatibility, use part.screwPlacementMode = true/false instead. Won't do anything!")]
 		public static void EnableScrewPlacementForAllParts(Mod mod)
 		{
-			globalScrewPlacementModeEnabled.Add(mod);
+			//Don't do anything
 		}
 
 		internal static bool ShowScrewSize => (bool)showBoltSizeSetting.Value;
@@ -91,6 +92,8 @@ namespace MscModApi
 			ModConsole.Print($"<color=white>You are running <color=blue>{Name}</color> [<color=green>v{Version}</color>]</color>");
 			Logger.InitLogger(this);
 			LoadAssets();
+			ConsoleCommand.Add(new ScrewPlacementModCommand(this, modsParts));
+
 		}
 
 		private void Load()
@@ -246,7 +249,7 @@ namespace MscModApi
 				if (part != null) break;
 			}
 
-			if (part == null || !part.hasParent || part.IsInScrewPlacementMode() ||
+			if (part == null || !part.hasParent || part.screwPlacementMode ||
 			    part.uninstallWhenParentUninstalls && !part.parentInstalled) return;
 
 			if (part.installBlocked)

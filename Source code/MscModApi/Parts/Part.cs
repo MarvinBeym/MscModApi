@@ -54,7 +54,63 @@ namespace MscModApi.Parts
 		internal List<Action> preUnfixedActions = new List<Action>();
 		internal List<Action> postUnfixedActions = new List<Action>();
 
-		internal bool screwPlacementMode;
+		protected Dictionary<Screw, int> preScrewPlacementModeEnableTightnessMap = new Dictionary<Screw, int>();
+
+		private bool _screwPlacementMode;
+		protected bool injectedScrewPlacementDisablePreUninstall = false;
+
+		public bool screwPlacementMode
+		{
+			get => _screwPlacementMode;
+			set
+			{
+				if (!installed)
+				{
+					return;
+				}
+
+				if (!injectedScrewPlacementDisablePreUninstall)
+				{
+					injectedScrewPlacementDisablePreUninstall = true;
+					AddPreUninstallAction(() =>
+					{
+						this.screwPlacementMode = false;
+					});
+				}
+
+				foreach (Screw screw in screws)
+				{
+					if (!value)
+					{
+						if (!preScrewPlacementModeEnableTightnessMap.TryGetValue(screw, out int preEnableTightness))
+						{
+							continue;
+						}
+
+						screw.tightness = Screw.maxTightness;
+						screw.OutBy(Screw.maxTightness);
+						screw.InBy(preEnableTightness);
+						preScrewPlacementModeEnableTightnessMap.Remove(screw);
+						continue;
+					}
+
+					if (preScrewPlacementModeEnableTightnessMap.ContainsKey(screw))
+					{
+						continue;
+					}
+					preScrewPlacementModeEnableTightnessMap.Add(screw, screw.tightness);
+					screw.InBy(Screw.maxTightness);
+					screw.tightness = 0;
+				}
+
+				if (!value && ScrewPlacementAssist.selectedPart == this)
+				{
+					ScrewPlacementAssist.HidePartInteraction();
+				}
+
+				_screwPlacementMode = value;
+			}
+		}
 
 		public bool hasParent => trigger != null;
 
@@ -180,12 +236,6 @@ namespace MscModApi.Parts
 				});
 			}
 
-			if (MscModApi.globalScrewPlacementModeEnabled.Contains(partBaseInfo.mod))
-			{
-				EnableScrewPlacementMode();
-			}
-
-
 			partBaseInfo.AddToPartsList(this);
 		}
 
@@ -271,16 +321,6 @@ namespace MscModApi.Parts
 		{
 			get => gameObject.activeSelf;
 			set => gameObject.SetActive(value);
-		}
-
-		public void EnableScrewPlacementMode()
-		{
-			screwPlacementMode = true;
-		}
-
-		internal bool IsInScrewPlacementMode()
-		{
-			return screwPlacementMode;
 		}
 
 		internal void ResetScrews()
@@ -378,11 +418,8 @@ namespace MscModApi.Parts
 
 			screw.CreateScrewModel(index);
 
-			if (!screwPlacementMode)
-			{
-				screw.LoadTightness(savedScrews.ElementAtOrDefault(index));
-				screw.InBy(screw.tightness, false, true);
-			}
+			screw.LoadTightness(savedScrews.ElementAtOrDefault(index));
+			screw.InBy(screw.tightness, false, true);
 
 			screw.gameObject.SetActive(installed);
 
@@ -539,6 +576,18 @@ namespace MscModApi.Parts
 		public bool HasParent()
 		{
 			return hasParent;
+		}
+
+		[Obsolete("Use 'screwPlacementMode' property instead")]
+		public void EnableScrewPlacementMode()
+		{
+			screwPlacementMode = true;
+		}
+
+		[Obsolete("Use 'screwPlacementMode' property instead")]
+		internal bool IsInScrewPlacementMode()
+		{
+			return screwPlacementMode;
 		}
 
 		public virtual void CustomSaveLoading(Mod mod, string saveFileName)

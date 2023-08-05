@@ -80,6 +80,7 @@
     <Compile Include="Caching\Cache.cs" />
     <Compile Include="Caching\CarH.cs" />
     <Compile Include="Caching\Game.cs" />
+    <Compile Include="Commands\ScrewPlacementModCommand.cs" />
     <Compile Include="PaintingSystem\PaintingStorage.cs" />
     <Compile Include="PaintingSystem\PaintingSystem.cs" />
     <Compile Include="PaintingSystem\PaintingSystemLogic.cs" />
