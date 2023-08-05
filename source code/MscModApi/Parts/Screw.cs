@@ -146,14 +146,19 @@ namespace MscModApi.Parts
 
 			gameObject.transform.Rotate(0, 0, rotationStep);
 			gameObject.transform.Translate(0f, 0f, -transformStep);
-			tightness++;
 
-			if (tightness == maxTightness) {
-				if (part.partSave.screws.All(screw => screw.tightness == maxTightness) && !part.IsFixed()) {
-					part.preFixedActions.InvokeAll();
-					part.SetFixed(true);
-					part.postFixedActions.InvokeAll();
-				}
+			bool changingToFixedState = tightness + 1 == maxTightness;
+			
+			if (changingToFixedState)
+			{
+				part.preFixedActions.InvokeAll();
+			}
+
+			tightness++;
+			
+			if (changingToFixedState)
+			{
+				part.postFixedActions.InvokeAll();
 			}
 		}
 
@@ -167,12 +172,18 @@ namespace MscModApi.Parts
 
 			gameObject.transform.Rotate(0, 0, -rotationStep);
 			gameObject.transform.Translate(0f, 0f, transformStep);
-			tightness--;
 
-			if (tightness < maxTightness)
+			bool changingToUnfixed = part.isFixed;
+			
+			if (changingToUnfixed)
 			{
 				part.preUnfixedActions.InvokeAll();
-				part.SetFixed(false);
+			}
+
+			tightness--;
+
+			if (changingToUnfixed)
+			{
 				part.postUnfixedActions.InvokeAll();
 			}
 		}
