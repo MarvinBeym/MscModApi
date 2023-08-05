@@ -8,24 +8,32 @@ using UnityEngine;
 
 namespace MscModApi.Parts
 {
-	public class Part
+	public class Part : BasicPart
 	{
+		protected static GameObject clampModel;
+
 		protected int clampsAdded;
 		protected bool partFixed;
 
-		internal List<Part> childParts = new List<Part>();
-		public string id;
-		public PartBaseInfo partBaseInfo;
-		public GameObject gameObject;
+		public List<Part> childParts { get; protected set; } = new List<Part>();
+
+		public string id { get; protected set; }
+
+		public PartBaseInfo partBaseInfo { get; protected set; }
+
+		public GameObject gameObject { get; protected set; }
 		internal PartSave partSave;
-		internal Vector3 installPosition;
-		internal bool uninstallWhenParentUninstalls;
-		internal Vector3 installRotation;
+
+		public Vector3 installPosition { get; protected set; }
+		public Vector3 installRotation { get; protected set; }
+
+		public bool uninstallWhenParentUninstalls { get; protected set; }
 		protected GameObject parentGameObject;
 		protected Part parentPart;
 		protected List<Screw> savedScrews;
 		internal Collider collider;
-		public TriggerWrapper trigger;
+
+		public TriggerWrapper trigger { get; protected set; }
 
 		public Transform transform => gameObject.transform;
 
@@ -48,10 +56,61 @@ namespace MscModApi.Parts
 		internal List<Action> postUnfixedActions = new List<Action>();
 
 		internal bool screwPlacementMode;
-		protected Vector3 defaultRotation = Vector3.zero;
-		protected Vector3 defaultPosition = Vector3.zero;
-		protected bool installBlocked;
-		protected static GameObject clampModel;
+
+		public bool hasParent => trigger != null;
+
+		public bool installBlocked { get; set; }
+
+		public List<Screw> screws => partSave.screws;
+
+		public bool installed => partSave.installed;
+
+		/// <inheritdoc />
+		protected Part()
+		{
+		}
+
+		public Part(string id, string name, GameObject part, Part parentPart, Vector3 installPosition,
+			Vector3 installRotation,
+			PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls = true,
+			bool disableCollisionWhenInstalled = true)
+		{
+			usingGameObjectInstantiation = true;
+			gameObjectUsedForInstantiation = part;
+
+			usingPartParent = true;
+			this.parentPart = parentPart;
+
+			Setup(id, name, parentPart.gameObject, installPosition, installRotation, partBaseInfo,
+				uninstallWhenParentUninstalls, disableCollisionWhenInstalled, null);
+			parentPart.childParts.Add(this);
+		}
+
+		public Part(string id, string name, GameObject parent, Vector3 installPosition, Vector3 installRotation,
+			PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls = true,
+			bool disableCollisionWhenInstalled = true, string prefabName = null)
+		{
+			Setup(id, name, parent, installPosition, installRotation, partBaseInfo,
+				uninstallWhenParentUninstalls, disableCollisionWhenInstalled, prefabName);
+		}
+
+		public Part(string id, string name, PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls = true,
+			bool disableCollisionWhenInstalled = true, string prefabName = null)
+		{
+			Setup(id, name, null, Vector3.zero, Vector3.zero, partBaseInfo,
+				uninstallWhenParentUninstalls, disableCollisionWhenInstalled, prefabName);
+		}
+
+		public Part(string id, string name, Part parentPart, Vector3 installPosition, Vector3 installRotation,
+			PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls = true,
+			bool disableCollisionWhenInstalled = true, string prefabName = null)
+		{
+			usingPartParent = true;
+			this.parentPart = parentPart;
+			Setup(id, name, parentPart.gameObject, installPosition, installRotation, partBaseInfo,
+				uninstallWhenParentUninstalls, disableCollisionWhenInstalled, prefabName);
+			parentPart.childParts.Add(this);
+		}
 
 		protected void Setup(string id, string name, GameObject parentGameObject, Vector3 installPosition,
 			Vector3 installRotation, PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls,
@@ -118,7 +177,7 @@ namespace MscModApi.Parts
 			{
 				MscModApi.modsParts.Add(partBaseInfo.mod.ID, new Dictionary<string, Part>
 				{
-					{id, this}
+					{ id, this }
 				});
 			}
 
@@ -131,69 +190,98 @@ namespace MscModApi.Parts
 			partBaseInfo.AddToPartsList(this);
 		}
 
-		/// <summary>
-		/// Only used for DerivablePart class
-		/// </summary>
-		protected Part()
-		{
+		/// <inheritdoc />
+		public override string name => gameObject.name;
 
+		/// <inheritdoc />
+		public override bool isLookingAt => gameObject.IsLookingAt();
+
+
+		/// <inheritdoc />
+		public override bool isHolding => gameObject.IsHolding();
+
+
+
+		public bool parentInstalled
+		{
+			get
+			{
+				if (usingPartParent)
+				{
+					return parentPart.installed;
+				}
+				else
+				{
+					//Todo: Implement normal msc parts installed/uninstalled
+					return true;
+				}
+			}
 		}
 
-		public Part(string id, string name, GameObject part, Part parentPart, Vector3 installPosition, Vector3 installRotation,
-			PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls = true,
-			bool disableCollisionWhenInstalled = true)
+		public bool parentFixed
 		{
-			usingGameObjectInstantiation = true;
-			gameObjectUsedForInstantiation = part;
-
-			usingPartParent = true;
-			this.parentPart = parentPart;
-
-			Setup(id, name, parentPart.gameObject, installPosition, installRotation, partBaseInfo,
-				uninstallWhenParentUninstalls, disableCollisionWhenInstalled, null);
-			parentPart.childParts.Add(this);
+			get
+			{
+				if (usingPartParent)
+				{
+					return parentPart.IsFixed(true);
+				}
+				else
+				{
+					//Todo: Implement normal msc parts fixed
+					return true;
+				}
+			}
 		}
 
-		public Part(string id, string name, GameObject parent, Vector3 installPosition, Vector3 installRotation,
-			PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls = true,
-			bool disableCollisionWhenInstalled = true, string prefabName = null)
+		/// <inheritdoc />
+		public override bool bought
 		{
-			Setup(id, name, parent, installPosition, installRotation, partBaseInfo,
-				uninstallWhenParentUninstalls, disableCollisionWhenInstalled, prefabName);
+			get => partSave.bought == PartSave.BoughtState.Yes;
+			set => partSave.bought = value ? PartSave.BoughtState.Yes : PartSave.BoughtState.No;
 		}
 
-		public Part(string id, string name, PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls = true,
-			bool disableCollisionWhenInstalled = true, string prefabName = null)
+		/// <inheritdoc />
+		public override Vector3 position
 		{
-			Setup(id, name, null, Vector3.zero, Vector3.zero, partBaseInfo,
-				uninstallWhenParentUninstalls, disableCollisionWhenInstalled, prefabName);
+			get => gameObject.transform.position;
+			set
+			{
+				if (!installed)
+				{
+					gameObject.transform.position = value;
+				}
+			}
 		}
 
-		public Part(string id, string name, Part parentPart, Vector3 installPosition, Vector3 installRotation,
-			PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls = true,
-			bool disableCollisionWhenInstalled = true, string prefabName = null)
+		/// <inheritdoc />
+		public override Vector3 rotation
 		{
-			usingPartParent = true;
-			this.parentPart = parentPart;
-			Setup(id, name, parentPart.gameObject, installPosition, installRotation, partBaseInfo,
-				uninstallWhenParentUninstalls, disableCollisionWhenInstalled, prefabName);
-			parentPart.childParts.Add(this);
+			get => gameObject.transform.rotation.eulerAngles;
+			set
+			{
+				if (!installed)
+				{
+					gameObject.transform.rotation = Quaternion.Euler(value);
+				}
+			}
 		}
 
+		/// <inheritdoc />
+		public override bool active
+		{
+			get => gameObject.activeSelf;
+			set => gameObject.SetActive(value);
+		}
 
-		public void EnableScrewPlacementMode() => screwPlacementMode = true;
+		public void EnableScrewPlacementMode()
+		{
+			screwPlacementMode = true;
+		}
 
 		internal bool IsInScrewPlacementMode()
 		{
 			return screwPlacementMode;
-		}
-
-		public void SetPosition(Vector3 position)
-		{
-			if (!IsInstalled())
-			{
-				gameObject.transform.position = position;
-			}
 		}
 
 		internal void ResetScrews()
@@ -204,22 +292,15 @@ namespace MscModApi.Parts
 			}
 		}
 
+		[Obsolete("Use 'screws' property instead")]
 		public List<Screw> GetScrews()
 		{
-			return partSave.screws;
+			return screws;
 		}
 
 		internal void SetScrewsActive(bool active)
 		{
-			partSave.screws.ForEach(delegate (Screw screw) { screw.gameObject.SetActive(active); });
-		}
-
-		public void SetRotation(Quaternion rotation)
-		{
-			if (!IsInstalled())
-			{
-				gameObject.transform.rotation = rotation;
-			}
+			partSave.screws.ForEach(delegate(Screw screw) { screw.gameObject.SetActive(active); });
 		}
 
 		public void Install()
@@ -227,9 +308,10 @@ namespace MscModApi.Parts
 			trigger?.Install();
 		}
 
+		[Obsolete("Use 'installed' property instead")]
 		public bool IsInstalled()
 		{
-			return partSave.installed;
+			return installed;
 		}
 
 		public bool IsFixed(bool ignoreUnsetScrews = true)
@@ -238,10 +320,14 @@ namespace MscModApi.Parts
 			{
 				return partFixed;
 			}
-			return partSave.screws.Count == 0 ? IsInstalled() : partFixed;
+
+			return partSave.screws.Count == 0 ? installed : partFixed;
 		}
 
-		internal void SetFixed(bool partFixed) => this.partFixed = partFixed;
+		internal void SetFixed(bool partFixed)
+		{
+			this.partFixed = partFixed;
+		}
 
 		public void Uninstall()
 		{
@@ -259,36 +345,24 @@ namespace MscModApi.Parts
 			clamp.transform.localRotation = new Quaternion { eulerAngles = rotation };
 		}
 
+
+		[Obsolete("Use 'parentInstalled' property instead")]
 		internal bool ParentInstalled()
 		{
-			if (usingPartParent)
-			{
-				return parentPart.IsInstalled();
-			}
-			else
-			{
-				//Todo: Implement normal msc parts installed/uninstalled
-				return true;
-			}
+			return parentInstalled;
 		}
 
+		[Obsolete("Use 'parentFixed' property instead")]
 		public bool ParentFixed()
 		{
-			if (usingPartParent)
-			{
-				return parentPart.IsFixed(true);
-			}
-			else
-			{
-				//Todo: Implement normal msc parts fixed
-				return true;
-			}
+			return parentFixed;
 		}
 
 		private void LoadPartPositionAndRotation(GameObject gameObject, PartSave partSave)
 		{
-			SetPosition(partSave.position);
-			SetRotation(partSave.rotation);
+			position = partSave.position;
+			Quaternion tmpRotation = (partSave.rotation);
+			rotation = tmpRotation.eulerAngles;
 		}
 
 		public void AddScrew(Screw screw)
@@ -308,7 +382,7 @@ namespace MscModApi.Parts
 				screw.InBy(screw.tightness, false, true);
 			}
 
-			screw.gameObject.SetActive(IsInstalled());
+			screw.gameObject.SetActive(installed);
 
 			MscModApi.screws.Add(screw.gameObject.name, screw);
 		}
@@ -340,6 +414,7 @@ namespace MscModApi.Parts
 		{
 			preSaveActions.Add(action);
 		}
+
 		public void AddPreInstallAction(Action action)
 		{
 			preInstallActions.Add(action);
@@ -348,7 +423,7 @@ namespace MscModApi.Parts
 		public void AddPostInstallAction(Action action)
 		{
 			postInstallActions.Add(action);
-			if (IsInstalled())
+			if (installed)
 			{
 				postInstallActions.InvokeAll();
 			}
@@ -362,7 +437,7 @@ namespace MscModApi.Parts
 		public void AddPostUninstallAction(Action action)
 		{
 			postUninstallActions.Add(action);
-			if (!IsInstalled())
+			if (!installed)
 			{
 				postUninstallActions.InvokeAll();
 			}
@@ -385,8 +460,8 @@ namespace MscModApi.Parts
 		public void AddPreUnfixedActions(Action action)
 		{
 			preUnfixedActions.Add(action);
-
 		}
+
 		public void AddPostUnfixedActions(Action action)
 		{
 			postUnfixedActions.Add(action);
@@ -394,7 +469,6 @@ namespace MscModApi.Parts
 			{
 				postUnfixedActions.InvokeAll();
 			}
-
 		}
 
 		[Obsolete("Use AddWhenInstalledBehaviour instead. Will be removed in a later version")]
@@ -412,34 +486,22 @@ namespace MscModApi.Parts
 		public T AddWhenInstalledBehaviour<T>() where T : Behaviour
 		{
 			var behaviour = AddComponent<T>();
-			behaviour.enabled = IsInstalled();
+			behaviour.enabled = installed;
 
-			AddPostInstallAction(delegate
-			{
-				behaviour.enabled = true;
-			});
+			AddPostInstallAction(delegate { behaviour.enabled = true; });
 
-			AddPostUninstallAction(delegate
-			{
-				behaviour.enabled = false;
-			});
+			AddPostUninstallAction(delegate { behaviour.enabled = false; });
 			return behaviour;
 		}
 
 		public T AddWhenUninstalledBehaviour<T>() where T : Behaviour
 		{
 			var behaviour = AddComponent<T>();
-			behaviour.enabled = !IsInstalled();
+			behaviour.enabled = !installed;
 
-			AddPostInstallAction(delegate
-			{
-				behaviour.enabled = false;
-			});
+			AddPostInstallAction(delegate { behaviour.enabled = false; });
 
-			AddPostUninstallAction(delegate
-			{
-				behaviour.enabled = true;
-			});
+			AddPostUninstallAction(delegate { behaviour.enabled = true; });
 			return behaviour;
 		}
 
@@ -447,54 +509,34 @@ namespace MscModApi.Parts
 
 		public T GetComponent<T>() => gameObject.GetComponent<T>();
 
-		public void SetBought(bool bought)
+		/// <inheritdoc />
+		public override void ResetToDefault(bool uninstall = false)
 		{
-			partSave.bought = bought ? PartSave.BoughtState.Yes : PartSave.BoughtState.No;
-		}
-
-		public bool IsBought()
-		{
-			return partSave.bought == PartSave.BoughtState.Yes;
-		}
-
-		public void SetActive(bool active)
-		{
-			gameObject.SetActive(active);
-		}
-
-		public void SetDefaultPosition(Vector3 defaultPosition)
-		{
-			this.defaultPosition = defaultPosition;
-		}
-
-		public void SetDefaultRotation(Vector3 defaultRotation)
-		{
-			this.defaultRotation = defaultRotation;
-		}
-
-		public void ResetToDefault(bool uninstall = false)
-		{
-			if (uninstall && IsInstalled())
+			if (uninstall && installed)
 			{
 				Uninstall();
 			}
-			SetPosition(defaultPosition);
-			SetRotation(Quaternion.Euler(defaultRotation));
+
+			position = defaultPosition;
+			rotation = defaultRotation;
 		}
 
+		[Obsolete("Use 'installBlocked' property instead")]
 		public void BlockInstall(bool block)
 		{
 			installBlocked = block;
 		}
 
+		[Obsolete("Use 'installBlocked' property instead")]
 		public bool IsInstallBlocked()
 		{
 			return installBlocked;
 		}
 
+		[Obsolete("Use 'hasParent' property instead")]
 		public bool HasParent()
 		{
-			return trigger != null;
+			return hasParent;
 		}
 
 		public virtual void CustomSaveLoading(Mod mod, string saveFileName)

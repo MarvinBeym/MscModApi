@@ -20,7 +20,7 @@ namespace MscModApi.Trigger
 
 		private IEnumerator HandleUninstall()
 		{
-			while (part.IsInstalled()) {
+			while (part.installed) {
 				
 				if (!part.IsFixed(false) && part.gameObject.IsLookingAt() && UserInteraction.EmptyHand() &&
 					!Tool.HasToolInHand()) {
@@ -45,7 +45,7 @@ namespace MscModApi.Trigger
 
 		private IEnumerator VerifyInstalled()
 		{
-			while (part.IsInstalled() && part.gameObject.transform.parent != parentGameObject.transform) {
+			while (part.installed && part.gameObject.transform.parent != parentGameObject.transform) {
 				rigidBody.isKinematic = true;
 				part.gameObject.transform.parent = parentGameObject.transform;
 				part.gameObject.transform.localPosition = part.installPosition;
@@ -58,7 +58,7 @@ namespace MscModApi.Trigger
 
 		private IEnumerator VerifyUninstalled()
 		{
-			while (!part.IsInstalled() && part.gameObject.transform.parent == parentGameObject.transform) {
+			while (!part.installed && part.gameObject.transform.parent == parentGameObject.transform) {
 				rigidBody.isKinematic = false;
 				part.gameObject.transform.parent = null;
 				part.gameObject.transform.Translate(Vector3.up * 0.025f);
@@ -72,7 +72,7 @@ namespace MscModApi.Trigger
 		{
 			part.preInstallActions.InvokeAll();
 
-			if (part.IsInstallBlocked())
+			if (part.installBlocked)
 			{
 				return;
 			}
@@ -82,7 +82,7 @@ namespace MscModApi.Trigger
 				return;
 			}
 
-			if (part.uninstallWhenParentUninstalls && !part.ParentInstalled()) {
+			if (part.uninstallWhenParentUninstalls && !part.parentInstalled) {
 				return;
 			}
 
@@ -124,7 +124,7 @@ namespace MscModApi.Trigger
 			part.partSave.installed = false;
 			part.gameObject.tag = "PART";
 
-			if (!part.IsInstalled() && verifyUninstalledRoutine == null) {
+			if (!part.installed && verifyUninstalledRoutine == null) {
 				verifyUninstalledRoutine = StartCoroutine(VerifyUninstalled());
 			}
 
@@ -151,10 +151,10 @@ namespace MscModApi.Trigger
 		private void OnTriggerEnter(Collider collider)
 		{
 			if (
-				(part.uninstallWhenParentUninstalls && !part.ParentInstalled()) 
+				(part.uninstallWhenParentUninstalls && !part.parentInstalled) 
 			    || !collider.gameObject.IsHolding()
 			    || collider.gameObject != part.gameObject
-			    || part.IsInstallBlocked()
+			    || part.installBlocked
 			){
 				return;
 			}
