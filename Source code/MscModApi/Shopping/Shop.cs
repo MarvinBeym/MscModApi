@@ -115,7 +115,7 @@ namespace MscModApi.Shopping
 
 		internal static void Handle()
 		{
-			if (shopInterface.IsOpen()) return;
+			if (shopInterface == null || shopInterface.IsOpen()) return;
 			foreach (var keyValuePair in shopCatalogs)
 			{
 				var shopLocation = keyValuePair.Key;
