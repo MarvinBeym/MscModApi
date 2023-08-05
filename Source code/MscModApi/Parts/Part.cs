@@ -13,7 +13,6 @@ namespace MscModApi.Parts
 		protected static GameObject clampModel;
 
 		protected int clampsAdded;
-		protected bool partFixed;
 
 		public List<Part> childParts { get; protected set; } = new List<Part>();
 
@@ -318,15 +317,18 @@ namespace MscModApi.Parts
 		{
 			if (!ignoreUnsetScrews)
 			{
-				return partFixed;
+				return isFixed;
 			}
 
-			return partSave.screws.Count == 0 ? installed : partFixed;
+			return partSave.screws.Count == 0 ? installed : isFixed;
 		}
 
-		internal void SetFixed(bool partFixed)
+		public bool isFixed
 		{
-			this.partFixed = partFixed;
+			get
+			{
+				return screws.All(screw => screw.tightness == Screw.maxTightness);
+			}
 		}
 
 		public void Uninstall()
