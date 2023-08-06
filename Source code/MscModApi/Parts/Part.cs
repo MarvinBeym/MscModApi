@@ -292,8 +292,7 @@ namespace MscModApi.Parts
 		/// <inheritdoc />
 		public override bool isHolding => gameObject.IsHolding();
 
-		public bool installPossible => installBlocked || !bought || trigger == null || installed;
-
+		public bool installPossible => !installBlocked && bought && trigger != null;
 
 
 		public bool parentInstalled
@@ -420,7 +419,7 @@ namespace MscModApi.Parts
 		{
 			trigger?.Uninstall();
 		}
-
+		
 		public void AddClampModel(Vector3 position, Vector3 rotation, Vector3 scale)
 		{
 			var clamp = GameObject.Instantiate(clampModel);
