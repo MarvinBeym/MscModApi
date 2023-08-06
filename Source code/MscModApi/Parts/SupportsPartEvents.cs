@@ -14,8 +14,8 @@ namespace MscModApi.Parts
 		Save,
 		Install,
 		Uninstall,
-		Fixed,
-		Unfixed
+		Bolted,
+		Unbolted
 	}
 
 	public interface SupportsPartEvents

@@ -130,8 +130,8 @@ namespace MscModApi.Parts.ReplacePart
 				newPart.part.AddEventListener(EventTime.Post, EventType.Install, delegate { NewPartInstalled(newPart); });
 				newPart.part.AddEventListener(EventTime.Post, EventType.Uninstall, delegate { NewPartUninstalled(newPart); });
 
-				newPart.part.AddEventListener(EventTime.Post, EventType.Fixed, NewPartFixed);
-				newPart.part.AddEventListener(EventTime.Post, EventType.Unfixed, NewPartUnfixed);
+				newPart.part.AddEventListener(EventTime.Post, EventType.Bolted, NewPartFixed);
+				newPart.part.AddEventListener(EventTime.Post, EventType.Unbolted, NewPartUnfixed);
 
 				if (newPart.installed)
 				{

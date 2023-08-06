@@ -535,25 +535,25 @@ namespace MscModApi.Parts
 		[Obsolete("Use cleaner 'AddEventListener' method instead", true)]
 		public void AddPostFixedAction(Action action)
 		{
-			AddEventListener(EventTime.Post, EventType.Fixed, action);
+			AddEventListener(EventTime.Post, EventType.Bolted, action);
 		}
 
 		[Obsolete("Use cleaner 'AddEventListener' method instead", true)]
 		public void AddPreFixedAction(Action action)
 		{
-			AddEventListener(EventTime.Pre, EventType.Fixed, action);
+			AddEventListener(EventTime.Pre, EventType.Bolted, action);
 		}
 
 		[Obsolete("Use cleaner 'AddEventListener' method instead", true)]
 		public void AddPreUnfixedActions(Action action)
 		{
-			AddEventListener(EventTime.Pre, EventType.Unfixed, action);
+			AddEventListener(EventTime.Pre, EventType.Unbolted, action);
 		}
 
 		[Obsolete("Use cleaner 'AddEventListener' method instead", true)]
 		public void AddPostUnfixedActions(Action action)
 		{
-			AddEventListener(EventTime.Post, EventType.Unfixed, action);
+			AddEventListener(EventTime.Post, EventType.Unbolted, action);
 		}
 
 		[Obsolete("Use AddWhenInstalledBehaviour instead. Will be removed in a later version", true)]
@@ -612,13 +612,13 @@ namespace MscModApi.Parts
 							action.Invoke();
 						}
 						break;
-					case EventType.Fixed:
+					case EventType.Bolted:
 						if (bolted)
 						{
 							action.Invoke();
 						}
 						break;
-					case EventType.Unfixed:
+					case EventType.Unbolted:
 						if (!bolted)
 						{
 							action.Invoke();
