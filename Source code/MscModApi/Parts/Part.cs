@@ -4,6 +4,7 @@ using MscModApi.Trigger;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using HutongGames.PlayMaker;
 using UnityEngine;
 
 namespace MscModApi.Parts
@@ -86,6 +87,7 @@ namespace MscModApi.Parts
 
 		private bool _screwPlacementMode;
 		protected bool injectedScrewPlacementDisablePreUninstall = false;
+		private FsmBool parentGameObjectBolted = new FsmBool("Bolted");
 
 		public bool screwPlacementMode
 		{
@@ -206,6 +208,34 @@ namespace MscModApi.Parts
 			this.installRotation = installRotation;
 			this.parentGameObject = parentGameObject;
 
+			if (!usingPartParent)
+			{
+				try
+				{
+
+					PlayMakerFSM parentRemovalFsm = parentGameObject.FindFsm("Removal");
+
+					/*
+					 * 					if (!removalFsm.Fsm.Initialized)
+					{
+						removalFsm.InitializeFSM();
+					}
+					 */
+					if (!parentRemovalFsm.Fsm.Initialized)
+					{
+						parentRemovalFsm.InitializeFSM();
+					}
+
+					GameObject fsmPartGameObject = parentRemovalFsm.FsmVariables.FindFsmGameObject("db_ThisPart").Value;
+					PlayMakerFSM fsmPartDataFsm = fsmPartGameObject.FindFsm("Data");
+					parentGameObjectBolted = fsmPartDataFsm.FsmVariables.FindFsmBool("Bolted");
+				}
+				catch (Exception)
+				{
+					// ignored
+				}
+			}
+
 			if (gameObjectUsedForInstantiation != null)
 			{
 				gameObject = GameObject.Instantiate(gameObjectUsedForInstantiation);
@@ -305,8 +335,7 @@ namespace MscModApi.Parts
 				}
 				else
 				{
-					//Todo: Implement normal msc parts installed/uninstalled
-					return true;
+					return parentGameObject.transform.parent == null;
 				}
 			}
 		}
@@ -321,8 +350,7 @@ namespace MscModApi.Parts
 				}
 				else
 				{
-					//Todo: Implement normal msc parts fixed
-					return true;
+					return parentGameObjectBolted.Value;
 				}
 			}
 		}
@@ -385,7 +413,7 @@ namespace MscModApi.Parts
 		{
 			partSave.screws.ForEach(delegate(Screw screw) { screw.gameObject.SetActive(active); });
 		}
-
+		
 		public void Install()
 		{
 			trigger?.Install();
