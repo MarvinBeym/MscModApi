@@ -70,21 +70,11 @@ namespace MscModApi.Trigger
 
 		internal void Install()
 		{
+			if (!part.installPossible)
+			{
+				return;
+			}
 			part.GetEvents(Part.EventTime.Pre, Part.EventType.Install).InvokeAll();
-
-			if (part.installBlocked)
-			{
-				return;
-			}
-
-			if (part.partSave.bought == PartSave.BoughtState.No)
-			{
-				return;
-			}
-
-			if (part.uninstallWhenParentUninstalls && !part.parentInstalled) {
-				return;
-			}
 
 			part.partSave.installed = true;
 			part.gameObject.tag = "Untagged";
@@ -154,7 +144,7 @@ namespace MscModApi.Trigger
 				(part.uninstallWhenParentUninstalls && !part.parentInstalled) 
 			    || !collider.gameObject.IsHolding()
 			    || collider.gameObject != part.gameObject
-			    || part.installBlocked
+			    || !part.installPossible
 			){
 				return;
 			}

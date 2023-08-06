@@ -274,6 +274,8 @@ namespace MscModApi.Parts
 		/// <inheritdoc />
 		public override bool isHolding => gameObject.IsHolding();
 
+		public bool installPossible => installBlocked || !bought || trigger == null || installed;
+
 
 
 		public bool parentInstalled
