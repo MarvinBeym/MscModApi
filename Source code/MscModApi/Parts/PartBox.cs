@@ -95,6 +95,19 @@ namespace MscModApi.Parts
 		}
 
 		/// <summary>
+		/// Returns if all parts contained in this box are installed
+		/// (Only made available through inheritance, rare use cases)
+		/// </summary>
+		public override bool installed => parts.All(part => part.installed);
+
+		/// <summary>
+		/// Returns if all parts contained in this box are bolted
+		/// (Only made available through inheritance, rare use cases)
+		/// </summary>
+		public override bool bolted => parts.All(part => part.bolted);
+
+
+		/// <summary>
 		/// Is the box model gameObject active
 		/// </summary>
 		public override bool active

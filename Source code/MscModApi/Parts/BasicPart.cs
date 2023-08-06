@@ -59,6 +59,16 @@ namespace MscModApi.Parts
 		/// </summary>
 		public abstract bool isHolding { get; }
 
+		public abstract bool installed
+		{
+			get;
+		}
+
+		public abstract bool bolted
+		{
+			get;
+		}
+
 		/// <summary>
 		/// Resets the part to its defaultPosition & defaultRotation
 		/// </summary>

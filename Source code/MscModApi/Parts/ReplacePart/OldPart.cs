@@ -61,7 +61,7 @@ namespace MscModApi.Parts.ReplacePart
 			set => assembleFsm.enabled = !value;
 		}
 
-		public bool installed
+		public override bool installed
 		{
 			get
 			{

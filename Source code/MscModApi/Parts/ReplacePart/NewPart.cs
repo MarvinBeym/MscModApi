@@ -26,7 +26,7 @@ namespace MscModApi.Parts.ReplacePart
 		/// <inheritdoc />
 		public override string name => part.name;
 
-		public bool installed => part.installed;
+		public override bool installed => part.installed;
 
 		[Obsolete("Use 'bolted' property instead")]
 		public bool IsFixed(bool ignoreUnsetScrews = true)

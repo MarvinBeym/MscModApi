@@ -181,7 +181,7 @@ namespace MscModApi.Parts.ReplacePart
 		{
 			foreach (var oldPart in oldParts)
 			{
-				oldPart.installed = status;
+				oldPart.Install(status);
 			}
 		}
 
