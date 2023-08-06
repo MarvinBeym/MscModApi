@@ -4,6 +4,7 @@ using System.Collections;
 using System.Collections.Generic;
 using MscModApi.Parts;
 using UnityEngine;
+using EventType = MscModApi.Parts.EventType;
 
 namespace MscModApi.Trigger
 {
@@ -74,7 +75,7 @@ namespace MscModApi.Trigger
 			{
 				return;
 			}
-			part.GetEvents(EventSupportingBasicPart.EventTime.Pre, EventSupportingBasicPart.EventType.Install).InvokeAll();
+			part.GetEvents(EventTime.Pre, EventType.Install).InvokeAll();
 
 			part.partSave.installed = true;
 			part.gameObject.tag = "Untagged";
@@ -96,12 +97,12 @@ namespace MscModApi.Trigger
 
 			canBeInstalled = false;
 
-			part.GetEvents(EventSupportingBasicPart.EventTime.Post, EventSupportingBasicPart.EventType.Install).InvokeAll();
+			part.GetEvents(EventTime.Post, EventType.Install).InvokeAll();
 		}
 
 		internal void Uninstall()
 		{
-			part.GetEvents(EventSupportingBasicPart.EventTime.Pre, EventSupportingBasicPart.EventType.Uninstall).InvokeAll();
+			part.GetEvents(EventTime.Pre, EventType.Uninstall).InvokeAll();
 
 			part.ResetScrews();
 
@@ -125,7 +126,7 @@ namespace MscModApi.Trigger
 			part.SetScrewsActive(false);
 			//part.trigger.SetActive(true);
 
-			part.GetEvents(EventSupportingBasicPart.EventTime.Post, EventSupportingBasicPart.EventType.Uninstall).InvokeAll();
+			part.GetEvents(EventTime.Post, EventType.Uninstall).InvokeAll();
 		}
 
 		private void OnTriggerStay(Collider collider)

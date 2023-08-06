@@ -87,7 +87,6 @@
     <Compile Include="PaintingSystem\SerializableColor.cs" />
     <Compile Include="Parts\BasicPart.cs" />
     <Compile Include="Parts\DerivablePart.cs" />
-    <Compile Include="Parts\EventSupportingBasicPart.cs" />
     <Compile Include="Parts\ReplacePart\GamePart.cs" />
     <Compile Include="Parts\ReplacePart\NewPart.cs" />
     <Compile Include="Parts\ReplacePart\OldPart.cs" />
@@ -95,6 +94,7 @@
     <Compile Include="Parts\Box.cs" />
     <Compile Include="Parts\BoxLogic.cs" />
     <Compile Include="Parts\Kit.cs" />
+    <Compile Include="Parts\SupportsPartEvents.cs" />
     <Compile Include="Shopping\ModItem.cs" />
     <Compile Include="Parts\PartBox.cs" />
     <Compile Include="Shopping\ShopBaseInfo.cs" />

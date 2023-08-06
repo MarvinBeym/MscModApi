@@ -127,11 +127,11 @@ namespace MscModApi.Parts.ReplacePart
 
 			foreach (var newPart in newParts)
 			{
-				newPart.part.AddEventListener(EventSupportingBasicPart.EventTime.Post, EventSupportingBasicPart.EventType.Install, delegate { NewPartInstalled(newPart); });
-				newPart.part.AddEventListener(EventSupportingBasicPart.EventTime.Post, EventSupportingBasicPart.EventType.Uninstall, delegate { NewPartUninstalled(newPart); });
+				newPart.part.AddEventListener(EventTime.Post, EventType.Install, delegate { NewPartInstalled(newPart); });
+				newPart.part.AddEventListener(EventTime.Post, EventType.Uninstall, delegate { NewPartUninstalled(newPart); });
 
-				newPart.part.AddEventListener(EventSupportingBasicPart.EventTime.Post, EventSupportingBasicPart.EventType.Fixed, NewPartFixed);
-				newPart.part.AddEventListener(EventSupportingBasicPart.EventTime.Post, EventSupportingBasicPart.EventType.Unfixed, NewPartUnfixed);
+				newPart.part.AddEventListener(EventTime.Post, EventType.Fixed, NewPartFixed);
+				newPart.part.AddEventListener(EventTime.Post, EventType.Unfixed, NewPartUnfixed);
 
 				if (newPart.installed)
 				{

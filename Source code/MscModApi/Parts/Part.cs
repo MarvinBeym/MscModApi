@@ -9,10 +9,10 @@ using UnityEngine;
 
 namespace MscModApi.Parts
 {
-	public class Part : EventSupportingBasicPart
+
+
+	public class Part : BasicPart, SupportsPartEvents
 	{
-
-
 		protected static GameObject clampModel;
 
 		protected int clampsAdded;
@@ -69,6 +69,12 @@ namespace MscModApi.Parts
 		private bool _screwPlacementMode;
 		protected bool injectedScrewPlacementDisablePreUninstall = false;
 		private FsmBool parentGameObjectBolted = new FsmBool("Bolted");
+
+		/// <summary>
+		/// Stores all events that a developer may have added to this part object
+		/// </summary>
+		protected Dictionary<EventTime, Dictionary<EventType, List<Action>>> events =
+			new Dictionary<EventTime, Dictionary<EventType, List<Action>>>();
 
 		public bool screwPlacementMode
 		{
@@ -179,6 +185,7 @@ namespace MscModApi.Parts
 			Vector3 installRotation, PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls,
 			bool disableCollisionWhenInstalled, string prefabName)
 		{
+			InitEventStorage();
 			this.id = id;
 			this.partBaseInfo = partBaseInfo;
 			this.installPosition = installPosition;
@@ -275,7 +282,20 @@ namespace MscModApi.Parts
 			partBaseInfo.AddToPartsList(this);
 		}
 
+		protected void InitEventStorage()
+		{
+			foreach (EventTime eventTime in Enum.GetValues(typeof(EventTime)))
+			{
+				Dictionary<EventType, List<Action>> eventTypeDict = new Dictionary<EventType, List<Action>>();
 
+				foreach (EventType eventType in Enum.GetValues(typeof(EventType)))
+				{
+					eventTypeDict.Add(eventType, new List<Action>());
+				}
+
+				events.Add(eventTime, eventTypeDict);
+			}
+		}
 
 		/// <inheritdoc />
 		public override string name => gameObject.name;
@@ -569,6 +589,48 @@ namespace MscModApi.Parts
 
 			AddEventListener(EventTime.Post, EventType.Uninstall, delegate { behaviour.enabled = true; });
 			return behaviour;
+		}
+
+		public void AddEventListener(EventTime eventTime, EventType eventType, Action action)
+		{
+			events[eventTime][eventType].Add(action);
+
+			if (eventTime == EventTime.Post)
+			{
+				switch (eventType)
+				{
+					//ToDo: check if invoking just the newly added action is enough of if all have to be invoked
+					case EventType.Install:
+						if (installed)
+						{
+							action.Invoke();
+						}
+						break;
+					case EventType.Uninstall:
+						if (!installed)
+						{
+							action.Invoke();
+						}
+						break;
+					case EventType.Fixed:
+						if (bolted)
+						{
+							action.Invoke();
+						}
+						break;
+					case EventType.Unfixed:
+						if (!bolted)
+						{
+							action.Invoke();
+						}
+						break;
+				}
+			}
+		}
+
+		public List<Action> GetEvents(EventTime eventTime, EventType eventType)
+		{
+			return events[eventTime][eventType];
 		}
 
 		public T AddComponent<T>() where T : Component => gameObject.AddComponent(typeof(T)) as T;

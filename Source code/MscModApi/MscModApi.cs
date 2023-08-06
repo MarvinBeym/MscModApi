@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using MscModApi.Commands;
 using MscModApi.PaintingSystem;
 using UnityEngine;
+using EventType = MscModApi.Parts.EventType;
 
 namespace MscModApi
 {
@@ -140,7 +141,7 @@ namespace MscModApi
 						// ignored
 					}
 
-					part.GetEvents(EventSupportingBasicPart.EventTime.Pre, EventSupportingBasicPart.EventType.Save).InvokeAll();
+					part.GetEvents(EventTime.Pre, EventType.Save).InvokeAll();
 
 					var partSave = part.partSave;
 					partSave.position = part.gameObject.transform.position;
