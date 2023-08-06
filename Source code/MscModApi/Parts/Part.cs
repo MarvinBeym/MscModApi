@@ -313,7 +313,7 @@ namespace MscModApi.Parts
 		/// <inheritdoc />
 		public override bool bought
 		{
-			get => partSave.bought == PartSave.BoughtState.Yes;
+			get => partSave.bought == PartSave.BoughtState.Yes || partSave.bought == PartSave.BoughtState.NotConfigured;
 			set => partSave.bought = value ? PartSave.BoughtState.Yes : PartSave.BoughtState.No;
 		}
 
