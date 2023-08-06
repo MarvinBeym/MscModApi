@@ -12,10 +12,8 @@ namespace MscModApi.Parts
 		protected DerivablePart(GameObject part, Part parentPart, PartBaseInfo partBaseInfo,
 			bool uninstallWhenParentUninstalls = true, bool disableCollisionWhenInstalled = true)
 		{
-			usingGameObjectInstantiation = true;
 			gameObjectUsedForInstantiation = part;
 
-			usingPartParent = true;
 			this.parentPart = parentPart;
 
 			Setup(partId, partName, parentPart.gameObject, partInstallPosition, partInstallRotation, partBaseInfo,
@@ -40,7 +38,6 @@ namespace MscModApi.Parts
 		protected DerivablePart(Part parentPart, PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls = true,
 			bool disableCollisionWhenInstalled = true, string prefabName = null)
 		{
-			usingPartParent = true;
 			this.parentPart = parentPart;
 			Setup(partId, partName, parentPart.gameObject, partInstallPosition, partInstallRotation, partBaseInfo,
 				uninstallWhenParentUninstalls, disableCollisionWhenInstalled, prefabName);

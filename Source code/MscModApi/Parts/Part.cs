@@ -42,18 +42,39 @@ namespace MscModApi.Parts
 		public Vector3 installRotation { get; protected set; }
 
 		public bool uninstallWhenParentUninstalls { get; protected set; }
-		protected GameObject parentGameObject;
-		protected Part parentPart;
-		protected List<Screw> savedScrews;
-		internal Collider collider;
 
-		public TriggerWrapper trigger { get; protected set; }
+		public GameObject parentGameObject
+		{
+			get;
+			protected set;
+		}
+		public Part parentPart
+		{
+			get;
+			protected set;
+		}
+		protected List<Screw> savedScrews;
+
+		public Collider collider
+		{
+			get;
+			protected set;
+		}
+
+		public TriggerWrapper trigger
+		{
+			get; 
+			protected set;
+		}
 
 		public Transform transform => gameObject.transform;
-
-		protected bool usingGameObjectInstantiation;
-		protected GameObject gameObjectUsedForInstantiation;
-		protected bool usingPartParent;
+        
+		public GameObject gameObjectUsedForInstantiation
+		{
+			get;
+			protected set;
+		}
+		public bool usingPartParent => parentPart != null;
 
 		/// <summary>
 		/// Stores all events that a developer may have added to this part object
@@ -137,10 +158,8 @@ namespace MscModApi.Parts
 			PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls = true,
 			bool disableCollisionWhenInstalled = true)
 		{
-			usingGameObjectInstantiation = true;
 			gameObjectUsedForInstantiation = part;
 
-			usingPartParent = true;
 			this.parentPart = parentPart;
 
 			Setup(id, name, parentPart.gameObject, installPosition, installRotation, partBaseInfo,
@@ -167,7 +186,6 @@ namespace MscModApi.Parts
 			PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls = true,
 			bool disableCollisionWhenInstalled = true, string prefabName = null)
 		{
-			usingPartParent = true;
 			this.parentPart = parentPart;
 			Setup(id, name, parentPart.gameObject, installPosition, installRotation, partBaseInfo,
 				uninstallWhenParentUninstalls, disableCollisionWhenInstalled, prefabName);
@@ -188,7 +206,7 @@ namespace MscModApi.Parts
 			this.installRotation = installRotation;
 			this.parentGameObject = parentGameObject;
 
-			if (usingGameObjectInstantiation)
+			if (gameObjectUsedForInstantiation != null)
 			{
 				gameObject = GameObject.Instantiate(gameObjectUsedForInstantiation);
 				gameObject.SetNameLayerTag(name + "(Clone)", "PART", "Parts");
