@@ -400,7 +400,7 @@ namespace MscModApi.Parts
 		{
 			get
 			{
-				return screws.All(screw => screw.tightness == Screw.maxTightness);
+				return screws.Count > 0 && screws.All(screw => screw.tightness == Screw.maxTightness) && installed;
 			}
 		}
 
