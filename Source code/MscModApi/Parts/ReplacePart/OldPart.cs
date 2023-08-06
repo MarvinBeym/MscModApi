@@ -15,6 +15,7 @@ namespace MscModApi.Parts.ReplacePart
 		protected GameObject trigger;
 		protected FsmBool installedFsm;
 		protected FsmBool bolted;
+		protected FsmBool purchased;
 		protected PlayMakerFSM assembleFsm;
 		protected PlayMakerFSM removalFsm;
 		protected GameObject oldFsmGameObject;
@@ -30,7 +31,7 @@ namespace MscModApi.Parts.ReplacePart
 			trigger = fsm.FsmVariables.FindFsmGameObject("Trigger").Value;
 			installedFsm = fsm.FsmVariables.FindFsmBool("Installed");
 			bolted = fsm.FsmVariables.FindFsmBool("Bolted");
-
+			purchased = fsm.FsmVariables.FindFsmBool("Purchased");
 			assembleFsm = GetFsmByName(trigger, "Assembly");
 			removalFsm = GetFsmByName(gameObject, "Removal");
 
@@ -109,7 +110,7 @@ namespace MscModApi.Parts.ReplacePart
 
 		public override bool bought
 		{
-			get => true;
+			get => purchased != null && purchased.Value;
 			set => throw new NotImplementedException();
 		}
 
