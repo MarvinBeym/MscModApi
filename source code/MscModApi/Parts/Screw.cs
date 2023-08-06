@@ -151,14 +151,14 @@ namespace MscModApi.Parts
 			
 			if (changingToFixedState)
 			{
-				part.GetEvents(Part.EventTime.Pre, Part.EventType.Fixed).InvokeAll();
+				part.GetEvents(EventSupportingBasicPart.EventTime.Pre, EventSupportingBasicPart.EventType.Fixed).InvokeAll();
 			}
 
 			tightness++;
 			
 			if (changingToFixedState)
 			{
-				part.GetEvents(Part.EventTime.Post, Part.EventType.Fixed).InvokeAll();
+				part.GetEvents(EventSupportingBasicPart.EventTime.Post, EventSupportingBasicPart.EventType.Fixed).InvokeAll();
 			}
 		}
 
@@ -173,18 +173,18 @@ namespace MscModApi.Parts
 			gameObject.transform.Rotate(0, 0, -rotationStep);
 			gameObject.transform.Translate(0f, 0f, transformStep);
 
-			bool changingToUnfixed = part.isFixed;
+			bool changingToUnfixed = part.bolted;
 			
 			if (changingToUnfixed)
 			{
-				part.GetEvents(Part.EventTime.Pre, Part.EventType.Unfixed).InvokeAll();
+				part.GetEvents(EventSupportingBasicPart.EventTime.Pre, EventSupportingBasicPart.EventType.Unfixed).InvokeAll();
 			}
 
 			tightness--;
 
 			if (changingToUnfixed)
 			{
-				part.GetEvents(Part.EventTime.Post, Part.EventType.Unfixed).InvokeAll();
+				part.GetEvents(EventSupportingBasicPart.EventTime.Post, EventSupportingBasicPart.EventType.Unfixed).InvokeAll();
 			}
 		}
 

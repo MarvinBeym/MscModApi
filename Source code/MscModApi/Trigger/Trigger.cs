@@ -74,7 +74,7 @@ namespace MscModApi.Trigger
 			{
 				return;
 			}
-			part.GetEvents(Part.EventTime.Pre, Part.EventType.Install).InvokeAll();
+			part.GetEvents(EventSupportingBasicPart.EventTime.Pre, EventSupportingBasicPart.EventType.Install).InvokeAll();
 
 			part.partSave.installed = true;
 			part.gameObject.tag = "Untagged";
@@ -96,12 +96,12 @@ namespace MscModApi.Trigger
 
 			canBeInstalled = false;
 
-			part.GetEvents(Part.EventTime.Post, Part.EventType.Install).InvokeAll();
+			part.GetEvents(EventSupportingBasicPart.EventTime.Post, EventSupportingBasicPart.EventType.Install).InvokeAll();
 		}
 
 		internal void Uninstall()
 		{
-			part.GetEvents(Part.EventTime.Pre, Part.EventType.Uninstall).InvokeAll();
+			part.GetEvents(EventSupportingBasicPart.EventTime.Pre, EventSupportingBasicPart.EventType.Uninstall).InvokeAll();
 
 			part.ResetScrews();
 
@@ -125,7 +125,7 @@ namespace MscModApi.Trigger
 			part.SetScrewsActive(false);
 			//part.trigger.SetActive(true);
 
-			part.GetEvents(Part.EventTime.Post, Part.EventType.Uninstall).InvokeAll();
+			part.GetEvents(EventSupportingBasicPart.EventTime.Post, EventSupportingBasicPart.EventType.Uninstall).InvokeAll();
 		}
 
 		private void OnTriggerStay(Collider collider)

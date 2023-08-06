@@ -9,22 +9,9 @@ using UnityEngine;
 
 namespace MscModApi.Parts
 {
-	public class Part : BasicPart
+	public class Part : EventSupportingBasicPart
 	{
-		public enum EventTime
-		{
-			Pre,
-			Post
-		}
 
-		public enum EventType
-		{
-			Save,
-			Install,
-			Uninstall,
-			Fixed,
-			Unfixed
-		}
 
 		protected static GameObject clampModel;
 
@@ -76,12 +63,6 @@ namespace MscModApi.Parts
 			protected set;
 		}
 		public bool usingPartParent => parentPart != null;
-
-		/// <summary>
-		/// Stores all events that a developer may have added to this part object
-		/// </summary>
-		protected Dictionary<EventTime, Dictionary<EventType, List<Action>>> events =
-			new Dictionary<EventTime, Dictionary<EventType, List<Action>>>();
 
 		protected Dictionary<Screw, int> preScrewPlacementModeEnableTightnessMap = new Dictionary<Screw, int>();
 
@@ -148,7 +129,7 @@ namespace MscModApi.Parts
 
 		public List<Screw> screws => partSave.screws;
 
-		public bool installed => partSave.installed;
+		public override bool installed => partSave.installed;
 
 		/// <inheritdoc />
 		protected Part()
@@ -198,9 +179,6 @@ namespace MscModApi.Parts
 			Vector3 installRotation, PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls,
 			bool disableCollisionWhenInstalled, string prefabName)
 		{
-			InitEventStorage();
-
-
 			this.id = id;
 			this.partBaseInfo = partBaseInfo;
 			this.installPosition = installPosition;
@@ -297,20 +275,7 @@ namespace MscModApi.Parts
 			partBaseInfo.AddToPartsList(this);
 		}
 
-		private void InitEventStorage()
-		{
-			foreach (EventTime eventTime in Enum.GetValues(typeof(EventTime)))
-			{
-				Dictionary<EventType, List<Action>> eventTypeDict = new Dictionary<EventType, List<Action>>();
 
-				foreach (EventType eventType in Enum.GetValues(typeof(EventType)))
-				{
-					eventTypeDict.Add(eventType, new List<Action>());
-				}
-
-				events.Add(eventTime, eventTypeDict);
-			}
-		}
 
 		/// <inheritdoc />
 		public override string name => gameObject.name;
@@ -516,49 +481,6 @@ namespace MscModApi.Parts
 				AddScrew(screw);
 			}
 		}
-
-		public void AddEventListener(EventTime eventTime, EventType eventType, Action action)
-		{
-			events[eventTime][eventType].Add(action);
-
-			if (eventTime == EventTime.Post)
-			{
-				switch (eventType)
-				{
-					//ToDo: check if invoking just the newly added action is enough of if all have to be invoked
-					case EventType.Install:
-						if (installed)
-						{
-							action.Invoke();
-						}
-						break;
-					case EventType.Uninstall:
-						if (!installed)
-						{
-							action.Invoke();
-						}
-						break;
-					case EventType.Fixed:
-						if (IsFixed())
-						{
-							action.Invoke();
-						}
-						break;
-					case EventType.Unfixed:
-						if (!IsFixed())
-						{
-							action.Invoke();
-						}
-						break;
-				}
-			}
-		}
-
-		public List<Action> GetEvents(EventTime eventTime, EventType eventType)
-		{
-			return events[eventTime][eventType];
-		}
-
 
 		[Obsolete("Use cleaner 'AddEventListener' method instead", true)]
 		public void AddPreSaveAction(Action action)

@@ -73,12 +73,14 @@ namespace MscModApi.Parts.ReplacePart
 
 				return installedFsm.Value;
 			}
-			set
+		}
+
+		public void Install(bool install)
+		{
+			if (!allowSettingFakedStatus)
 			{
-				if (!allowSettingFakedStatus)
-				{
-					return;
-				}
+				return;
+			}
 
 			installedFsm.Value = install;
 			boltedFsm.Value = install;
