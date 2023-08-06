@@ -141,8 +141,7 @@ namespace MscModApi.Trigger
 		private void OnTriggerEnter(Collider collider)
 		{
 			if (
-				(part.uninstallWhenParentUninstalls && !part.parentInstalled) 
-			    || !collider.gameObject.IsHolding()
+				!collider.gameObject.IsHolding()
 			    || collider.gameObject != part.gameObject
 			    || !part.installPossible
 			){
