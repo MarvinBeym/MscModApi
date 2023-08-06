@@ -268,7 +268,7 @@ namespace MscModApi
 			}
 
 
-			if (!part.IsFixed())
+			if (!part.bolted)
 			{
 				if (part.installed)
 				{

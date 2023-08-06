@@ -173,7 +173,7 @@ namespace MscModApi.Parts
 			gameObject.transform.Rotate(0, 0, -rotationStep);
 			gameObject.transform.Translate(0f, 0f, transformStep);
 
-			bool changingToUnfixed = part.isFixed;
+			bool changingToUnfixed = part.bolted;
 			
 			if (changingToUnfixed)
 			{

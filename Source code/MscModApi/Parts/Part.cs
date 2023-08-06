@@ -340,13 +340,13 @@ namespace MscModApi.Parts
 			}
 		}
 
-		public bool parentFixed
+		public bool parentBolted
 		{
 			get
 			{
 				if (usingPartParent)
 				{
-					return parentPart.IsFixed(true);
+					return parentPart.bolted;
 				}
 				else
 				{
@@ -425,17 +425,13 @@ namespace MscModApi.Parts
 			return installed;
 		}
 
+		[Obsolete("Use 'bolted' property instead", true)]
 		public bool IsFixed(bool ignoreUnsetScrews = true)
 		{
-			if (!ignoreUnsetScrews)
-			{
-				return isFixed;
-			}
-
-			return partSave.screws.Count == 0 ? installed : isFixed;
+			return bolted;
 		}
 
-		public bool isFixed
+		public override bool bolted
 		{
 			get
 			{
@@ -466,10 +462,10 @@ namespace MscModApi.Parts
 			return parentInstalled;
 		}
 
-		[Obsolete("Use 'parentFixed' property instead", true)]
+		[Obsolete("Use 'parentBolted' property instead", true)]
 		public bool ParentFixed()
 		{
-			return parentFixed;
+			return parentBolted;
 		}
 
 		private void LoadPartPositionAndRotation(GameObject gameObject, PartSave partSave)

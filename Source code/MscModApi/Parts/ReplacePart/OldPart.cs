@@ -14,7 +14,7 @@ namespace MscModApi.Parts.ReplacePart
 		protected GameObject gameObject;
 		protected GameObject trigger;
 		protected FsmBool installedFsm;
-		protected FsmBool bolted;
+		protected FsmBool boltedFsm;
 		protected FsmBool purchased;
 		protected PlayMakerFSM assembleFsm;
 		protected PlayMakerFSM removalFsm;
@@ -30,7 +30,7 @@ namespace MscModApi.Parts.ReplacePart
 			gameObject = fsm.FsmVariables.FindFsmGameObject("ThisPart").Value;
 			trigger = fsm.FsmVariables.FindFsmGameObject("Trigger").Value;
 			installedFsm = fsm.FsmVariables.FindFsmBool("Installed");
-			bolted = fsm.FsmVariables.FindFsmBool("Bolted");
+			boltedFsm = fsm.FsmVariables.FindFsmBool("Bolted");
 			purchased = fsm.FsmVariables.FindFsmBool("Purchased");
 			assembleFsm = GetFsmByName(trigger, "Assembly");
 			removalFsm = GetFsmByName(gameObject, "Removal");
@@ -80,12 +80,14 @@ namespace MscModApi.Parts.ReplacePart
 					return;
 				}
 
-				installedFsm.Value = value;
-				bolted.Value = value;
-			}
+			installedFsm.Value = install;
+			boltedFsm.Value = install;
 		}
 
-		public bool IsFixed() => installed && bolted.Value;
+		public override bool bolted => boltedFsm.Value;
+
+		[Obsolete("Use 'bolted' property instead", true)]
+		public bool IsFixed() => bolted;
 
 		public void Uninstall() => removalFsm.SendEvent("REMOVE");
 
@@ -142,10 +144,10 @@ namespace MscModApi.Parts.ReplacePart
 			//Don't implement
 		}
 
-		[Obsolete("Use 'installed' property instead", true)]
+		[Obsolete("Use 'Install' method instead", true)]
 		internal void SetFakedInstallStatus(bool status)
 		{
-			installed = status;
+			Install(status);
 		}
 
 		[Obsolete("Use 'installBlocked' property instead", true)]

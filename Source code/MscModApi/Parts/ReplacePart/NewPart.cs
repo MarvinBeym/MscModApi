@@ -28,6 +28,7 @@ namespace MscModApi.Parts.ReplacePart
 
 		public bool installed => part.installed;
 
+		[Obsolete("Use 'bolted' property instead")]
 		public bool IsFixed(bool ignoreUnsetScrews = true)
 		{
 			return part.IsFixed(ignoreUnsetScrews);
@@ -75,6 +76,8 @@ namespace MscModApi.Parts.ReplacePart
 				}
 			}
 		}
+
+		public override bool bolted => part.bolted;
 
 		[Obsolete("Use 'installBlocked' property instead", true)]
 		public void BlockInstall(bool block)

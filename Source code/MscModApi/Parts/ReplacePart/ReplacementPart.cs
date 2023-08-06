@@ -172,7 +172,7 @@ namespace MscModApi.Parts.ReplacePart
 		/// <returns>b</returns>
 		public bool AreAnyNewFixed(bool ignoreUnsetScrews = true)
 		{
-			return newParts.Any(part => part.IsFixed(ignoreUnsetScrews));
+			return newParts.Any(part => part.bolted);
 		}
 
 		/// <summary>Sets the faked install status.</summary>
@@ -190,20 +190,20 @@ namespace MscModApi.Parts.ReplacePart
 		/// <returns></returns>
 		public bool AreAllNewFixed(bool ignoreUnsetScrews = true)
 		{
-			return newParts.All(part => part.IsFixed(ignoreUnsetScrews));
+			return newParts.All(part => part.bolted);
 		}
 
 		/// <summary>Are any old fixed.</summary>
 		/// <returns></returns>
 		public bool AreAnyOldFixed()
 		{
-			return oldParts.Any(part => part.IsFixed());
+			return oldParts.Any(part => part.bolted);
 		}
 
 		/// <summary>Are all old fixed.</summary>
 		public bool AreAllOldFixed()
 		{
-			return oldParts.All(part => part.IsFixed());
+			return oldParts.All(part => part.bolted);
 		}
 
 		/// <summary>Are any new installed.</summary>
