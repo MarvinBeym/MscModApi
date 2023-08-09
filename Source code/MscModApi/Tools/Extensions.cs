@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using HutongGames.PlayMaker;
 using UnityEngine;
 
 namespace MscModApi.Tools
@@ -90,6 +91,24 @@ namespace MscModApi.Tools
 			return newScrews;
 		}
 
+		/// <summary>
+		/// Finds an fsm state by name
+		/// </summary>
+		/// <param name="fsm">The PlayMakerFSM object to search in</param>
+		/// <param name="stateName">The name of the state to find</param>
+		/// <returns>The found FsmState or null</returns>
+		public static FsmState FindState(this PlayMakerFSM fsm, string stateName)
+		{
+			foreach (var fsmState in fsm.FsmStates)
+			{
+				if (fsmState.Name == stateName)
+				{
+					return fsmState;
+				}
+			}
+
+			return null;
+		}
 		public static string ToStringOrEmpty(this object value)
 		{
 			return value == null ? "" : value.ToString();
