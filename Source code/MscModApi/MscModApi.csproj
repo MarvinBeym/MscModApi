@@ -102,6 +102,7 @@
     <Compile Include="Shopping\ShopInterface.cs" />
     <Compile Include="Shopping\ShopItem.cs" />
     <Compile Include="Tools\Extensions.cs" />
+    <Compile Include="Tools\FsmAction.cs" />
     <Compile Include="Tools\LoggedMod.cs" />
     <Compile Include="Tools\Logger.cs" />
     <Compile Include="Tools\ScrewPlacementAssist.cs" />
