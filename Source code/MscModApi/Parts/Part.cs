@@ -267,9 +267,9 @@ namespace MscModApi.Parts
 				MscModApi.modSaveFileMapping.Add(partBaseInfo.mod.ID, partBaseInfo.saveFilePath);
 			}
 
-			if (MscModApi.modsParts.ContainsKey(partBaseInfo.mod.ID))
+			if (MscModApi.modsParts.TryGetValue(partBaseInfo.mod.ID, out var modParts))
 			{
-				MscModApi.modsParts[partBaseInfo.mod.ID].Add(id, this);
+				modParts.Add(id, this);
 			}
 			else
 			{
