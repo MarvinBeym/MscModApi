@@ -269,6 +269,11 @@ namespace MscModApi.Parts.ReplacePart
 		}
 
 		/// <summary>
+		/// Block installation of the part by disabling the trigger object
+		/// </summary>
+		public bool installBlocked { get => triggerFsmGameObject.activeSelf; set => triggerFsmGameObject.SetActive(!value); }
+
+		/// <summary>
 		/// The parts tightness (sum of all screw tightness (8 x screw count = all bolted))
 		/// </summary>
 		public FsmFloat tightness { get; protected set; }
