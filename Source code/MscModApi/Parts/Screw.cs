@@ -147,8 +147,22 @@ namespace MscModApi.Parts
 			gameObject.transform.Rotate(0, 0, rotationStep);
 			gameObject.transform.Translate(0f, 0f, -transformStep);
 
-			bool changingToFixedState = tightness + 1 == maxTightness;
-			
+			bool changingToFixedState = false;
+			if (tightness + 1 == maxTightness)
+			{
+				int screwCount = part.screws.Count;
+				int totalTightness = 0;
+				part.screws.ForEach((Screw screw) =>
+				{
+					totalTightness += screw.tightness;
+				});
+
+				if (totalTightness + 1 == screwCount * maxTightness)
+				{
+					changingToFixedState = true;
+				}
+			}
+
 			if (changingToFixedState)
 			{
 				part.GetEvents(EventTime.Pre, EventType.Bolted).InvokeAll();
