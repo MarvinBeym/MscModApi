@@ -231,7 +231,7 @@ namespace MscModApi
 #if DEBUG
 		private void InstantInstallDebug()
 		{
-			if (!(bool)showBoltSizeSetting.Value)
+			if (!(bool)enableInstantInstall.Value)
 			{
 				return;
 			}
