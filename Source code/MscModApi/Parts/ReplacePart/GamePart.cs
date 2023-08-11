@@ -89,17 +89,22 @@ namespace MscModApi.Parts.ReplacePart
 			removalFsm = partFsmGameObject.FindFsm("Removal");
 			boltCheckFsm = partFsmGameObject.FindFsm("BoltCheck");
 
-			tightness = boltCheckFsm.FsmVariables.FindFsmFloat("Tightness");
-
 			if (!assemblyFsm.Fsm.Initialized)
 			{
 				assemblyFsm.InitializeFSM();
 			}
 
-			if (!removalFsm.Fsm.Initialized || !boltCheckFsm.Fsm.Initialized)
+			if (!removalFsm.Fsm.Initialized)
 			{
 				removalFsm.InitializeFSM();
 			}
+
+			if (!boltCheckFsm.Fsm.Initialized)
+			{
+				boltCheckFsm.InitializeFSM();
+			}
+
+			tightness = boltCheckFsm.FsmVariables.FindFsmFloat("Tightness");
 
 			AddActionAsFirst(assemblyFsm.FindState("Assemble"), () =>
 			{
