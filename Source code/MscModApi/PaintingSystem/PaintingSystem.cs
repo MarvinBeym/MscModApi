@@ -41,7 +41,7 @@ namespace MscModApi.PaintingSystem
 			if (!modSave.ContainsKey(mod))
 			{
 				colorSave = Helper.LoadSaveOrReturnNew<Dictionary<string, SerializableColor>>(mod,
-					"color_saveFile.json");
+					"paintingSystem_saveFile.json");
 				modSave.Add(mod, colorSave);
 			}
 			else

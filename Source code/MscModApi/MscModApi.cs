@@ -87,7 +87,7 @@ namespace MscModApi
 		public static void NewGameCleanUp(Mod mod, string saveFileName = "parts_saveFile.json")
 		{
 			SaveLoad.SerializeSaveFile(mod, new Dictionary<string, PartSave>(), saveFileName);
-			SaveLoad.SerializeSaveFile(mod, new Dictionary<string, SerializableColor>(), "color_saveFile.json");
+			SaveLoad.SerializeSaveFile(mod, new Dictionary<string, SerializableColor>(), "paintingSystem_saveFile.json");
 		}
 
 		private void MenuLoad()
