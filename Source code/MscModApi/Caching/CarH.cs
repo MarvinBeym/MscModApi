@@ -14,7 +14,7 @@ namespace MscModApi.Caching
 		private static GameObject _electricity;
 		private static FsmString _playerCurrentVehicle;
 
-		public static bool running => drivetrain.rpm > 0;
+		public static bool running => drivetrain.rpm > 20;
 		public static bool playerInCar => playerCurrentVehicle == "Satsuma";
 
 		public static string playerCurrentVehicle
