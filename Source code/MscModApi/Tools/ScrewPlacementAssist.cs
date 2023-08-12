@@ -1,4 +1,5 @@
-﻿using MSCLoader;
+﻿using System.Collections.Generic;
+using MSCLoader;
 using System.Linq;
 using System.Reflection;
 using MscModApi.Parts;
@@ -15,6 +16,7 @@ namespace MscModApi.Tools
 		internal static int selectedScrew;
 		private static Rect windowRect = new Rect(20, 20, 200, 50);
 
+		private static Dictionary<string, bool> screwPlacementEnabledMods = new Dictionary<string, bool>();
 
 		internal static void ModSettings(Mod mod)
 		{
@@ -142,6 +144,21 @@ namespace MscModApi.Tools
 			var quaternion = Quaternion.Euler(transform.localRotation.eulerAngles.CopyVector3());
 			vector += (quaternion * Vector3.forward) * (Screw.maxTightness * Screw.transformStep);
 			return vector;
+		}
+
+		public static void EnableScrewPlacementMode(Mod mod, bool enabled)
+		{
+			screwPlacementEnabledMods[mod.ID] = enabled;
+		}
+
+		public static bool IsScrewPlacementModeEnabled(string modId)
+		{
+			return screwPlacementEnabledMods.TryGetValue(modId, out var enabled) && enabled;
+		}
+
+		public static bool IsScrewPlacementModeEnabled(Mod mod)
+		{
+			return screwPlacementEnabledMods.TryGetValue(mod.ID, out var enabled) && enabled;
 		}
 	}
 }

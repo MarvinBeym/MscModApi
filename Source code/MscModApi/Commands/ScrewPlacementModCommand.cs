@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using MSCLoader;
 using MscModApi.Parts;
+using MscModApi.Tools;
 
 namespace MscModApi.Commands
 {
@@ -118,6 +119,13 @@ namespace MscModApi.Commands
 					modId = modId.Replace("'", "");
 					partId = partId.Replace("'", "");
 
+					if (!ScrewPlacementAssist.IsScrewPlacementModeEnabled(modId))
+					{
+						ModConsole.Print($"ScrewPlacementMode not enabled for mod with id '{modId}'");
+						break;
+					}
+
+
 					if (!modsParts.ContainsKey(modId))
 					{
 						ModConsole.Error($"No mod with id <color=blue>{modId}</color> found that has added parts");
@@ -143,6 +151,13 @@ namespace MscModApi.Commands
 
 					//Removing potential ''
 					modId = modId.Replace("'", "");
+
+					if (!ScrewPlacementAssist.IsScrewPlacementModeEnabled(modId))
+					{
+						ModConsole.Print($"ScrewPlacementMode not enabled for mod with id '{modId}'");
+						break;
+					}
+
 					if (!modsParts.ContainsKey(modId))
 					{
 						ModConsole.Error($"No mod with id <color=blue>{modId}</color> found that has added parts");
