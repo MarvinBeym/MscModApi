@@ -95,7 +95,6 @@ namespace MscModApi.Trigger
 			}
 
 			verifyInstalledRoutine = null;
-			ModConsole.Print($"VerifyInstalled done for part: {part.name}");
 		}
 
 		/// <summary>
