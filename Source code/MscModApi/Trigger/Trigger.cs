@@ -9,18 +9,53 @@ using EventType = MscModApi.Parts.EventType;
 
 namespace MscModApi.Trigger
 {
-	internal class Trigger : MonoBehaviour
+	/// <summary>
+	/// The trigger logic dealing with installing & uninstalling parts
+	/// </summary>
+	public class Trigger : MonoBehaviour
 	{
-		private Part part;
-		private GameObject parentGameObject;
-		private bool disableCollisionWhenInstalled;
-		private Rigidbody rigidBody;
-		private bool canBeInstalled;
-		private Coroutine handleUninstallRoutine;
-		private Coroutine verifyInstalledRoutine;
-		private Coroutine verifyUninstalledRoutine;
+		/// <summary>
+		/// The part this trigger is for
+		/// </summary>
+		protected Part part;
 
-		private IEnumerator HandleUninstall()
+		/// <summary>
+		/// The parent gameObject of the part
+		/// </summary>
+		protected GameObject parentGameObject;
+
+		/// <summary>
+		/// If the collider of the part should be disabled on installation (Improved performance)
+		/// </summary>
+		protected bool disableCollisionWhenInstalled;
+
+		private Rigidbody rigidBody;
+
+		/// <summary>
+		/// Flag to now when a part can be installed
+		/// </summary>
+		protected bool canBeInstalled;
+
+		/// <summary>
+		/// Coroutine to run to deal with uninstalled after a part has been installed
+		/// </summary>
+		protected Coroutine handleUninstallRoutine;
+
+		/// <summary>
+		/// Verifies the part was installed correctly (running a loop, installing the part until it's actually on the part
+		/// </summary>
+		protected Coroutine verifyInstalledRoutine;
+
+		/// <summary>
+		/// Verifies the part was uninstalled correctly (running a loop, uninstalling the part until it's actually removed
+		/// </summary>
+		protected Coroutine verifyUninstalledRoutine;
+
+		/// <summary>
+		/// Handles uninstall
+		/// </summary>
+		/// <returns></returns>
+		protected IEnumerator HandleUninstall()
 		{
 			while (part.installed) {
 				
@@ -45,7 +80,11 @@ namespace MscModApi.Trigger
 			handleUninstallRoutine = null;
 		}
 
-		private IEnumerator VerifyInstalled()
+		/// <summary>
+		/// Verifies the installation
+		/// </summary>
+		/// <returns></returns>
+		protected IEnumerator VerifyInstalled()
 		{
 			while (part.installed && part.gameObject.transform.parent != parentGameObject.transform) {
 				Destroy(rigidBody);
@@ -59,7 +98,11 @@ namespace MscModApi.Trigger
 			ModConsole.Print($"VerifyInstalled done for part: {part.name}");
 		}
 
-		private IEnumerator VerifyUninstalled()
+		/// <summary>
+		/// Verifies the uninstallation
+		/// </summary>
+		/// <returns></returns>
+		protected IEnumerator VerifyUninstalled()
 		{
 			while (!part.installed && part.gameObject.transform.parent == parentGameObject.transform)
 			{
@@ -73,7 +116,10 @@ namespace MscModApi.Trigger
 			verifyUninstalledRoutine = null;
 		}
 
-		internal void Install()
+		/// <summary>
+		/// Executes the install logic
+		/// </summary>
+		public void Install()
 		{
 			if (!part.installPossible)
 			{
@@ -104,7 +150,10 @@ namespace MscModApi.Trigger
 			part.GetEvents(EventTime.Post, EventType.Install).InvokeAll();
 		}
 
-		internal void Uninstall()
+		/// <summary>
+		/// Executes the uninstall logic
+		/// </summary>
+		public void Uninstall()
 		{
 			part.GetEvents(EventTime.Pre, EventType.Uninstall).InvokeAll();
 
@@ -133,7 +182,11 @@ namespace MscModApi.Trigger
 			part.GetEvents(EventTime.Post, EventType.Uninstall).InvokeAll();
 		}
 
-		private void OnTriggerStay(Collider collider)
+		/// <summary>
+		/// Triggered when the collider of the part stays in the trigger
+		/// </summary>
+		/// <param name="collider"></param>
+		protected void OnTriggerStay(Collider collider)
 		{
 			if (!canBeInstalled || !UserInteraction.LeftMouseDown) return;
 
@@ -143,7 +196,11 @@ namespace MscModApi.Trigger
 			Install();
 		}
 
-		private void OnTriggerEnter(Collider collider)
+		/// <summary>
+		/// Triggered when the collider of the part enters the trigger
+		/// </summary>
+		/// <param name="collider"></param>
+		protected void OnTriggerEnter(Collider collider)
 		{
 			if (
 				!collider.gameObject.IsHolding()
@@ -157,7 +214,11 @@ namespace MscModApi.Trigger
 			canBeInstalled = true;
 		}
 
-		private void OnTriggerExit(Collider collider)
+		/// <summary>
+		/// Triggered when the collider of the part leaves the trigger
+		/// </summary>
+		/// <param name="collider"></param>
+		protected void OnTriggerExit(Collider collider)
 		{
 			if (!canBeInstalled) return;
 
@@ -165,7 +226,13 @@ namespace MscModApi.Trigger
 			UserInteraction.GuiInteraction(UserInteraction.Type.None);
 		}
 
-		internal void Init(Part part, GameObject parentGameObject, bool disableCollisionWhenInstalled)
+		/// <summary>
+		/// Initializes the trigger logic
+		/// </summary>
+		/// <param name="part">The part</param>
+		/// <param name="parentGameObject">Parent GameObject</param>
+		/// <param name="disableCollisionWhenInstalled">Should the collider be disabled when the part installs</param>
+		public void Init(Part part, GameObject parentGameObject, bool disableCollisionWhenInstalled)
 		{
 			this.part = part;
 			this.parentGameObject = parentGameObject;
