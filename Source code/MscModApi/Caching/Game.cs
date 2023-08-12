@@ -23,5 +23,10 @@ namespace MscModApi.Caching
 				_money.Value = value;
 			}
 		}
+
+		public static void LoadCleanup()
+		{
+			_money = null;
+		}
 	}
 }

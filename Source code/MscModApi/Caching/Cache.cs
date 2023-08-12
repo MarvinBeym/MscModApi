@@ -7,7 +7,7 @@ namespace MscModApi.Caching
 {
 	public static class Cache
 	{
-		public static Dictionary<string, GameObject> cachedGameObjects = new Dictionary<string, GameObject>();
+		public static Dictionary<string, GameObject> cachedGameObjects;
 
 		private static GameObject[] globalCache;
 
@@ -82,6 +82,12 @@ namespace MscModApi.Caching
 			}
 
 			return path;
+		}
+
+		public static void LoadCleanup()
+		{
+			cachedGameObjects = new Dictionary<string, GameObject>();
+			globalCache = null;
 		}
 	}
 }

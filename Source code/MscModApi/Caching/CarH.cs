@@ -87,5 +87,17 @@ namespace MscModApi.Caching
 				return _satsuma;
 			}
 		}
+
+		public static void LoadCleanup()
+		{
+			_satsuma = null;
+			_satsuma = null;
+			_drivetrain = null;
+			_axisController = null;
+			_carController = null;
+			_electricsOk = null;
+			_electricity = null;
+			_playerCurrentVehicle = null;
+		}
 	}
 }

@@ -15,9 +15,9 @@ namespace MscModApi.Tools
 	{
 		private static int maxLineLength = 62;
 
-		private static Dictionary<string, LoggedMod> loggedModsMap = new Dictionary<string, LoggedMod>();
-		private static List<string> initLoggerNotCalledByAssemblyCache = new List<string>();
-
+		private static Dictionary<string, LoggedMod> loggedModsMap;
+		private static List<string> initLoggerNotCalledByAssemblyCache;
+		
 		public static void InitLogger(Mod mod, string fileName)
 		{
 			Assembly callingAssembly = Assembly.GetCallingAssembly();
@@ -197,5 +197,13 @@ namespace MscModApi.Tools
 
 			return errorLogLine;
 		}
+
+		public static void LoadCleanup()
+		{
+			maxLineLength = 62;
+			loggedModsMap = new Dictionary<string, LoggedMod>();
+			initLoggerNotCalledByAssemblyCache = new List<string>();
+		}
+
 	}
 }

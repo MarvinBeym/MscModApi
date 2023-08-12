@@ -221,5 +221,19 @@ namespace MscModApi.Tools
 			public static bool Up => Input.GetAxis("Mouse ScrollWheel") > 0f;
 			public static bool Down => Input.GetAxis("Mouse ScrollWheel") < 0f;
 		}
+
+		public static void LoadCleanup()
+		{
+			assembleAudio = null;
+			disassembleAudio = null;
+			touchAudio = null;
+			buyAudio = null;
+			checkoutAudio = null;
+			guiInteraction = null;
+			guiAssemble = null;
+			guiDisassemble = null;
+			guiUse = null;
+			itemPivot = null;
+	}
 	}
 }

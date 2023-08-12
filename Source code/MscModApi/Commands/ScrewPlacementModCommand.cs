@@ -11,7 +11,13 @@ namespace MscModApi.Commands
 	class ScrewPlacementModCommand : ConsoleCommand
 	{
 		private readonly MscModApi mod;
+		protected List<Command> availableCommands = new List<Command>();
+		private readonly Dictionary<string, Dictionary<string, Part>> modsParts;
 
+		private readonly Command helpCommand;
+		private readonly Command enableCommand;
+		private readonly Command disableCommand;
+		private readonly Command listCommand;
 		protected class Command
 		{
 			public string name
@@ -37,14 +43,6 @@ namespace MscModApi.Commands
 				this.parameterCallExample = parameterCallExample;
 			}
 		}
-
-		protected List<Command> availableCommands = new List<Command>();
-		private readonly Dictionary<string, Dictionary<string, Part>> modsParts;
-
-		private readonly Command helpCommand;
-		private readonly Command enableCommand;
-		private readonly Command disableCommand;
-		private readonly Command listCommand;
 
 		public ScrewPlacementModCommand(MscModApi mod, Dictionary<string, Dictionary<string, Part>> modsParts)
 		{

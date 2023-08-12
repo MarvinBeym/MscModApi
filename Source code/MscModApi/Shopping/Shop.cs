@@ -12,7 +12,8 @@ namespace MscModApi.Shopping
 	{
 		private static ShopInterface shopInterface;
 
-		internal static Dictionary<ShopLocation, List<ModItem>> shopItems = new Dictionary<ShopLocation, List<ModItem>>();
+		internal static Dictionary<ShopLocation, List<ModItem>> shopItems;
+		private static Dictionary<ShopLocation, GameObject> shopCatalogs;
 
 		public enum ShopLocation
 		{
@@ -46,8 +47,6 @@ namespace MscModApi.Shopping
 			public static GameObject cartItem;
 			internal static GameObject shopCatalog;
 		}
-
-		private static Dictionary<ShopLocation, GameObject> shopCatalogs = new Dictionary<ShopLocation, GameObject>();
 
 		internal static void Init()
 		{
@@ -138,6 +137,13 @@ namespace MscModApi.Shopping
 			Prefabs.partPanel = assetBundle.LoadAsset<GameObject>("part_panel.prefab");
 			Prefabs.modPanel = assetBundle.LoadAsset<GameObject>("mod_panel.prefab");
 			Prefabs.cartItem = assetBundle.LoadAsset<GameObject>("cart_item.prefab");
+		}
+
+		public static void LoadCleanup()
+		{
+			shopInterface = null;
+			shopItems = new Dictionary<ShopLocation, List<ModItem>>();
+			shopCatalogs = new Dictionary<ShopLocation, GameObject>();
 		}
 	}
 }

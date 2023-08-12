@@ -14,9 +14,9 @@ namespace MscModApi.Tools
 		internal static Part selectedPart;
 		internal static Screw[] screws;
 		internal static int selectedScrew;
-		private static Rect windowRect = new Rect(20, 20, 200, 50);
+		private static Rect windowRect;
 
-		private static Dictionary<string, bool> screwPlacementEnabledMods = new Dictionary<string, bool>();
+		private static Dictionary<string, bool> screwPlacementEnabledMods;
 
 		internal static void ModSettings(Mod mod)
 		{
@@ -160,5 +160,16 @@ namespace MscModApi.Tools
 		{
 			return screwPlacementEnabledMods.TryGetValue(mod.ID, out var enabled) && enabled;
 		}
+
+		public static void LoadCleanup()
+		{
+			keySelectPart = null;
+
+			selectedPart = null;
+			screws = null;
+		selectedScrew = 0;
+		windowRect = new Rect(20, 20, 200, 50);
+		screwPlacementEnabledMods = new Dictionary<string, bool>();
+	}
 	}
 }

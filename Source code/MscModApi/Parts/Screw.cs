@@ -46,7 +46,7 @@ namespace MscModApi.Parts
 		internal static GameObject screwModel;
 		internal static GameObject normalModel;
 		internal static GameObject longModel;
-		private static readonly int Color1 = Shader.PropertyToID("_Color");
+		private static int color1;
 		internal static AudioClip soundClip;
 
 		public Screw(Vector3 position, Vector3 rotation, Type type = Type.Normal, float scale = 1, float size = 10,
@@ -228,7 +228,7 @@ namespace MscModApi.Parts
 		{
 			if (highlight) {
 				renderer.material.shader = textShader;
-				renderer.material.SetColor(Color1, Color.green);
+				renderer.material.SetColor(color1, Color.green);
 			} else {
 				renderer.material = material;
 			}
@@ -242,6 +242,18 @@ namespace MscModApi.Parts
 			screwModel = assetBundle.LoadAsset<GameObject>("screw.prefab");
 			normalModel = assetBundle.LoadAsset<GameObject>("screw_normal.prefab");
 			longModel = assetBundle.LoadAsset<GameObject>("screw_long.prefab");
+		}
+
+		public static void LoadCleanup()
+		{
+			material = null;
+			textShader = null;
+			nutModel = null;
+			screwModel = null;
+			normalModel = null;
+			longModel = null;
+			color1 = Shader.PropertyToID("_Color");
+			soundClip = null;
 		}
 	}
 }

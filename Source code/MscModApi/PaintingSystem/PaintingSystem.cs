@@ -22,15 +22,13 @@ namespace MscModApi.PaintingSystem
 		private static FsmColor sprayCanColorFsm;
 		private static State state = State.NotPainting;
 
-		private static Dictionary<Mod, List<PaintingStorage>> storage = new Dictionary<Mod, List<PaintingStorage>>();
+		private static Dictionary<Mod, List<PaintingStorage>> storage;
 
-		private static Material[] availableMaterials = new Material[0];
+		private static Material[] availableMaterials;
 
-		private static Dictionary<Mod, Dictionary<string, SerializableColor>> modSave =
-			new Dictionary<Mod, Dictionary<string, SerializableColor>>();
+		private static Dictionary<Mod, Dictionary<string, SerializableColor>> modSave;
 
-		public static PaintingStorage Setup(Mod mod, string id, GameObject paintDetector,
-			Dictionary<GameObject, List<string>> paintConfig)
+		public static PaintingStorage Setup(Mod mod, string id, GameObject paintDetector, Dictionary<GameObject, List<string>> paintConfig)
 		{
 			if (!storage.ContainsKey(mod))
 			{
@@ -198,6 +196,17 @@ namespace MscModApi.PaintingSystem
 
 				SaveLoad.SerializeSaveFile(modPaintData.Key, colorSave, "paintingSystem_saveFile.json");
 			}
+		}
+
+		public static void LoadCleanup()
+		{
+			sprayCan = null;
+			sprayCanFsm = null;
+			sprayCanColorFsm = null;
+			state = State.NotPainting;
+			storage = new Dictionary<Mod, List<PaintingStorage>>();
+			availableMaterials = new Material[0];
+			modSave = new Dictionary<Mod, Dictionary<string, SerializableColor>>();
 		}
 	}
 }

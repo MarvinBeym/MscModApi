@@ -4,6 +4,7 @@ using MscModApi.Parts;
 using MscModApi.Shopping;
 using MscModApi.Tools;
 using System.Collections.Generic;
+using MscModApi.Caching;
 using MscModApi.Commands;
 using MscModApi.PaintingSystem;
 using UnityEngine;
@@ -35,7 +36,7 @@ namespace MscModApi
 
 		internal static Dictionary<string, string> modSaveFileMapping;
 		internal static Dictionary<string, Dictionary<string, Part>> modsParts;
-		internal static List<PartBox> partBoxes = new List<PartBox>();
+		internal static List<PartBox> partBoxes;
 		internal static Dictionary<string, Screw> screws;
 		private Screw previousScrew;
 
@@ -62,10 +63,6 @@ namespace MscModApi
 			SetupFunction(Setup.OnMenuLoad, MenuLoad);
 			SetupFunction(Setup.OnSave, Save);
 			SetupFunction(Setup.Update, Update);
-
-			modSaveFileMapping = new Dictionary<string, string>();
-			modsParts = new Dictionary<string, Dictionary<string, Part>>();
-			screws = new Dictionary<string, Screw>();
 		}
 
 		public override void ModSettings()
@@ -93,6 +90,20 @@ namespace MscModApi
 		private void MenuLoad()
 		{
 			ModConsole.Print($"<color=white>You are running <color=blue>{Name}</color> [<color=green>v{Version}</color>]</color>");
+
+			//Do cleanup of static fields to avoid problems with reloading (going/getting to menu and then going back into game)
+			LoadCleanup();
+			Cache.LoadCleanup();
+			CarH.LoadCleanup();
+			Game.LoadCleanup();
+			PaintingSystem.PaintingSystem.LoadCleanup();
+			Screw.LoadCleanup();
+			Shop.LoadCleanup();
+			Logger.LoadCleanup();
+			ScrewPlacementAssist.LoadCleanup();
+			UserInteraction.LoadCleanup();
+			Tool.LoadCleanup();
+
 			Logger.InitLogger(this);
 			LoadAssets();
 			ConsoleCommand.Add(new ScrewPlacementModCommand(this, modsParts));
@@ -347,6 +358,14 @@ namespace MscModApi
 			Box.LoadAssets(assetBundle);
 
 			assetBundle.Unload(false);
+		}
+
+		public static void LoadCleanup()
+		{
+			partBoxes = new List<PartBox>();
+			modSaveFileMapping = new Dictionary<string, string>();
+			modsParts = new Dictionary<string, Dictionary<string, Part>>();
+			screws = new Dictionary<string, Screw>();
 		}
 	}
 }
