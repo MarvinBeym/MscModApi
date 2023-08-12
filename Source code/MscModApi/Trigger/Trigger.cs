@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using MSCLoader;
 using MscModApi.Parts;
 using UnityEngine;
 using EventType = MscModApi.Parts.EventType;
@@ -47,7 +48,7 @@ namespace MscModApi.Trigger
 		private IEnumerator VerifyInstalled()
 		{
 			while (part.installed && part.gameObject.transform.parent != parentGameObject.transform) {
-				rigidBody.isKinematic = true;
+				Destroy(rigidBody);
 				part.gameObject.transform.parent = parentGameObject.transform;
 				part.gameObject.transform.localPosition = part.installPosition;
 				part.gameObject.transform.localRotation = Quaternion.Euler(part.installRotation);
@@ -55,12 +56,15 @@ namespace MscModApi.Trigger
 			}
 
 			verifyInstalledRoutine = null;
+			ModConsole.Print($"VerifyInstalled done for part: {part.name}");
 		}
 
 		private IEnumerator VerifyUninstalled()
 		{
-			while (!part.installed && part.gameObject.transform.parent == parentGameObject.transform) {
-				rigidBody.isKinematic = false;
+			while (!part.installed && part.gameObject.transform.parent == parentGameObject.transform)
+			{
+				rigidBody = part.gameObject.AddComponent<Rigidbody>();
+				rigidBody.mass = 3;
 				part.gameObject.transform.parent = null;
 				part.gameObject.transform.Translate(Vector3.up * 0.025f);
 				yield return null;
@@ -88,12 +92,12 @@ namespace MscModApi.Trigger
 				verifyInstalledRoutine = StartCoroutine(VerifyInstalled());
 			}
 
+
 			if (disableCollisionWhenInstalled) {
 				part.collider.isTrigger = true;
 			}
 
 			part.SetScrewsActive(true);
-			//part.trigger.SetActive(false);
 
 			canBeInstalled = false;
 
@@ -167,6 +171,10 @@ namespace MscModApi.Trigger
 			this.parentGameObject = parentGameObject;
 			this.disableCollisionWhenInstalled = disableCollisionWhenInstalled;
 			rigidBody = part.gameObject.GetComponent<Rigidbody>();
+			if (!rigidBody)
+			{
+				rigidBody = part.gameObject.AddComponent<Rigidbody>();
+			}
 		}
 	}
 }
