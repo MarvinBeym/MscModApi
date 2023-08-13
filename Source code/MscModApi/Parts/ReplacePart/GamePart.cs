@@ -104,13 +104,26 @@ namespace MscModApi.Parts.ReplacePart
 			AddActionAsFirst(assemblyFsm.FindState("Assemble"),
 				() => { GetEvents(EventTime.Pre, EventType.Install).InvokeAll(); });
 
-			AddActionAsLast(assemblyFsm.FindState("End"),
-				() => { GetEvents(EventTime.Post, EventType.Install).InvokeAll(); });
+			AddActionAsLast(assemblyFsm.FindState("End"), () =>
+				{
+					GetEvents(EventTime.Post, EventType.Install).InvokeAll();
+					if (installedOnCar)
+					{
+						GetEvents(EventTime.Post, EventType.InstallOnCar).InvokeAll();
+					}
+				});
 
 			AddActionAsFirst(removalFsm.FindState("Remove part"),
 				() => { GetEvents(EventTime.Pre, EventType.Uninstall).InvokeAll(); });
-			AddActionAsLast(removalFsm.FindState("Remove part"),
-				() => { GetEvents(EventTime.Post, EventType.Uninstall).InvokeAll(); });
+			AddActionAsLast(removalFsm.FindState("Remove part"), () =>
+				{
+					GetEvents(EventTime.Post, EventType.Uninstall).InvokeAll();
+					if (!installedOnCar)
+					{
+						//Check probably not needed, likely already not on car because part can't be connected to something else after being uninstalled
+						GetEvents(EventTime.Post, EventType.UninstallFromCar).InvokeAll();
+					}
+				});
 
 			if (tightness == null) {
 				throw new Exception($"Unable to find tightness on bolt check fsm of part '{partFsmGameObject.name}'");
@@ -519,6 +532,13 @@ namespace MscModApi.Parts.ReplacePart
 		/// <inheritdoc />
 		public void AddEventListener(EventTime eventTime, EventType eventType, Action action)
 		{
+			if (
+				eventTime == EventTime.Pre 
+				&& (eventType == EventType.InstallOnCar || eventType == EventType.UninstallFromCar)
+			) {
+				throw new Exception($"Event {eventType} can't be detected at '{eventTime}'. Unsupported!");
+			}
+
 			events[eventTime][eventType].Add(action);
 
 			if (eventTime == EventTime.Post) {
@@ -548,7 +568,18 @@ namespace MscModApi.Parts.ReplacePart
 							//ToDo: bolted state should only be true if maxTightness is also reached
 							action.Invoke();
 						}
-
+						break;
+					case EventType.InstallOnCar:
+						if (installedOnCar)
+						{
+							action.Invoke();
+						}
+						break;
+					case EventType.UninstallFromCar:
+						if (!installedOnCar)
+						{
+							action.Invoke();
+						}
 						break;
 				}
 			}

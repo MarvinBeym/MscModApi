@@ -97,6 +97,10 @@ namespace MscModApi.Trigger
 
 			verifyInstalledRoutine = null;
 			part.GetEvents(EventTime.Post, EventType.Install).InvokeAll();
+			if (part.installedOnCar)
+			{
+				part.GetEvents(EventTime.Post, EventType.InstallOnCar).InvokeAll();
+			}
 		}
 
 		/// <summary>
@@ -115,6 +119,11 @@ namespace MscModApi.Trigger
 
 			verifyUninstalledRoutine = null;
 			part.GetEvents(EventTime.Post, EventType.Uninstall).InvokeAll();
+			if (!part.installedOnCar)
+			{
+				//Probably called always because installedOnCar is likely already false at this point (can't be still installed on car)
+				part.GetEvents(EventTime.Post, EventType.UninstallFromCar).InvokeAll();
+			}
 		}
 
 		/// <summary>

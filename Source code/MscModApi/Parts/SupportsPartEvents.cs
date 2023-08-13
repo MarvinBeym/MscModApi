@@ -15,7 +15,9 @@ namespace MscModApi.Parts
 		Install,
 		Uninstall,
 		Bolted,
-		Unbolted
+		Unbolted,
+		InstallOnCar,
+		UninstallFromCar
 	}
 
 	public interface SupportsPartEvents
