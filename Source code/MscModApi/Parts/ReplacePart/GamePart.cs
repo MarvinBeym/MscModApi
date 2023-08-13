@@ -192,7 +192,7 @@ namespace MscModApi.Parts.ReplacePart
 					return;
 				}
 
-				GetEvents(EventTime.Pre, EventType.Uninstall).InvokeAll();
+				GetEvents(EventTime.Pre, EventType.Unbolted).InvokeAll();
 			});
 			AddActionAsLast(boltCheckFsm.FindState("Bolts OFF"), () =>
 			{
@@ -203,7 +203,7 @@ namespace MscModApi.Parts.ReplacePart
 					return;
 				}
 
-				GetEvents(EventTime.Post, EventType.Uninstall).InvokeAll();
+				GetEvents(EventTime.Post, EventType.Unbolted).InvokeAll();
 			});
 
 
@@ -215,7 +215,7 @@ namespace MscModApi.Parts.ReplacePart
 					return;
 				}
 
-				GetEvents(EventTime.Pre, EventType.Install).InvokeAll();
+				GetEvents(EventTime.Pre, EventType.Bolted).InvokeAll();
 			});
 			AddActionAsLast(boltCheckFsm.FindState("Bolts ON"), () =>
 			{
@@ -226,7 +226,7 @@ namespace MscModApi.Parts.ReplacePart
 					return;
 				}
 
-				GetEvents(EventTime.Post, EventType.Install).InvokeAll();
+				GetEvents(EventTime.Post, EventType.Bolted).InvokeAll();
 			});
 		}
 
