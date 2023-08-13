@@ -94,6 +94,7 @@
     <Compile Include="Parts\Box.cs" />
     <Compile Include="Parts\BoxLogic.cs" />
     <Compile Include="Parts\Kit.cs" />
+    <Compile Include="Parts\SupportsPartBehaviourEvents.cs" />
     <Compile Include="Parts\SupportsPartEvents.cs" />
     <Compile Include="Shopping\ModItem.cs" />
     <Compile Include="Parts\PartBox.cs" />

@@ -10,7 +10,7 @@ using UnityEngine;
 
 namespace MscModApi.Parts
 {
-	public class Part : BasicPart, SupportsPartEvents
+	public class Part : BasicPart, SupportsPartEvents, SupportsPartBehaviourEvents
 	{
 		protected static GameObject clampModel;
 		protected int clampsAdded;
@@ -417,31 +417,58 @@ namespace MscModApi.Parts
 				AddScrew(screw);
 			}
 		}
-		public T AddWhenInstalledBehaviour<T>() where T : Behaviour
+
+		/// <inheritdoc />
+		public T AddEventBehaviour<T>(EventType eventType) where T : Behaviour
 		{
 			var behaviour = AddComponent<T>();
-			behaviour.enabled = installed;
+			switch (eventType)
+			{
+				case EventType.Install:
+					behaviour.enabled = installed;
+					AddEventListener(EventTime.Post, eventType, () => behaviour.enabled = true);
+					AddEventListener(EventTime.Post, EventType.Uninstall, () => behaviour.enabled = false);
+					break;
+				case EventType.Uninstall:
+					behaviour.enabled = !installed;
+					AddEventListener(EventTime.Post, eventType, () => behaviour.enabled = true);
+					AddEventListener(EventTime.Post, EventType.Install, () => behaviour.enabled = false);
+					break;
+				case EventType.InstallOnCar:
+					behaviour.enabled = installedOnCar;
+					AddEventListener(EventTime.Post, eventType, () => behaviour.enabled = true);
+					AddEventListener(EventTime.Post, EventType.UninstallFromCar, () => behaviour.enabled = false);
+					break;
+				case EventType.UninstallFromCar:
+					behaviour.enabled = !installedOnCar;
+					AddEventListener(EventTime.Post, eventType, () => behaviour.enabled = true);
+					AddEventListener(EventTime.Post, EventType.InstallOnCar, () => behaviour.enabled = false);
+					break;
+				case EventType.Bolted:
+					behaviour.enabled = bolted;
+					AddEventListener(EventTime.Post, eventType, () => behaviour.enabled = true);
+					AddEventListener(EventTime.Post, EventType.Unbolted, () => behaviour.enabled = false);
+					break;
+				case EventType.Unbolted:
+					behaviour.enabled = !bolted;
+					AddEventListener(EventTime.Post, eventType, () => behaviour.enabled = true);
+					AddEventListener(EventTime.Post, EventType.Bolted, () => behaviour.enabled = false);
+					break;
+			}
 
-
-			AddEventListener(EventTime.Post, EventType.Install, delegate { behaviour.enabled = true; });
-
-			AddEventListener(EventTime.Post, EventType.Uninstall, delegate { behaviour.enabled = false; });
-			return behaviour;
-		}
-
-		public T AddWhenUninstalledBehaviour<T>() where T : Behaviour
-		{
-			var behaviour = AddComponent<T>();
-			behaviour.enabled = !installed;
-
-			AddEventListener(EventTime.Post, EventType.Install, delegate { behaviour.enabled = false; });
-
-			AddEventListener(EventTime.Post, EventType.Uninstall, delegate { behaviour.enabled = true; });
 			return behaviour;
 		}
 
 		public void AddEventListener(EventTime eventTime, EventType eventType, Action action)
 		{
+			if (
+				eventTime == EventTime.Pre
+				&& (eventType == EventType.InstallOnCar || eventType == EventType.UninstallFromCar)
+			)
+			{
+				throw new Exception($"Event {eventType} can't be detected at '{eventTime}'. Unsupported!");
+			}
+
 			events[eventTime][eventType].Add(action);
 
 			if (eventTime == EventTime.Post)
@@ -522,6 +549,19 @@ namespace MscModApi.Parts
 			clamp.transform.localPosition = position;
 			clamp.transform.localScale = scale;
 			clamp.transform.localRotation = new Quaternion { eulerAngles = rotation };
+		}
+		
+
+		[Obsolete("Use 'AddEventBehaviour' method instead", true)]
+		public T AddWhenInstalledBehaviour<T>() where T : Behaviour
+		{
+			return AddEventBehaviour<T>(EventType.Install);
+		}
+
+		[Obsolete("Use 'AddEventBehaviour' method instead", true)]
+		public T AddWhenUninstalledBehaviour<T>() where T : Behaviour
+		{
+			return AddEventBehaviour<T>(EventType.Uninstall);
 		}
 
 		[Obsolete("Use 'screws' property instead", true)]
