@@ -379,6 +379,9 @@ namespace MscModApi.Parts.ReplacePart
 		}
 
 		/// <inheritdoc />
+		public override bool installedOnCar => partFsmGameObject.transform.root == CarH.satsuma.transform;
+
+		/// <inheritdoc />
 		public override bool active
 		{
 			get => partFsmGameObject.activeSelf;

@@ -3,6 +3,7 @@ using HutongGames.PlayMaker;
 using MSCLoader;
 using System.Linq;
 using MSCLoader.Helper;
+using MscModApi.Caching;
 using MscModApi.Tools;
 using UnityEngine;
 
@@ -71,6 +72,8 @@ namespace MscModApi.Parts.ReplacePart
 				return installedFsm.Value;
 			}
 		}
+
+		public override bool installedOnCar => gameObject.transform.root == CarH.satsuma;
 
 		public void Install(bool install)
 		{

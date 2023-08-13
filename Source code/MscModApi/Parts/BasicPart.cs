@@ -59,9 +59,20 @@ namespace MscModApi.Parts
 		/// </summary>
 		public abstract bool isHolding { get; }
 
+		/// <summary>
+		/// Returns if the part is currently installed to it's parent
+		/// </summary>
 		public abstract bool installed { get; }
 
+		/// <summary>
+		/// Returns if the part is currently bolted to it's parent
+		/// </summary>
 		public abstract bool bolted { get; }
+
+		/// <summary>
+		/// Returns if the part is currently installed on the car
+		/// </summary>
+		public abstract bool installedOnCar { get; }
 
 		/// <summary>
 		/// Resets the part to its defaultPosition & defaultRotation

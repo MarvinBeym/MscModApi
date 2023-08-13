@@ -106,6 +106,11 @@ namespace MscModApi.Parts
 
 
 		/// <summary>
+		/// Returns if all parts contained in this box are installed on the car
+		/// </summary>
+		public override bool installedOnCar => parts.All(part => part.installedOnCar);
+
+		/// <summary>
 		/// Is the box model gameObject active
 		/// </summary>
 		public override bool active

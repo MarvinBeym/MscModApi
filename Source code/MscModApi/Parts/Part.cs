@@ -245,7 +245,9 @@ namespace MscModApi.Parts
 		{
 			get { return screws.Count > 0 && screws.All(screw => screw.tightness == Screw.maxTightness) && installed; }
 		}
-        
+
+		public override bool installedOnCar => gameObject.transform.root == CarH.satsuma.transform;
+
 		protected void Setup(string id, string name, GameObject parentGameObject, Vector3 installPosition,
 			Vector3 installRotation, PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls,
 			bool disableCollisionWhenInstalled, string prefabName)

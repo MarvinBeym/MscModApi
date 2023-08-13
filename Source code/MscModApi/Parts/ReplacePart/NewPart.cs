@@ -78,6 +78,9 @@ namespace MscModApi.Parts.ReplacePart
 
 		public override bool bolted => part.bolted;
 
+		/// <inheritdoc />
+		public override bool installedOnCar => part.installedOnCar;
+
 		[Obsolete("Use 'installBlocked' property instead", true)]
 		public void BlockInstall(bool block)
 		{
