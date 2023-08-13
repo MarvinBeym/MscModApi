@@ -15,7 +15,7 @@ namespace MscModApi.Tools
 			if (paths == null) {
 				throw new ArgumentNullException(nameof(paths));
 			}
-			
+
 			return paths.Aggregate(Path.Combine);
 		}
 
@@ -34,7 +34,8 @@ namespace MscModApi.Tools
 		{
 			try {
 				return LoadAssets.LoadBundle(mod, fileName);
-			} catch {
+			}
+			catch {
 				var message = $"AssetBundle file '{fileName}' could not be loaded";
 				ModConsole.Error(message);
 				ModUI.ShowYesNoMessage($"{message}\n\nClose Game? - RECOMMENDED", ExitGame);
@@ -50,10 +51,10 @@ namespace MscModApi.Tools
 
 		public static bool CheckCloseToPosition(Vector3 positionToCheck, Vector3 position, float minimumDistance)
 		{
-			try
-			{
+			try {
 				return Vector3.Distance(positionToCheck, position) <= minimumDistance;
-			} catch {
+			}
+			catch {
 				return false;
 			}
 		}
@@ -64,16 +65,13 @@ namespace MscModApi.Tools
 
 			T save;
 
-			if (!File.Exists(path))
-			{
+			if (!File.Exists(path)) {
 				save = new T();
 			}
-			else
-			{
+			else {
 				save = JsonConvert.DeserializeObject<T>(File.ReadAllText(path));
 
-				if (save == null)
-				{
+				if (save == null) {
 					save = new T();
 				}
 			}
@@ -81,7 +79,8 @@ namespace MscModApi.Tools
 			return save;
 		}
 
-		internal static GameObject LoadPartAndSetName(AssetBundle assetsBundle, string prefabName, string name, bool addClone = true)
+		internal static GameObject LoadPartAndSetName(AssetBundle assetsBundle, string prefabName, string name,
+			bool addClone = true)
 		{
 			var gameObject = GameObject.Instantiate(assetsBundle.LoadAsset(prefabName) as GameObject);
 			gameObject.SetNameLayerTag(name + (addClone ? "(Clone)" : ""), "PART", "Parts");
@@ -92,20 +91,19 @@ namespace MscModApi.Tools
 		public static Sprite LoadNewSprite(Sprite current, byte[] data, float pivotX = 0.5f, float pivotY = 0.5f,
 			float pixelsPerUnit = 100.0f)
 		{
-
 			var spriteTexture = LoadTexture(data);
-			if (!spriteTexture)
-			{
+			if (!spriteTexture) {
 				return current;
 			}
+
 			return Sprite.Create(spriteTexture, new Rect(0, 0, spriteTexture.width, spriteTexture.height),
 				new Vector2(pivotX, pivotY), pixelsPerUnit);
 		}
+
 		public static Sprite LoadNewSprite(Sprite current, string filePath, float pivotX = 0.5f, float pivotY = 0.5f,
 			float pixelsPerUnit = 100.0f)
 		{
-			if (File.Exists(filePath) && Path.GetExtension(filePath) == ".png")
-			{
+			if (File.Exists(filePath) && Path.GetExtension(filePath) == ".png") {
 				return LoadNewSprite(current, File.ReadAllBytes(filePath), pivotX, pivotY, pixelsPerUnit);
 			}
 
@@ -124,23 +122,25 @@ namespace MscModApi.Tools
 
 		public static GameObject GetGameObjectFromFsm(GameObject fsmGameObject, string fsmToUse = "Data")
 		{
-			foreach (PlayMakerFSM fsm in fsmGameObject.GetComponents<PlayMakerFSM>())
-			{
-				if (fsm.FsmName == fsmToUse)
-				{
+			foreach (PlayMakerFSM fsm in fsmGameObject.GetComponents<PlayMakerFSM>()) {
+				if (fsm.FsmName == fsmToUse) {
 					return fsm.FsmVariables.FindFsmGameObject("ThisPart").Value;
 				}
 			}
-			Logger.New("Unable to find base gameobject on supplied fsm gameobject", fsmGameObject.name + "fsmToUse: " + fsmToUse);
+
+			Logger.New("Unable to find base gameobject on supplied fsm gameobject",
+				fsmGameObject.name + "fsmToUse: " + fsmToUse);
 			return null;
 		}
 
 		public static PlayMakerFSM FindFsmOnGameObject(GameObject gameObject, string fsmName)
 		{
-			foreach (PlayMakerFSM fSM in gameObject.GetComponents<PlayMakerFSM>())
-			{
-				if (fSM.FsmName == fsmName) { return fSM; }
+			foreach (PlayMakerFSM fSM in gameObject.GetComponents<PlayMakerFSM>()) {
+				if (fSM.FsmName == fsmName) {
+					return fSM;
+				}
 			}
+
 			return null;
 		}
 	}

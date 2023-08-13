@@ -78,6 +78,7 @@ namespace MscModApi.Trigger
 		/// Executes the install logic
 		/// </summary>
 		public void Install() => logic.Install();
+
 		/// <summary>
 		/// Executed the uninstall logic
 		/// </summary>

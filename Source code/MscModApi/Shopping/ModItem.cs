@@ -29,10 +29,7 @@ namespace MscModApi.Shopping
 			modImage.enabled = false; //Tmp until solution is found
 			//modImage.sprite = Helper.LoadNewSprite(modImage.sprite, mod.Icon);
 			var btnOpenShop = gameObject.FindChild("panel/mod_open_shop").GetComponent<Button>();
-			btnOpenShop.onClick.AddListener(delegate
-			{
-				shopInterface.OnOpenShop(shopLocation, this);
-			});
+			btnOpenShop.onClick.AddListener(delegate { shopInterface.OnOpenShop(shopLocation, this); });
 			var modName = gameObject.FindChild("panel/mod_name").GetComponent<Text>();
 			modName.text = mod.Name;
 
@@ -49,11 +46,11 @@ namespace MscModApi.Shopping
 		internal int GetAvailablePartCount()
 		{
 			int count = 0;
-			foreach (ShopItem item in items)
-			{
+			foreach (ShopItem item in items) {
 				count += item.IsBuyable() ? 1 : 0;
 			}
-			return  count;
+
+			return count;
 		}
 
 		internal int GetTotalPartCount()
@@ -74,16 +71,14 @@ namespace MscModApi.Shopping
 
 		public void Open()
 		{
-			foreach (ShopItem item in GetItems())
-			{
+			foreach (ShopItem item in GetItems()) {
 				item.Show(item.IsBuyable());
 			}
 		}
 
 		public void Close()
 		{
-			foreach (ShopItem item in GetItems())
-			{
+			foreach (ShopItem item in GetItems()) {
 				item.Show(false);
 			}
 		}

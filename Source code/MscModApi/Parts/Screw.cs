@@ -34,8 +34,7 @@ namespace MscModApi.Parts
 		internal GameObject gameObject;
 		private MeshRenderer renderer;
 
-		[JsonProperty]
-		internal int tightness;
+		[JsonProperty] internal int tightness;
 
 		internal bool showSize;
 		private Collider collider;
@@ -148,30 +147,23 @@ namespace MscModApi.Parts
 			gameObject.transform.Translate(0f, 0f, -transformStep);
 
 			bool changingToFixedState = false;
-			if (tightness + 1 == maxTightness)
-			{
+			if (tightness + 1 == maxTightness) {
 				int screwCount = part.screws.Count;
 				int totalTightness = 0;
-				part.screws.ForEach((Screw screw) =>
-				{
-					totalTightness += screw.tightness;
-				});
+				part.screws.ForEach((Screw screw) => { totalTightness += screw.tightness; });
 
-				if (totalTightness + 1 == screwCount * maxTightness)
-				{
+				if (totalTightness + 1 == screwCount * maxTightness) {
 					changingToFixedState = true;
 				}
 			}
 
-			if (changingToFixedState)
-			{
+			if (changingToFixedState) {
 				part.GetEvents(EventTime.Pre, EventType.Bolted).InvokeAll();
 			}
 
 			tightness++;
-			
-			if (changingToFixedState)
-			{
+
+			if (changingToFixedState) {
 				part.GetEvents(EventTime.Post, EventType.Bolted).InvokeAll();
 			}
 		}
@@ -188,16 +180,14 @@ namespace MscModApi.Parts
 			gameObject.transform.Translate(0f, 0f, transformStep);
 
 			bool changingToUnfixed = part.bolted;
-			
-			if (changingToUnfixed)
-			{
+
+			if (changingToUnfixed) {
 				part.GetEvents(EventTime.Pre, EventType.Unbolted).InvokeAll();
 			}
 
 			tightness--;
 
-			if (changingToUnfixed)
-			{
+			if (changingToUnfixed) {
 				part.GetEvents(EventTime.Post, EventType.Unbolted).InvokeAll();
 			}
 		}
@@ -229,7 +219,8 @@ namespace MscModApi.Parts
 			if (highlight) {
 				renderer.material.shader = textShader;
 				renderer.material.SetColor(color1, Color.green);
-			} else {
+			}
+			else {
 				renderer.material = material;
 			}
 		}

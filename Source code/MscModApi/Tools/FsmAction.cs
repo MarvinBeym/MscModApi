@@ -11,6 +11,7 @@ namespace MscModApi.Tools
 		{
 			this.action = action;
 		}
+
 		public override void OnEnter()
 		{
 			action?.Invoke();

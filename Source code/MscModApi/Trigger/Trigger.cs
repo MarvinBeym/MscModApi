@@ -58,13 +58,14 @@ namespace MscModApi.Trigger
 		protected IEnumerator HandleUninstall()
 		{
 			while (part.installed) {
-				
 				if (!part.bolted && part.gameObject.IsLookingAt() && UserInteraction.EmptyHand() &&
-					!Tool.HasToolInHand()) {
+				    !Tool.HasToolInHand()) {
 					if (part.screwPlacementMode) {
 						ScrewPlacementAssist.HandlePartInteraction(part);
-					} else {
-						UserInteraction.GuiInteraction(UserInteraction.Type.Disassemble, $"Uninstall {part.gameObject.name}");
+					}
+					else {
+						UserInteraction.GuiInteraction(UserInteraction.Type.Disassemble,
+							$"Uninstall {part.gameObject.name}");
 
 						if (UserInteraction.RightMouseDown) {
 							UserInteraction.GuiInteraction(UserInteraction.Type.None);
@@ -103,8 +104,7 @@ namespace MscModApi.Trigger
 		/// <returns></returns>
 		protected IEnumerator VerifyUninstalled()
 		{
-			while (!part.installed && part.gameObject.transform.parent == parentGameObject.transform)
-			{
+			while (!part.installed && part.gameObject.transform.parent == parentGameObject.transform) {
 				rigidBody = part.gameObject.AddComponent<Rigidbody>();
 				rigidBody.mass = 3;
 				part.gameObject.transform.parent = null;
@@ -120,10 +120,10 @@ namespace MscModApi.Trigger
 		/// </summary>
 		public void Install()
 		{
-			if (!part.installPossible)
-			{
+			if (!part.installPossible) {
 				return;
 			}
+
 			part.GetEvents(EventTime.Pre, EventType.Install).InvokeAll();
 
 			part.partSave.installed = true;
@@ -158,7 +158,8 @@ namespace MscModApi.Trigger
 
 			part.ResetScrews();
 
-			part.childParts.ForEach(delegate (Part part) {
+			part.childParts.ForEach(delegate(Part part)
+			{
 				if (part.uninstallWhenParentUninstalls) {
 					part.Uninstall();
 				}
@@ -203,9 +204,9 @@ namespace MscModApi.Trigger
 		{
 			if (
 				!collider.gameObject.IsHolding()
-			    || collider.gameObject != part.gameObject
-			    || !part.installPossible
-			){
+				|| collider.gameObject != part.gameObject
+				|| !part.installPossible
+			) {
 				return;
 			}
 
@@ -237,8 +238,7 @@ namespace MscModApi.Trigger
 			this.parentGameObject = parentGameObject;
 			this.disableCollisionWhenInstalled = disableCollisionWhenInstalled;
 			rigidBody = part.gameObject.GetComponent<Rigidbody>();
-			if (!rigidBody)
-			{
+			if (!rigidBody) {
 				rigidBody = part.gameObject.AddComponent<Rigidbody>();
 			}
 		}

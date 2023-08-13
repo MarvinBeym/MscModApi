@@ -31,6 +31,7 @@ namespace MscModApi
 
 		private static Settings enableInstantInstall =
 			new Settings("enableInstantInstall", "Enable Instant Part install", false);
+
 		private const string assetsFile = "msc-mod-api.unity3d";
 		private Tool tool;
 
@@ -48,7 +49,8 @@ namespace MscModApi
 
 		/// <summary>Enables the screw placement for all parts.</summary>
 		/// <param name="mod">The mod.</param>
-		[Obsolete("Only kept for compatibility, use part.screwPlacementMode = true/false instead. Won't do anything!", true)]
+		[Obsolete("Only kept for compatibility, use part.screwPlacementMode = true/false instead. Won't do anything!",
+			true)]
 		public static void EnableScrewPlacementForAllParts(Mod mod)
 		{
 			//Don't do anything
@@ -70,7 +72,8 @@ namespace MscModApi
 			Settings.AddCheckBox(this, showBoltSizeSetting);
 			Keybind.AddHeader(this, "Developer area - Screw placement mode");
 #if DEBUG
-			instantInstallKeybind = Keybind.Add(this, "instant-install", "Instant install part looking at", KeyCode.UpArrow);
+			instantInstallKeybind =
+				Keybind.Add(this, "instant-install", "Instant install part looking at", KeyCode.UpArrow);
 			Settings.AddCheckBox(this, enableInstantInstall);
 #endif
 			ScrewPlacementAssist.ModSettings(this);
@@ -80,16 +83,18 @@ namespace MscModApi
 		{
 			ScrewPlacementAssist.OnGui();
 		}
-		
+
 		public static void NewGameCleanUp(Mod mod, string saveFileName = "parts_saveFile.json")
 		{
 			SaveLoad.SerializeSaveFile(mod, new Dictionary<string, PartSave>(), saveFileName);
-			SaveLoad.SerializeSaveFile(mod, new Dictionary<string, SerializableColor>(), "paintingSystem_saveFile.json");
+			SaveLoad.SerializeSaveFile(mod, new Dictionary<string, SerializableColor>(),
+				"paintingSystem_saveFile.json");
 		}
 
 		private void MenuLoad()
 		{
-			ModConsole.Print($"<color=white>You are running <color=blue>{Name}</color> [<color=green>v{Version}</color>]</color>");
+			ModConsole.Print(
+				$"<color=white>You are running <color=blue>{Name}</color> [<color=green>v{Version}</color>]</color>");
 
 			//Do cleanup of static fields to avoid problems with reloading (going/getting to menu and then going back into game)
 			LoadCleanup();
@@ -107,7 +112,6 @@ namespace MscModApi
 			Logger.InitLogger(this);
 			LoadAssets();
 			ConsoleCommand.Add(new ScrewPlacementModCommand(this, modsParts));
-
 		}
 
 		private void Load()
@@ -120,35 +124,29 @@ namespace MscModApi
 
 		private void Save()
 		{
-			foreach (PartBox partBox in partBoxes)
-			{
+			foreach (PartBox partBox in partBoxes) {
 				partBox.CheckUnpackedOnSave();
 			}
 
 			PaintingSystem.PaintingSystem.Save();
 
-			foreach (var modParts in modsParts)
-			{
+			foreach (var modParts in modsParts) {
 				var mod = ModLoader.GetMod(modParts.Key);
 
-				if (!modSaveFileMapping.TryGetValue(mod.ID, out var saveFileName))
-				{
+				if (!modSaveFileMapping.TryGetValue(mod.ID, out var saveFileName)) {
 					//save file for mod can't be found, skip the whole mod.
 					continue;
 				}
 
 				var modPartSaves = new Dictionary<string, PartSave>();
 
-				foreach (var partData in modParts.Value)
-				{
+				foreach (var partData in modParts.Value) {
 					var id = partData.Key;
 					var part = partData.Value;
-					try
-					{
+					try {
 						part.CustomSaveSaving(mod, $"{id}_saveFile.json");
 					}
-					catch
-					{
+					catch {
 						// ignored
 					}
 
@@ -167,20 +165,18 @@ namespace MscModApi
 
 		private new void Update()
 		{
-			if (updateLocked)
-			{
+			if (updateLocked) {
 				return;
 			}
+
 			Shop.Handle();
 #if DEBUG
 			InstantInstallDebug();
 #endif
 
 			var toolInHand = tool.GetToolInHand();
-			if (toolInHand == Tool.ToolType.None)
-			{
-				if (previousScrew != null)
-				{
+			if (toolInHand == Tool.ToolType.None) {
+				if (previousScrew != null) {
 					previousScrew.Highlight(false);
 					previousScrew = null;
 				}
@@ -192,13 +188,11 @@ namespace MscModApi
 
 			if (screw == null) return;
 
-			if (screw.part.screwPlacementMode)
-			{
+			if (screw.part.screwPlacementMode) {
 				return;
 			}
 
-			if (ShowScrewSize && screw.showSize)
-			{
+			if (ShowScrewSize && screw.showSize) {
 				UserInteraction.GuiInteraction($"Screw size: {screw.size.ToString("#.#").Replace(".00", "")}mm");
 			}
 
@@ -208,10 +202,8 @@ namespace MscModApi
 
 			if (!tool.CheckBoltingSpeed()) return;
 
-			if (UserInteraction.MouseScrollWheel.Up)
-			{
-				switch (toolInHand)
-				{
+			if (UserInteraction.MouseScrollWheel.Up) {
+				switch (toolInHand) {
 					case Tool.ToolType.RatchetTighten:
 						screw.In();
 						break;
@@ -223,10 +215,8 @@ namespace MscModApi
 						break;
 				}
 			}
-			else if (UserInteraction.MouseScrollWheel.Down)
-			{
-				switch (toolInHand)
-				{
+			else if (UserInteraction.MouseScrollWheel.Down) {
+				switch (toolInHand) {
 					case Tool.ToolType.RatchetTighten:
 						screw.In();
 						break;
@@ -242,8 +232,7 @@ namespace MscModApi
 #if DEBUG
 		private void InstantInstallDebug()
 		{
-			if (!(bool)enableInstantInstall.Value)
-			{
+			if (!(bool)enableInstantInstall.Value) {
 				return;
 			}
 
@@ -253,13 +242,10 @@ namespace MscModApi
 			if (hit.collider == null) return;
 			var gameObject = hit.collider.gameObject;
 			Part part = null;
-			foreach (var modParts in modsParts)
-			{
-				foreach (var partData in modParts.Value)
-				{
+			foreach (var modParts in modsParts) {
+				foreach (var partData in modParts.Value) {
 					var partName = partData.Value.gameObject.name;
-					if (partName == gameObject.name)
-					{
+					if (partName == gameObject.name) {
 						part = partData.Value;
 						break;
 					}
@@ -268,46 +254,37 @@ namespace MscModApi
 				if (part != null) break;
 			}
 
-			if (part == null || !part.hasParent || part.screwPlacementMode)
-			{
+			if (part == null || !part.hasParent || part.screwPlacementMode) {
 				return;
 			}
 
-			if (part.installBlocked)
-			{
+			if (part.installBlocked) {
 				UserInteraction.GuiInteraction("Installation is blocked");
 				return;
 			}
 
 
-			if (!part.bolted)
-			{
-				if (part.installed)
-				{
+			if (!part.bolted) {
+				if (part.installed) {
 					UserInteraction.GuiInteraction("Tighten all screws");
-					if (instantInstallKeybind.GetKeybindDown())
-					{
+					if (instantInstallKeybind.GetKeybindDown()) {
 						part.partSave.screws.ForEach(delegate(Screw screw)
 						{
 							screw.InBy(Screw.maxTightness - screw.tightness);
 						});
 					}
 				}
-				else
-				{
+				else {
 					UserInteraction.GuiInteraction("Fully install part");
-					if (instantInstallKeybind.GetKeybindDown())
-					{
+					if (instantInstallKeybind.GetKeybindDown()) {
 						part.Install();
 						part.partSave.screws.ForEach(delegate(Screw screw) { screw.InBy(Screw.maxTightness); });
 					}
 				}
 			}
-			else
-			{
+			else {
 				UserInteraction.GuiInteraction("Loosen all screws");
-				if (instantInstallKeybind.GetKeybindDown())
-				{
+				if (instantInstallKeybind.GetKeybindDown()) {
 					part.partSave.screws.ForEach(delegate(Screw screw) { screw.OutBy(Screw.maxTightness); });
 				}
 			}
@@ -315,25 +292,21 @@ namespace MscModApi
 #endif
 		private Screw DetectScrew()
 		{
-			if (previousScrew != null)
-			{
+			if (previousScrew != null) {
 				previousScrew.Highlight(false);
 				previousScrew = null;
 			}
 
-			if (Camera.main == null)
-			{
+			if (Camera.main == null) {
 				return null;
 			}
 
 			if (!Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out var hit, 1f,
-				    1 << LayerMask.NameToLayer("DontCollide")))
-			{
+				    1 << LayerMask.NameToLayer("DontCollide"))) {
 				return null;
 			}
 
-			if (!hit.collider)
-			{
+			if (!hit.collider) {
 				return null;
 			}
 

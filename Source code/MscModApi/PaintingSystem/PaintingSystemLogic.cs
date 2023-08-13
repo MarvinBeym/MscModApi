@@ -14,17 +14,14 @@ namespace MscModApi.PaintingSystem
 
 		void Update()
 		{
-			if (!PaintingSystem.IsPainting() || !gameObject.IsLookingAt())
-			{
+			if (!PaintingSystem.IsPainting() || !gameObject.IsLookingAt()) {
 				return;
 			}
 
 			Color color = PaintingSystem.GetCurrentColor();
 
-			foreach (var pair in paintingStorage.GetGameObjectMaterialConfig())
-			{
-				foreach (Material material in pair.Value)
-				{
+			foreach (var pair in paintingStorage.GetGameObjectMaterialConfig()) {
+				foreach (Material material in pair.Value) {
 					paintingStorage.SetColorOfMaterial(material, color);
 				}
 			}

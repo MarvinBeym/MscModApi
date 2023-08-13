@@ -17,7 +17,7 @@ namespace MscModApi.Tools
 
 		private static Dictionary<string, LoggedMod> loggedModsMap;
 		private static List<string> initLoggerNotCalledByAssemblyCache;
-		
+
 		public static void InitLogger(Mod mod, string fileName)
 		{
 			Assembly callingAssembly = Assembly.GetCallingAssembly();
@@ -33,8 +33,7 @@ namespace MscModApi.Tools
 
 		private static void Setup(string callingAssembly, Mod mod, string fileName)
 		{
-			if (loggedModsMap.ContainsKey(mod.ID))
-			{
+			if (loggedModsMap.ContainsKey(mod.ID)) {
 				ModConsole.Warning("Logger already initialized for mod with ID '" + mod.ID + "'");
 				return;
 			}
@@ -72,10 +71,8 @@ namespace MscModApi.Tools
 			Exception ex)
 		{
 			//If InitLogger wasn't called, warn once and default to printing message to ModConsole
-			if (!loggedModsMap.TryGetValue(callingAssemblyName, out LoggedMod loggedMod))
-			{
-				if (!initLoggerNotCalledByAssemblyCache.Contains(callingAssemblyName))
-				{
+			if (!loggedModsMap.TryGetValue(callingAssemblyName, out LoggedMod loggedMod)) {
+				if (!initLoggerNotCalledByAssemblyCache.Contains(callingAssemblyName)) {
 					initLoggerNotCalledByAssemblyCache.Add(callingAssemblyName);
 					ModConsole.Error("Logger was not initialized by assembly with name '" + callingAssemblyName +
 					                 "'. Logging will default to printing limited info to ModConsole!");
@@ -85,16 +82,13 @@ namespace MscModApi.Tools
 				return;
 			}
 
-			using (var sw = new StreamWriter(loggedMod.FilePath, true))
-			{
+			using (var sw = new StreamWriter(loggedMod.FilePath, true)) {
 				var errorLogLine = AddBaseLogLine(message);
-				if (additionalInfo != "")
-				{
+				if (additionalInfo != "") {
 					errorLogLine = AddAdditionalInfoLine(errorLogLine, additionalInfo);
 				}
 
-				if (ex != null && ex.Message != "")
-				{
+				if (ex != null && ex.Message != "") {
 					errorLogLine = AddExceptionLine(errorLogLine, ex);
 				}
 
@@ -122,8 +116,7 @@ namespace MscModApi.Tools
 {modsInstalled}
 ╚{GenerateHeader("")}
 ";
-			using (var streamWriter = new StreamWriter(loggedMod.FilePath, false))
-			{
+			using (var streamWriter = new StreamWriter(loggedMod.FilePath, false)) {
 				streamWriter.Write(baseInformation);
 			}
 		}
@@ -140,8 +133,7 @@ namespace MscModApi.Tools
 		{
 			RegistryKey registryKey = Registry.LocalMachine.OpenSubKey(@"SOFTWARE\Microsoft\Windows NT\CurrentVersion");
 
-			if (registryKey == null)
-			{
+			if (registryKey == null) {
 				return "Unavailable";
 			}
 
@@ -151,8 +143,7 @@ namespace MscModApi.Tools
 		private static string GetModsInstalled()
 		{
 			var modsInstalled = "";
-			foreach (var mod in ModLoader.LoadedMods)
-			{
+			foreach (var mod in ModLoader.LoadedMods) {
 				// Ignore MSCLoader.
 				if (mod.ID == "MSCLoader_Console" || mod.ID == "MSCLoader_Settings")
 					continue;
@@ -164,8 +155,7 @@ namespace MscModApi.Tools
 					mod.Version
 				);
 				modsInstalled += modLine;
-				if (maxLineLength < modLine.Length)
-				{
+				if (maxLineLength < modLine.Length) {
 					maxLineLength = modLine.Length;
 				}
 			}
@@ -190,8 +180,7 @@ namespace MscModApi.Tools
 
 		private static string AddExceptionLine(string errorLogLine, Exception ex)
 		{
-			if (ex != null)
-			{
+			if (ex != null) {
 				errorLogLine += $"{Environment.NewLine}=> Exception message: {ex.Message}";
 			}
 
@@ -204,6 +193,5 @@ namespace MscModApi.Tools
 			loggedModsMap = new Dictionary<string, LoggedMod>();
 			initLoggerNotCalledByAssemblyCache = new List<string>();
 		}
-
 	}
 }

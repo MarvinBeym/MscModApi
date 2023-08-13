@@ -35,13 +35,11 @@ namespace MscModApi.Parts.ReplacePart
 			assembleFsm = GetFsmByName(trigger, "Assembly");
 			removalFsm = GetFsmByName(gameObject, "Removal");
 
-			if (!assembleFsm.Fsm.Initialized)
-			{
+			if (!assembleFsm.Fsm.Initialized) {
 				assembleFsm.InitializeFSM();
 			}
 
-			if (!removalFsm.Fsm.Initialized)
-			{
+			if (!removalFsm.Fsm.Initialized) {
 				removalFsm.InitializeFSM();
 			}
 		}
@@ -65,8 +63,7 @@ namespace MscModApi.Parts.ReplacePart
 		{
 			get
 			{
-				if (justUninstalled)
-				{
+				if (justUninstalled) {
 					justUninstalled = false;
 					return false;
 				}
@@ -77,8 +74,7 @@ namespace MscModApi.Parts.ReplacePart
 
 		public void Install(bool install)
 		{
-			if (!allowSettingFakedStatus)
-			{
+			if (!allowSettingFakedStatus) {
 				return;
 			}
 

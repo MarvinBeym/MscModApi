@@ -80,13 +80,13 @@ namespace MscModApi.Tools
 			}
 
 			GUI.DragWindow(new Rect(0, 0, 10000, 10000));
-
 		}
 
 		internal static void OnGui()
 		{
 			if (selectedPart == null) return;
-			windowRect = GUILayout.Window(0, windowRect, ScrewPlacementAssist.CreateWindow, "Screw placement mode", GUILayout.ExpandWidth(true));
+			windowRect = GUILayout.Window(0, windowRect, ScrewPlacementAssist.CreateWindow, "Screw placement mode",
+				GUILayout.ExpandWidth(true));
 		}
 
 		internal static void HandlePartInteraction(Part part)
@@ -96,14 +96,14 @@ namespace MscModApi.Tools
 			);
 
 			if (keySelectPart.GetKeybindDown()) {
-				if (selectedPart == null)
-				{
+				if (selectedPart == null) {
 					ShowPartInteraction(part);
-				} else {
+				}
+				else {
 					HidePartInteraction();
 				}
-
-			} else {
+			}
+			else {
 				windowRect = new Rect(windowRect.xMin, windowRect.yMin, 200, 50);
 			}
 		}
@@ -122,7 +122,8 @@ namespace MscModApi.Tools
 
 		private static void CopyToClipBoard(this string value)
 		{
-			typeof(GUIUtility).GetProperty("systemCopyBuffer", BindingFlags.Static | BindingFlags.NonPublic)?.SetValue(null, value, null);
+			typeof(GUIUtility).GetProperty("systemCopyBuffer", BindingFlags.Static | BindingFlags.NonPublic)
+				?.SetValue(null, value, null);
 		}
 
 		private static string PrintAxis(string label, float val)
@@ -134,6 +135,7 @@ namespace MscModApi.Tools
 			if (GUILayout.Button("Copy")) {
 				value.CopyToClipBoard();
 			}
+
 			GUILayout.EndHorizontal();
 			return value;
 		}
@@ -167,9 +169,9 @@ namespace MscModApi.Tools
 
 			selectedPart = null;
 			screws = null;
-		selectedScrew = 0;
-		windowRect = new Rect(20, 20, 200, 50);
-		screwPlacementEnabledMods = new Dictionary<string, bool>();
-	}
+			selectedScrew = 0;
+			windowRect = new Rect(20, 20, 200, 50);
+			screwPlacementEnabledMods = new Dictionary<string, bool>();
+		}
 	}
 }

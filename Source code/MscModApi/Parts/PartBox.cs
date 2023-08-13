@@ -33,8 +33,7 @@ namespace MscModApi.Parts
 
 		internal void IncrementUnpackedCount()
 		{
-			if (!hasPartsToUnpack)
-			{
+			if (!hasPartsToUnpack) {
 				return;
 			}
 
@@ -87,8 +86,7 @@ namespace MscModApi.Parts
 			get { return parts.Any(part => part.bought); }
 			set
 			{
-				foreach (Part part in parts)
-				{
+				foreach (Part part in parts) {
 					part.bought = value;
 				}
 			}
@@ -121,15 +119,12 @@ namespace MscModApi.Parts
 		/// </summary>
 		public void CheckUnpackedOnSave()
 		{
-			if (!bought)
-			{
+			if (!bought) {
 				return;
 			}
 
-			if (hasPartsToUnpack)
-			{
-				foreach (var part in parts.Where(part => !part.installed && !part.gameObject.activeSelf))
-				{
+			if (hasPartsToUnpack) {
+				foreach (var part in parts.Where(part => !part.installed && !part.gameObject.activeSelf)) {
 					part.position = boxModel.transform.position;
 					part.active = active;
 				}
@@ -146,16 +141,13 @@ namespace MscModApi.Parts
 		/// <param name="uninstall">Should an installed part be uninstalled prior to resetting</param>
 		public override void ResetToDefault(bool uninstall = false)
 		{
-			if (active)
-			{
+			if (active) {
 				position = defaultPosition;
 				rotation = defaultRotation;
 			}
 
-			foreach (Part part in parts)
-			{
-				if (uninstall && part.installed)
-				{
+			foreach (Part part in parts) {
+				if (uninstall && part.installed) {
 					part.Uninstall();
 				}
 
@@ -179,8 +171,7 @@ namespace MscModApi.Parts
 		/// <param name="parts"></param>
 		protected void AddParts(IEnumerable<Part> parts)
 		{
-			foreach (Part part in parts)
-			{
+			foreach (Part part in parts) {
 				AddPart(part);
 			}
 		}

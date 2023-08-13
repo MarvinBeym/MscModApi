@@ -70,8 +70,7 @@ namespace MscModApi.Parts.ReplacePart
 			get => part.installBlocked;
 			set
 			{
-				if (!canBeInstalledWithoutReplacing)
-				{
+				if (!canBeInstalledWithoutReplacing) {
 					part.installBlocked = value;
 				}
 			}

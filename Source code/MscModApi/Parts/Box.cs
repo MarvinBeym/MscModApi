@@ -110,8 +110,7 @@ namespace MscModApi.Parts
 
 			PartBaseInfo partBaseInfo = parent.partBaseInfo;
 
-			for (int i = 0; i < numberOfParts; i++)
-			{
+			for (int i = 0; i < numberOfParts; i++) {
 				int iOffset = i + 1;
 
 				Part part = new Part(
@@ -119,8 +118,7 @@ namespace MscModApi.Parts
 					parent, installLocations[i], installRotations[i], partBaseInfo, uninstallWhenParentUninstalls,
 					disableCollisionWhenInstalled);
 				part.defaultPosition = defaultPosition;
-				if (!part.bought)
-				{
+				if (!part.bought) {
 					part.Uninstall();
 					part.active = false;
 				}
@@ -141,8 +139,7 @@ namespace MscModApi.Parts
 		/// <param name="overrideSize"></param>
 		protected void AddScrews(Screw[] screws, float overrideScale = 0f, float overrideSize = 0f)
 		{
-			foreach (Part part in parts)
-			{
+			foreach (Part part in parts) {
 				part.AddScrews(screws.CloneToNew(), overrideScale, overrideSize);
 			}
 		}

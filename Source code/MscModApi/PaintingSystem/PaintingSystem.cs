@@ -28,22 +28,20 @@ namespace MscModApi.PaintingSystem
 
 		private static Dictionary<Mod, Dictionary<string, SerializableColor>> modSave;
 
-		public static PaintingStorage Setup(Mod mod, string id, GameObject paintDetector, Dictionary<GameObject, List<string>> paintConfig)
+		public static PaintingStorage Setup(Mod mod, string id, GameObject paintDetector,
+			Dictionary<GameObject, List<string>> paintConfig)
 		{
-			if (!storage.ContainsKey(mod))
-			{
+			if (!storage.ContainsKey(mod)) {
 				storage.Add(mod, new List<PaintingStorage>());
 			}
 
 			Dictionary<string, SerializableColor> colorSave = new Dictionary<string, SerializableColor>();
-			if (!modSave.ContainsKey(mod))
-			{
+			if (!modSave.ContainsKey(mod)) {
 				colorSave = Helper.LoadSaveOrReturnNew<Dictionary<string, SerializableColor>>(mod,
 					"paintingSystem_saveFile.json");
 				modSave.Add(mod, colorSave);
 			}
-			else
-			{
+			else {
 				colorSave = modSave[mod];
 			}
 
@@ -53,22 +51,18 @@ namespace MscModApi.PaintingSystem
 			Dictionary<GameObject, List<Material>> collectedPaintMaterialConfig =
 				new Dictionary<GameObject, List<Material>>();
 
-			foreach (var pair in paintConfig)
-			{
+			foreach (var pair in paintConfig) {
 				List<string> rebuildMaterialList = new List<string>();
 
-				foreach (var materialName in pair.Value)
-				{
+				foreach (var materialName in pair.Value) {
 					rebuildMaterialList.Add(materialName);
 					rebuildMaterialList.Add(materialName + " (Instance)");
 				}
 
 				List<Material> materialsToPaint = new List<Material>();
 
-				foreach (Renderer renderer in pair.Key.GetComponentsInChildren<Renderer>(true))
-				{
-					if (rebuildMaterialList.Contains(renderer.material.name) || pair.Value.Count == 0)
-					{
+				foreach (Renderer renderer in pair.Key.GetComponentsInChildren<Renderer>(true)) {
+					if (rebuildMaterialList.Contains(renderer.material.name) || pair.Value.Count == 0) {
 						materialsToPaint.Add(renderer.material);
 					}
 					/*
@@ -88,8 +82,7 @@ namespace MscModApi.PaintingSystem
 
 			PaintingStorage paintingStorage = new PaintingStorage(mod, id, collectedPaintMaterialConfig);
 
-			if (colorSave.ContainsKey(id))
-			{
+			if (colorSave.ContainsKey(id)) {
 				paintingStorage.SetColor(colorSave[id]);
 			}
 
@@ -173,10 +166,8 @@ namespace MscModApi.PaintingSystem
 
 		internal static Material FindMaterial(string name)
 		{
-			foreach (Material material in availableMaterials)
-			{
-				if (material.name == name)
-				{
+			foreach (Material material in availableMaterials) {
+				if (material.name == name) {
 					return material;
 				}
 			}
@@ -186,11 +177,9 @@ namespace MscModApi.PaintingSystem
 
 		public static void Save()
 		{
-			foreach (var modPaintData in storage)
-			{
+			foreach (var modPaintData in storage) {
 				Dictionary<string, SerializableColor> colorSave = new Dictionary<string, SerializableColor>();
-				foreach (PaintingStorage paintingData in modPaintData.Value)
-				{
+				foreach (PaintingStorage paintingData in modPaintData.Value) {
 					colorSave.Add(paintingData.GetPaintingId(), paintingData.GetCurrentColor());
 				}
 

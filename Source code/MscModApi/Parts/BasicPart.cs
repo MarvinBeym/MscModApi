@@ -53,21 +53,15 @@ namespace MscModApi.Parts
 		/// Returns if the player is currently looking at this part
 		/// </summary>
 		public abstract bool isLookingAt { get; }
-		
+
 		/// <summary>
 		/// Returns if the player is currently holding this part
 		/// </summary>
 		public abstract bool isHolding { get; }
 
-		public abstract bool installed
-		{
-			get;
-		}
+		public abstract bool installed { get; }
 
-		public abstract bool bolted
-		{
-			get;
-		}
+		public abstract bool bolted { get; }
 
 		/// <summary>
 		/// Resets the part to its defaultPosition & defaultRotation

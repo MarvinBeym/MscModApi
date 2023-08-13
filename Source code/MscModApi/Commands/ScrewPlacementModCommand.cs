@@ -18,23 +18,15 @@ namespace MscModApi.Commands
 		private readonly Command enableCommand;
 		private readonly Command disableCommand;
 		private readonly Command listCommand;
+
 		protected class Command
 		{
-			public string name
-			{
-				get;
-			}
+			public string name { get; }
 
-			public string help
-			{
-				get;
-			}
+			public string help { get; }
 
 
-			public string parameterCallExample
-			{
-				get;
-			}
+			public string parameterCallExample { get; }
 
 			public Command(string name, string help, string parameterCallExample = "")
 			{
@@ -49,8 +41,12 @@ namespace MscModApi.Commands
 			this.mod = mod;
 			this.modsParts = modsParts;
 
-			helpCommand = new Command("help", "This help", "Escape further command arguments with spaces, with two <color=blue>'</color>");
-			
+			helpCommand = new Command(
+				"help",
+				"This help",
+				"Escape further command arguments with spaces, with two <color=blue>'</color>"
+			);
+
 			enableCommand = new Command(
 				"enable",
 				"Enable screw placement mode for a part",
@@ -69,7 +65,7 @@ namespace MscModApi.Commands
 				"mod-api-screw list '<your-mod-id>'"
 			);
 
-			availableCommands.AddRange(new []
+			availableCommands.AddRange(new[]
 			{
 				helpCommand,
 				listCommand,
@@ -77,13 +73,12 @@ namespace MscModApi.Commands
 				disableCommand,
 			});
 		}
+
 		public override void Run(string[] args)
 		{
 			Command mainCommand = null;
-			foreach (Command command in availableCommands)
-			{
-				if (command.name == args.ElementAtOrDefault(0))
-				{
+			foreach (Command command in availableCommands) {
+				if (command.name == args.ElementAtOrDefault(0)) {
 					mainCommand = command;
 				}
 			}
@@ -91,25 +86,22 @@ namespace MscModApi.Commands
 			string partId;
 			string modId;
 			Part part;
-			switch (mainCommand)
-			{
+			switch (mainCommand) {
 				case Command cmd when cmd == helpCommand:
-					foreach (Command command in availableCommands)
-					{
+					foreach (Command command in availableCommands) {
 						ModConsole.Print($"<color=orange>{command.name}</color>: {command.help}");
-						if (command.parameterCallExample != "")
-						{
+						if (command.parameterCallExample != "") {
 							ModConsole.Print($"<color=orange>=></color> {command.parameterCallExample}");
 						}
 					}
+
 					break;
 				case Command cmd1 when cmd1 == enableCommand:
 				case Command cmd2 when cmd2 == disableCommand:
 					modId = args.ElementAtOrDefault(1);
 					partId = args.ElementAtOrDefault(2);
 
-					if (string.IsNullOrEmpty(modId) || string.IsNullOrEmpty(partId))
-					{
+					if (string.IsNullOrEmpty(modId) || string.IsNullOrEmpty(partId)) {
 						goto default;
 					}
 
@@ -117,22 +109,20 @@ namespace MscModApi.Commands
 					modId = modId.Replace("'", "");
 					partId = partId.Replace("'", "");
 
-					if (!ScrewPlacementAssist.IsScrewPlacementModeEnabled(modId))
-					{
+					if (!ScrewPlacementAssist.IsScrewPlacementModeEnabled(modId)) {
 						ModConsole.Print($"ScrewPlacementMode not enabled for mod with id '{modId}'");
 						break;
 					}
 
 
-					if (!modsParts.ContainsKey(modId))
-					{
+					if (!modsParts.ContainsKey(modId)) {
 						ModConsole.Error($"No mod with id <color=blue>{modId}</color> found that has added parts");
 						break;
 					}
 
-					if (!modsParts[modId].ContainsKey(partId))
-					{
-						ModConsole.Error($"No part with id <color=blue>{partId}</color> found for mod with id <color=blue>{modId}</color>");
+					if (!modsParts[modId].ContainsKey(partId)) {
+						ModConsole.Error(
+							$"No part with id <color=blue>{partId}</color> found for mod with id <color=blue>{modId}</color>");
 						break;
 					}
 
@@ -142,30 +132,27 @@ namespace MscModApi.Commands
 				case Command cmd2 when cmd2 == listCommand:
 					modId = args.ElementAtOrDefault(1);
 
-					if (string.IsNullOrEmpty(modId))
-					{
+					if (string.IsNullOrEmpty(modId)) {
 						goto default;
 					}
 
 					//Removing potential ''
 					modId = modId.Replace("'", "");
 
-					if (!ScrewPlacementAssist.IsScrewPlacementModeEnabled(modId))
-					{
+					if (!ScrewPlacementAssist.IsScrewPlacementModeEnabled(modId)) {
 						ModConsole.Print($"ScrewPlacementMode not enabled for mod with id '{modId}'");
 						break;
 					}
 
-					if (!modsParts.ContainsKey(modId))
-					{
+					if (!modsParts.ContainsKey(modId)) {
 						ModConsole.Error($"No mod with id <color=blue>{modId}</color> found that has added parts");
 						break;
 					}
 
-					foreach (var partDict in modsParts[modId])
-					{
+					foreach (var partDict in modsParts[modId]) {
 						part = partDict.Value;
-						ModConsole.Print($"<color=orange>{part.id}</color> => {(part.screwPlacementMode ? "Enabled" : "Disabled")}");
+						ModConsole.Print(
+							$"<color=orange>{part.id}</color> => {(part.screwPlacementMode ? "Enabled" : "Disabled")}");
 					}
 
 					break;

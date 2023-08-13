@@ -9,8 +9,6 @@ using UnityEngine;
 
 namespace MscModApi.Parts
 {
-
-
 	public class Part : BasicPart, SupportsPartEvents
 	{
 		protected static GameObject clampModel;
@@ -31,37 +29,17 @@ namespace MscModApi.Parts
 
 		public bool uninstallWhenParentUninstalls { get; protected set; }
 
-		public GameObject parentGameObject
-		{
-			get;
-			protected set;
-		}
-		public Part parentPart
-		{
-			get;
-			protected set;
-		}
+		public GameObject parentGameObject { get; protected set; }
+		public Part parentPart { get; protected set; }
 		protected List<Screw> savedScrews;
 
-		public Collider collider
-		{
-			get;
-			protected set;
-		}
+		public Collider collider { get; protected set; }
 
-		public TriggerWrapper trigger
-		{
-			get; 
-			protected set;
-		}
+		public TriggerWrapper trigger { get; protected set; }
 
 		public Transform transform => gameObject.transform;
-        
-		public GameObject gameObjectUsedForInstantiation
-		{
-			get;
-			protected set;
-		}
+
+		public GameObject gameObjectUsedForInstantiation { get; protected set; }
 		public bool usingPartParent => parentPart != null;
 
 		protected Dictionary<Screw, int> preScrewPlacementModeEnableTightnessMap = new Dictionary<Screw, int>();
@@ -81,26 +59,18 @@ namespace MscModApi.Parts
 			get => _screwPlacementMode;
 			set
 			{
-				if (!installed)
-				{
+				if (!installed) {
 					return;
 				}
 
-				if (!injectedScrewPlacementDisablePreUninstall)
-				{
+				if (!injectedScrewPlacementDisablePreUninstall) {
 					injectedScrewPlacementDisablePreUninstall = true;
-					AddEventListener(EventTime.Pre, EventType.Uninstall, () =>
-					{
-						this.screwPlacementMode = false;
-					});
+					AddEventListener(EventTime.Pre, EventType.Uninstall, () => { this.screwPlacementMode = false; });
 				}
 
-				foreach (Screw screw in screws)
-				{
-					if (!value)
-					{
-						if (!preScrewPlacementModeEnableTightnessMap.TryGetValue(screw, out int preEnableTightness))
-						{
+				foreach (Screw screw in screws) {
+					if (!value) {
+						if (!preScrewPlacementModeEnableTightnessMap.TryGetValue(screw, out int preEnableTightness)) {
 							continue;
 						}
 
@@ -111,17 +81,16 @@ namespace MscModApi.Parts
 						continue;
 					}
 
-					if (preScrewPlacementModeEnableTightnessMap.ContainsKey(screw))
-					{
+					if (preScrewPlacementModeEnableTightnessMap.ContainsKey(screw)) {
 						continue;
 					}
+
 					preScrewPlacementModeEnableTightnessMap.Add(screw, screw.tightness);
 					screw.InBy(Screw.maxTightness);
 					screw.tightness = 0;
 				}
 
-				if (!value && ScrewPlacementAssist.selectedPart == this)
-				{
+				if (!value && ScrewPlacementAssist.selectedPart == this) {
 					ScrewPlacementAssist.HidePartInteraction();
 				}
 
@@ -193,11 +162,8 @@ namespace MscModApi.Parts
 			this.installRotation = installRotation;
 			this.parentGameObject = parentGameObject;
 
-			if (!usingPartParent)
-			{
-				try
-				{
-
+			if (!usingPartParent) {
+				try {
 					PlayMakerFSM parentRemovalFsm = parentGameObject.FindFsm("Removal");
 
 					/*
@@ -206,8 +172,7 @@ namespace MscModApi.Parts
 						removalFsm.InitializeFSM();
 					}
 					 */
-					if (!parentRemovalFsm.Fsm.Initialized)
-					{
+					if (!parentRemovalFsm.Fsm.Initialized) {
 						parentRemovalFsm.InitializeFSM();
 					}
 
@@ -215,33 +180,27 @@ namespace MscModApi.Parts
 					PlayMakerFSM fsmPartDataFsm = fsmPartGameObject.FindFsm("Data");
 					parentGameObjectBolted = fsmPartDataFsm.FsmVariables.FindFsmBool("Bolted");
 				}
-				catch (Exception)
-				{
+				catch (Exception) {
 					// ignored
 				}
 			}
 
-			if (gameObjectUsedForInstantiation != null)
-			{
+			if (gameObjectUsedForInstantiation != null) {
 				gameObject = GameObject.Instantiate(gameObjectUsedForInstantiation);
 				gameObject.SetNameLayerTag(name + "(Clone)", "PART", "Parts");
 			}
-			else
-			{
+			else {
 				gameObject = Helper.LoadPartAndSetName(partBaseInfo.assetBundle, prefabName ?? id, name);
 			}
 
-			if (!partBaseInfo.partsSave.TryGetValue(id, out partSave))
-			{
+			if (!partBaseInfo.partsSave.TryGetValue(id, out partSave)) {
 				partSave = new PartSave();
 			}
 
-			try
-			{
+			try {
 				CustomSaveLoading(partBaseInfo.mod, $"{id}_saveFile.json");
 			}
-			catch
-			{
+			catch {
 				// ignored
 			}
 
@@ -250,29 +209,24 @@ namespace MscModApi.Parts
 
 			collider = gameObject.GetComponent<Collider>();
 
-			if (parentGameObject != null)
-			{
+			if (parentGameObject != null) {
 				trigger = new TriggerWrapper(this, parentGameObject, disableCollisionWhenInstalled);
 			}
 
-			if (partSave.installed)
-			{
+			if (partSave.installed) {
 				Install();
 			}
 
 			LoadPartPositionAndRotation(gameObject, partSave);
 
-			if (!MscModApi.modSaveFileMapping.ContainsKey(partBaseInfo.mod.ID))
-			{
+			if (!MscModApi.modSaveFileMapping.ContainsKey(partBaseInfo.mod.ID)) {
 				MscModApi.modSaveFileMapping.Add(partBaseInfo.mod.ID, partBaseInfo.saveFilePath);
 			}
 
-			if (MscModApi.modsParts.TryGetValue(partBaseInfo.mod.ID, out var modParts))
-			{
+			if (MscModApi.modsParts.TryGetValue(partBaseInfo.mod.ID, out var modParts)) {
 				modParts.Add(id, this);
 			}
-			else
-			{
+			else {
 				MscModApi.modsParts.Add(partBaseInfo.mod.ID, new Dictionary<string, Part>
 				{
 					{ id, this }
@@ -284,12 +238,10 @@ namespace MscModApi.Parts
 
 		protected void InitEventStorage()
 		{
-			foreach (EventTime eventTime in Enum.GetValues(typeof(EventTime)))
-			{
+			foreach (EventTime eventTime in Enum.GetValues(typeof(EventTime))) {
 				Dictionary<EventType, List<Action>> eventTypeDict = new Dictionary<EventType, List<Action>>();
 
-				foreach (EventType eventType in Enum.GetValues(typeof(EventType)))
-				{
+				foreach (EventType eventType in Enum.GetValues(typeof(EventType))) {
 					eventTypeDict.Add(eventType, new List<Action>());
 				}
 
@@ -314,12 +266,10 @@ namespace MscModApi.Parts
 		{
 			get
 			{
-				if (usingPartParent)
-				{
+				if (usingPartParent) {
 					return parentPart.installed;
 				}
-				else
-				{
+				else {
 					return parentGameObject.transform.parent != null;
 				}
 			}
@@ -329,12 +279,10 @@ namespace MscModApi.Parts
 		{
 			get
 			{
-				if (usingPartParent)
-				{
+				if (usingPartParent) {
 					return parentPart.bolted;
 				}
-				else
-				{
+				else {
 					return parentGameObjectBolted.Value;
 				}
 			}
@@ -353,8 +301,7 @@ namespace MscModApi.Parts
 			get => gameObject.transform.position;
 			set
 			{
-				if (!installed)
-				{
+				if (!installed) {
 					gameObject.transform.position = value;
 				}
 			}
@@ -366,8 +313,7 @@ namespace MscModApi.Parts
 			get => gameObject.transform.rotation.eulerAngles;
 			set
 			{
-				if (!installed)
-				{
+				if (!installed) {
 					gameObject.transform.rotation = Quaternion.Euler(value);
 				}
 			}
@@ -382,8 +328,7 @@ namespace MscModApi.Parts
 
 		internal void ResetScrews()
 		{
-			foreach (var screw in partSave.screws)
-			{
+			foreach (var screw in partSave.screws) {
 				screw.OutBy(screw.tightness);
 			}
 		}
@@ -398,7 +343,7 @@ namespace MscModApi.Parts
 		{
 			partSave.screws.ForEach(delegate(Screw screw) { screw.gameObject.SetActive(active); });
 		}
-		
+
 		public void Install()
 		{
 			trigger?.Install();
@@ -418,17 +363,14 @@ namespace MscModApi.Parts
 
 		public override bool bolted
 		{
-			get
-			{
-				return screws.Count > 0 && screws.All(screw => screw.tightness == Screw.maxTightness) && installed;
-			}
+			get { return screws.Count > 0 && screws.All(screw => screw.tightness == Screw.maxTightness) && installed; }
 		}
 
 		public void Uninstall()
 		{
 			trigger?.Uninstall();
 		}
-		
+
 		public void AddClampModel(Vector3 position, Vector3 rotation, Vector3 scale)
 		{
 			var clamp = GameObject.Instantiate(clampModel);
@@ -486,15 +428,12 @@ namespace MscModApi.Parts
 
 		public void AddScrews(Screw[] screws, float overrideScale = 0f, float overrideSize = 0f)
 		{
-			foreach (var screw in screws)
-			{
-				if (overrideScale != 0f)
-				{
+			foreach (var screw in screws) {
+				if (overrideScale != 0f) {
 					screw.scale = overrideScale;
 				}
 
-				if (overrideSize != 0f)
-				{
+				if (overrideSize != 0f) {
 					screw.size = overrideSize;
 				}
 
@@ -595,34 +534,32 @@ namespace MscModApi.Parts
 		{
 			events[eventTime][eventType].Add(action);
 
-			if (eventTime == EventTime.Post)
-			{
-				switch (eventType)
-				{
+			if (eventTime == EventTime.Post) {
+				switch (eventType) {
 					//ToDo: check if invoking just the newly added action is enough of if all have to be invoked
 					case EventType.Install:
-						if (installed)
-						{
+						if (installed) {
 							action.Invoke();
 						}
+
 						break;
 					case EventType.Uninstall:
-						if (!installed)
-						{
+						if (!installed) {
 							action.Invoke();
 						}
+
 						break;
 					case EventType.Bolted:
-						if (bolted)
-						{
+						if (bolted) {
 							action.Invoke();
 						}
+
 						break;
 					case EventType.Unbolted:
-						if (!bolted)
-						{
+						if (!bolted) {
 							action.Invoke();
 						}
+
 						break;
 				}
 			}
@@ -640,8 +577,7 @@ namespace MscModApi.Parts
 		/// <inheritdoc />
 		public override void ResetToDefault(bool uninstall = false)
 		{
-			if (uninstall && installed)
-			{
+			if (uninstall && installed) {
 				Uninstall();
 			}
 

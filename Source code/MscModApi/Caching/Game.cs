@@ -14,7 +14,7 @@ namespace MscModApi.Caching
 			{
 				if (_money != null) return _money.Value;
 				_money = PlayMakerGlobals.Instance.Variables.FindFsmFloat("PlayerMoney");
-				return (float) Math.Round(_money.Value, 1);
+				return (float)Math.Round(_money.Value, 1);
 			}
 			set
 			{

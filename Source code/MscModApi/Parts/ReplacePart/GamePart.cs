@@ -25,7 +25,7 @@ namespace MscModApi.Parts.ReplacePart
 		/// Flag used to avoid calling the pre bolted event multiple times
 		/// </summary>
 		protected bool alreadyCalledPreBolted;
-		
+
 		/// <summary>
 		/// Flag used to avoid calling the post bolted event multiple times
 		/// </summary>
@@ -57,27 +57,25 @@ namespace MscModApi.Parts.ReplacePart
 			InitEventStorage();
 			this.simpleBoltedStateDetection = simpleBoltedStateDetection;
 			mainFsmGameObject = Cache.Find(mainFsmPartName);
-			if (!mainFsmGameObject)
-			{
+			if (!mainFsmGameObject) {
 				throw new Exception($"Unable to find main fsm part GameObject using '{mainFsmPartName}'");
 			}
 
 			dataFsm = mainFsmGameObject.FindFsm("Data");
-			if (!dataFsm)
-			{
+			if (!dataFsm) {
 				throw new Exception($"Unable to find data fsm on GameObject with name '{mainFsmGameObject.name}'");
 			}
 
 			triggerFsmGameObject = dataFsm.FsmVariables.FindFsmGameObject("Trigger").Value;
-			if (!triggerFsmGameObject)
-			{
-				throw new Exception($"Unable to find trigger GameObject on GameObject with name '{mainFsmGameObject.name}'");
+			if (!triggerFsmGameObject) {
+				throw new Exception(
+					$"Unable to find trigger GameObject on GameObject with name '{mainFsmGameObject.name}'");
 			}
 
 			partFsmGameObject = dataFsm.FsmVariables.FindFsmGameObject("ThisPart").Value;
-			if (!partFsmGameObject)
-			{
-				throw new Exception($"Unable to find part GameObject on GameObject with name '{mainFsmGameObject.name}'");
+			if (!partFsmGameObject) {
+				throw new Exception(
+					$"Unable to find part GameObject on GameObject with name '{mainFsmGameObject.name}'");
 			}
 
 			boltedState = dataFsm.FsmVariables.FindFsmBool("Bolted");
@@ -89,60 +87,44 @@ namespace MscModApi.Parts.ReplacePart
 			removalFsm = partFsmGameObject.FindFsm("Removal");
 			boltCheckFsm = partFsmGameObject.FindFsm("BoltCheck");
 
-			if (!assemblyFsm.Fsm.Initialized)
-			{
+			if (!assemblyFsm.Fsm.Initialized) {
 				assemblyFsm.InitializeFSM();
 			}
 
-			if (!removalFsm.Fsm.Initialized)
-			{
+			if (!removalFsm.Fsm.Initialized) {
 				removalFsm.InitializeFSM();
 			}
 
-			if (!boltCheckFsm.Fsm.Initialized)
-			{
+			if (!boltCheckFsm.Fsm.Initialized) {
 				boltCheckFsm.InitializeFSM();
 			}
 
 			tightness = boltCheckFsm.FsmVariables.FindFsmFloat("Tightness");
 
-			AddActionAsFirst(assemblyFsm.FindState("Assemble"), () =>
-			{
-				GetEvents(EventTime.Pre, EventType.Install).InvokeAll();
-			});
+			AddActionAsFirst(assemblyFsm.FindState("Assemble"),
+				() => { GetEvents(EventTime.Pre, EventType.Install).InvokeAll(); });
 
-			AddActionAsLast(assemblyFsm.FindState("End"), () =>
-			{
-				GetEvents(EventTime.Post, EventType.Install).InvokeAll();
-			});
+			AddActionAsLast(assemblyFsm.FindState("End"),
+				() => { GetEvents(EventTime.Post, EventType.Install).InvokeAll(); });
 
-			AddActionAsFirst(removalFsm.FindState("Remove part"), () =>
-			{
-				GetEvents(EventTime.Pre, EventType.Uninstall).InvokeAll();
-			});
-			AddActionAsLast(removalFsm.FindState("Remove part"), () =>
-			{
-				GetEvents(EventTime.Post, EventType.Uninstall).InvokeAll();
-			});
+			AddActionAsFirst(removalFsm.FindState("Remove part"),
+				() => { GetEvents(EventTime.Pre, EventType.Uninstall).InvokeAll(); });
+			AddActionAsLast(removalFsm.FindState("Remove part"),
+				() => { GetEvents(EventTime.Post, EventType.Uninstall).InvokeAll(); });
 
-			if (tightness == null)
-			{
+			if (tightness == null) {
 				throw new Exception($"Unable to find tightness on bolt check fsm of part '{partFsmGameObject.name}'");
 			}
 
-			if (boltedState != null)
-			{
-				if (simpleBoltedStateDetection)
-				{
+			if (boltedState != null) {
+				if (simpleBoltedStateDetection) {
 					SetupSimpleBoltedStateDetection();
 				}
-				else
-				{
+				else {
 					SetupAdvancedBoltedStateDetection();
 				}
 			}
-			else
-			{
+			else {
 				boltedState = new FsmBool(); //Avoiding null
 			}
 		}
@@ -153,30 +135,25 @@ namespace MscModApi.Parts.ReplacePart
 		protected void SetupAdvancedBoltedStateDetection()
 		{
 			GameObject boltsGameObject = partFsmGameObject.FindChild("Bolts");
-			if (!boltsGameObject)
-			{
-				ModConsole.Print($"GamePart: Unable to find 'Bolts' child of '{partFsmGameObject.name}'. Bolted event listening not possible");
+			if (!boltsGameObject) {
+				ModConsole.Print(
+					$"GamePart: Unable to find 'Bolts' child of '{partFsmGameObject.name}'. Bolted event listening not possible");
 			}
 
-			for (int i = 0; i < boltsGameObject.transform.childCount; i++)
-			{
+			for (int i = 0; i < boltsGameObject.transform.childCount; i++) {
 				GameObject boltGameObject;
-				try
-				{
+				try {
 					boltGameObject = boltsGameObject.transform.GetChild(i).gameObject;
-					if (!boltGameObject)
-					{
+					if (!boltGameObject) {
 						throw new Exception("Null GameObject");
 					}
 				}
-				catch (Exception)
-				{
+				catch (Exception) {
 					continue;
 				}
 
 				PlayMakerFSM boltFsm = boltGameObject.FindFsm("Screw");
-				if (!boltFsm)
-				{
+				if (!boltFsm) {
 					continue;
 				}
 
@@ -184,13 +161,11 @@ namespace MscModApi.Parts.ReplacePart
 				FsmState tightState = boltFsm.FindState("8 2");
 				FsmState unscrewPreState = boltFsm.FindState("Unscrew 2");
 				FsmState unscrewPostState = boltFsm.FindState("Wait 4");
-				if (tightState == null || unscrewPreState == null || unscrewPostState == null)
-				{
+				if (tightState == null || unscrewPreState == null || unscrewPostState == null) {
 					return;
 				}
 
-				if (!boltFsm.Fsm.Initialized)
-				{
+				if (!boltFsm.Fsm.Initialized) {
 					boltFsm.InitializeFSM();
 				}
 
@@ -213,10 +188,10 @@ namespace MscModApi.Parts.ReplacePart
 			{
 				alreadyCalledPreBolted = false;
 
-				if (alreadyCalledPreUnbolted)
-				{
+				if (alreadyCalledPreUnbolted) {
 					return;
 				}
+
 				GetEvents(EventTime.Pre, EventType.Uninstall).InvokeAll();
 			});
 			AddActionAsLast(boltCheckFsm.FindState("Bolts OFF"), () =>
@@ -224,10 +199,10 @@ namespace MscModApi.Parts.ReplacePart
 				alreadyCalledPostBolted = false;
 
 
-				if (alreadyCalledPostUnbolted)
-				{
+				if (alreadyCalledPostUnbolted) {
 					return;
 				}
+
 				GetEvents(EventTime.Post, EventType.Uninstall).InvokeAll();
 			});
 
@@ -236,10 +211,10 @@ namespace MscModApi.Parts.ReplacePart
 			{
 				alreadyCalledPreUnbolted = false;
 
-				if (alreadyCalledPreBolted)
-				{
+				if (alreadyCalledPreBolted) {
 					return;
 				}
+
 				GetEvents(EventTime.Pre, EventType.Install).InvokeAll();
 			});
 			AddActionAsLast(boltCheckFsm.FindState("Bolts ON"), () =>
@@ -247,10 +222,10 @@ namespace MscModApi.Parts.ReplacePart
 				alreadyCalledPostUnbolted = false;
 
 
-				if (alreadyCalledPostBolted)
-				{
+				if (alreadyCalledPostBolted) {
 					return;
 				}
+
 				GetEvents(EventTime.Post, EventType.Install).InvokeAll();
 			});
 		}
@@ -260,12 +235,10 @@ namespace MscModApi.Parts.ReplacePart
 		/// </summary>
 		protected void InitEventStorage()
 		{
-			foreach (EventTime eventTime in Enum.GetValues(typeof(EventTime)))
-			{
+			foreach (EventTime eventTime in Enum.GetValues(typeof(EventTime))) {
 				Dictionary<EventType, List<Action>> eventTypeDict = new Dictionary<EventType, List<Action>>();
 
-				foreach (EventType eventType in Enum.GetValues(typeof(EventType)))
-				{
+				foreach (EventType eventType in Enum.GetValues(typeof(EventType))) {
 					eventTypeDict.Add(eventType, new List<Action>());
 				}
 
@@ -276,7 +249,11 @@ namespace MscModApi.Parts.ReplacePart
 		/// <summary>
 		/// Block installation of the part by disabling the trigger object
 		/// </summary>
-		public bool installBlocked { get => triggerFsmGameObject.activeSelf; set => triggerFsmGameObject.SetActive(!value); }
+		public bool installBlocked
+		{
+			get => triggerFsmGameObject.activeSelf;
+			set => triggerFsmGameObject.SetActive(!value);
+		}
 
 		/// <summary>
 		/// The parts tightness (sum of all screw tightness (8 x screw count = all bolted))
@@ -363,8 +340,7 @@ namespace MscModApi.Parts.ReplacePart
 			get => partFsmGameObject.transform.position;
 			set
 			{
-				if (!installed)
-				{
+				if (!installed) {
 					partFsmGameObject.transform.position = value;
 				}
 			}
@@ -376,8 +352,7 @@ namespace MscModApi.Parts.ReplacePart
 			get => partFsmGameObject.transform.rotation.eulerAngles;
 			set
 			{
-				if (!installed)
-				{
+				if (!installed) {
 					partFsmGameObject.transform.rotation = Quaternion.Euler(value);
 				}
 			}
@@ -395,8 +370,7 @@ namespace MscModApi.Parts.ReplacePart
 		{
 			get
 			{
-				if (simpleBoltedStateDetection)
-				{
+				if (simpleBoltedStateDetection) {
 					return boltedState.Value;
 				}
 
@@ -430,8 +404,7 @@ namespace MscModApi.Parts.ReplacePart
 
 		public override void ResetToDefault(bool uninstall = false)
 		{
-			if (uninstall && installed)
-			{
+			if (uninstall && installed) {
 				Uninstall();
 			}
 
@@ -444,8 +417,7 @@ namespace MscModApi.Parts.ReplacePart
 		/// </summary>
 		protected void AddActionAsFirst(FsmState fsmState, Action action)
 		{
-			if (fsmState == null)
-			{
+			if (fsmState == null) {
 				return;
 			}
 
@@ -459,8 +431,7 @@ namespace MscModApi.Parts.ReplacePart
 		/// </summary>
 		protected void AddActionAsLast(FsmState fsmState, Action action)
 		{
-			if (fsmState == null)
-			{
+			if (fsmState == null) {
 				return;
 			}
 
@@ -477,11 +448,9 @@ namespace MscModApi.Parts.ReplacePart
 			alreadyCalledPreBolted = false;
 			alreadyCalledPostBolted = false;
 
-			switch (eventTime)
-			{
+			switch (eventTime) {
 				case EventTime.Pre:
-					if (alreadyCalledPreUnbolted)
-					{
+					if (alreadyCalledPreUnbolted) {
 						return;
 					}
 
@@ -489,8 +458,7 @@ namespace MscModApi.Parts.ReplacePart
 					GetEvents(EventTime.Pre, EventType.Unbolted).InvokeAll();
 					break;
 				case EventTime.Post:
-					if (alreadyCalledPostUnbolted)
-					{
+					if (alreadyCalledPostUnbolted) {
 						return;
 					}
 
@@ -506,20 +474,17 @@ namespace MscModApi.Parts.ReplacePart
 		/// <param name="eventTime"></param>
 		protected void OnTight(EventTime eventTime)
 		{
-			if (tightness.Value < maxTightness)
-			{
+			if (tightness.Value < maxTightness) {
 				return; //Wait for all screws to be tight
 			}
-			
+
 			alreadyCalledPreUnbolted = false;
 			alreadyCalledPostUnbolted = false;
 
 
-			switch (eventTime)
-			{
+			switch (eventTime) {
 				case EventTime.Pre:
-					if (alreadyCalledPreBolted)
-					{
+					if (alreadyCalledPreBolted) {
 						return;
 					}
 
@@ -527,8 +492,7 @@ namespace MscModApi.Parts.ReplacePart
 					GetEvents(EventTime.Pre, EventType.Bolted).InvokeAll();
 					break;
 				case EventTime.Post:
-					if (alreadyCalledPostBolted)
-					{
+					if (alreadyCalledPostBolted) {
 						return;
 					}
 
@@ -554,36 +518,34 @@ namespace MscModApi.Parts.ReplacePart
 		{
 			events[eventTime][eventType].Add(action);
 
-			if (eventTime == EventTime.Post)
-			{
-				switch (eventType)
-				{
+			if (eventTime == EventTime.Post) {
+				switch (eventType) {
 					//ToDo: check if invoking just the newly added action is enough of if all have to be invoked
 					case EventType.Install:
-						if (installed)
-						{
+						if (installed) {
 							action.Invoke();
 						}
+
 						break;
 					case EventType.Uninstall:
-						if (!installed)
-						{
+						if (!installed) {
 							action.Invoke();
 						}
+
 						break;
 					case EventType.Bolted:
-						if (bolted)
-						{
+						if (bolted) {
 							//ToDo: bolted state should only be true if maxTightness is also reached
 							action.Invoke();
 						}
+
 						break;
 					case EventType.Unbolted:
-						if (!bolted)
-						{
+						if (!bolted) {
 							//ToDo: bolted state should only be true if maxTightness is also reached
 							action.Invoke();
 						}
+
 						break;
 				}
 			}
