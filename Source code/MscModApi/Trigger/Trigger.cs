@@ -96,6 +96,7 @@ namespace MscModApi.Trigger
 			}
 
 			verifyInstalledRoutine = null;
+			part.GetEvents(EventTime.Post, EventType.Install).InvokeAll();
 		}
 
 		/// <summary>
@@ -113,6 +114,7 @@ namespace MscModApi.Trigger
 			}
 
 			verifyUninstalledRoutine = null;
+			part.GetEvents(EventTime.Post, EventType.Uninstall).InvokeAll();
 		}
 
 		/// <summary>
@@ -145,8 +147,6 @@ namespace MscModApi.Trigger
 			part.SetScrewsActive(true);
 
 			canBeInstalled = false;
-
-			part.GetEvents(EventTime.Post, EventType.Install).InvokeAll();
 		}
 
 		/// <summary>
@@ -178,8 +178,6 @@ namespace MscModApi.Trigger
 
 			part.SetScrewsActive(false);
 			//part.trigger.SetActive(true);
-
-			part.GetEvents(EventTime.Post, EventType.Uninstall).InvokeAll();
 		}
 
 		/// <summary>
