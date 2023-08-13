@@ -1,4 +1,5 @@
-﻿using MSCLoader;
+﻿using System.Collections.Generic;
+using MSCLoader;
 using System.Linq;
 using System.Reflection;
 using MscModApi.Parts;
@@ -13,8 +14,9 @@ namespace MscModApi.Tools
 		internal static Part selectedPart;
 		internal static Screw[] screws;
 		internal static int selectedScrew;
-		private static Rect windowRect = new Rect(20, 20, 200, 50);
+		private static Rect windowRect;
 
+		private static Dictionary<string, bool> screwPlacementEnabledMods;
 
 		internal static void ModSettings(Mod mod)
 		{
@@ -78,38 +80,50 @@ namespace MscModApi.Tools
 			}
 
 			GUI.DragWindow(new Rect(0, 0, 10000, 10000));
-
 		}
 
 		internal static void OnGui()
 		{
 			if (selectedPart == null) return;
-			windowRect = GUILayout.Window(0, windowRect, ScrewPlacementAssist.CreateWindow, "Screw placement mode", GUILayout.ExpandWidth(true));
+			windowRect = GUILayout.Window(0, windowRect, ScrewPlacementAssist.CreateWindow, "Screw placement mode",
+				GUILayout.ExpandWidth(true));
 		}
 
-		internal static void ShowPartInteraction(Part part)
+		internal static void HandlePartInteraction(Part part)
 		{
-			UserInteraction.GuiInteraction($"Press [{keySelectPart.Key}] to {(selectedPart == null ? "select" : "deselect")} part"
+			UserInteraction.GuiInteraction(
+				$"Press [{keySelectPart.Key}] to {(selectedPart == null ? "select" : "deselect")} part"
 			);
 
 			if (keySelectPart.GetKeybindDown()) {
 				if (selectedPart == null) {
-					selectedPart = part;
-					screws = selectedPart.partSave.screws.OrderBy(screw => screw.gameObject.name).ToArray();
-				} else {
-					selectedPart = null;
-					screws = new Screw[0];
+					ShowPartInteraction(part);
 				}
-
-
-			} else {
+				else {
+					HidePartInteraction();
+				}
+			}
+			else {
 				windowRect = new Rect(windowRect.xMin, windowRect.yMin, 200, 50);
 			}
 		}
 
+		internal static void ShowPartInteraction(Part part)
+		{
+			selectedPart = part;
+			screws = selectedPart.partSave.screws.OrderBy(screw => screw.gameObject.name).ToArray();
+		}
+
+		public static void HidePartInteraction()
+		{
+			selectedPart = null;
+			screws = new Screw[0];
+		}
+
 		private static void CopyToClipBoard(this string value)
 		{
-			typeof(GUIUtility).GetProperty("systemCopyBuffer", BindingFlags.Static | BindingFlags.NonPublic)?.SetValue(null, value, null);
+			typeof(GUIUtility).GetProperty("systemCopyBuffer", BindingFlags.Static | BindingFlags.NonPublic)
+				?.SetValue(null, value, null);
 		}
 
 		private static string PrintAxis(string label, float val)
@@ -121,6 +135,7 @@ namespace MscModApi.Tools
 			if (GUILayout.Button("Copy")) {
 				value.CopyToClipBoard();
 			}
+
 			GUILayout.EndHorizontal();
 			return value;
 		}
@@ -131,6 +146,32 @@ namespace MscModApi.Tools
 			var quaternion = Quaternion.Euler(transform.localRotation.eulerAngles.CopyVector3());
 			vector += (quaternion * Vector3.forward) * (Screw.maxTightness * Screw.transformStep);
 			return vector;
+		}
+
+		public static void EnableScrewPlacementMode(Mod mod, bool enabled)
+		{
+			screwPlacementEnabledMods[mod.ID] = enabled;
+		}
+
+		public static bool IsScrewPlacementModeEnabled(string modId)
+		{
+			return screwPlacementEnabledMods.TryGetValue(modId, out var enabled) && enabled;
+		}
+
+		public static bool IsScrewPlacementModeEnabled(Mod mod)
+		{
+			return screwPlacementEnabledMods.TryGetValue(mod.ID, out var enabled) && enabled;
+		}
+
+		public static void LoadCleanup()
+		{
+			keySelectPart = null;
+
+			selectedPart = null;
+			screws = null;
+			selectedScrew = 0;
+			windowRect = new Rect(20, 20, 200, 50);
+			screwPlacementEnabledMods = new Dictionary<string, bool>();
 		}
 	}
 }

@@ -7,7 +7,7 @@ namespace MscModApi.Caching
 {
 	public static class Cache
 	{
-		public static Dictionary<string, GameObject> cachedGameObjects = new Dictionary<string, GameObject>();
+		public static Dictionary<string, GameObject> cachedGameObjects;
 
 		private static GameObject[] globalCache;
 
@@ -19,8 +19,7 @@ namespace MscModApi.Caching
 					return gameObject;
 				}
 			}
-			catch
-			{
+			catch {
 				// ignored. Continues below
 			}
 
@@ -28,8 +27,7 @@ namespace MscModApi.Caching
 
 			GameObject foundObject = GameObject.Find(name);
 
-			if (!foundObject && findEvenIfInactive)
-			{
+			if (!foundObject && findEvenIfInactive) {
 				foundObject = FindInGlobal(name);
 			}
 
@@ -39,29 +37,25 @@ namespace MscModApi.Caching
 
 		private static GameObject FindInGlobal(string name)
 		{
-			if (globalCache == null)
-			{
+			if (globalCache == null) {
 				globalCache = Resources.FindObjectsOfTypeAll<GameObject>();
 			}
 
-			foreach(var gameObject in globalCache)
-			{
+			foreach (var gameObject in globalCache) {
 				string nameToCompareTo = gameObject.name;
 
-				if (gameObject.name.Contains("OptionsMenu"))
-				{
-
+				if (gameObject.name.Contains("OptionsMenu")) {
 				}
 
-				if (name.Contains("/"))
-				{
+				if (name.Contains("/")) {
 					nameToCompareTo = GetObjectPath(gameObject);
 				}
-				if (nameToCompareTo == name)
-				{
+
+				if (nameToCompareTo == name) {
 					return gameObject;
 				}
 			}
+
 			return null;
 		}
 
@@ -75,13 +69,18 @@ namespace MscModApi.Caching
 			Transform currentTransform = gameObject.transform;
 			string path = currentTransform.name;
 
-			while (currentTransform.parent != null)
-			{
+			while (currentTransform.parent != null) {
 				currentTransform = currentTransform.parent;
 				path = currentTransform.name + "/" + path;
 			}
 
 			return path;
+		}
+
+		public static void LoadCleanup()
+		{
+			cachedGameObjects = new Dictionary<string, GameObject>();
+			globalCache = null;
 		}
 	}
 }

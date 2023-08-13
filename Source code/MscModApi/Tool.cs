@@ -91,5 +91,11 @@ namespace MscModApi
 			timer = 0;
 			return true;
 		}
+
+		public static void LoadCleanup()
+		{
+			hasToolInHand = false;
+			selectItem = null;
+		}
 	}
 }

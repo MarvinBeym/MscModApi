@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
+using HutongGames.PlayMaker;
 using UnityEngine;
 
 namespace MscModApi.Tools
@@ -29,7 +30,8 @@ namespace MscModApi.Tools
 			return value ? trueText : falseText;
 		}
 
-		public static void SetNameLayerTag(this GameObject gameObject, string name, string tag = "PART", string layer = "Parts")
+		public static void SetNameLayerTag(this GameObject gameObject, string name, string tag = "PART",
+			string layer = "Parts")
 		{
 			gameObject.name = name;
 			gameObject.tag = tag;
@@ -47,7 +49,8 @@ namespace MscModApi.Tools
 
 		public static bool CompareVector3(this Vector3 vector3, Vector3 other, float tolerance = 0.05f)
 		{
-			return Math.Abs(vector3.x - other.x) < tolerance && Math.Abs(vector3.y - other.y) < tolerance && Math.Abs(vector3.z - other.z) < tolerance;
+			return Math.Abs(vector3.x - other.x) < tolerance && Math.Abs(vector3.y - other.y) < tolerance &&
+			       Math.Abs(vector3.z - other.z) < tolerance;
 		}
 
 		public static PlayMakerFSM FindFsm(this GameObject gameObject, string fsmName)
@@ -67,8 +70,7 @@ namespace MscModApi.Tools
 
 		public static void InvokeAll(this List<Action> actions)
 		{
-			foreach (var action in actions)
-			{
+			foreach (var action in actions) {
 				action.Invoke();
 			}
 		}
@@ -81,13 +83,29 @@ namespace MscModApi.Tools
 		public static Screw[] CloneToNew(this Screw[] screws)
 		{
 			var newScrews = new Screw[screws.Length];
-			for (var i = 0; i < screws.Length; i++)
-			{
+			for (var i = 0; i < screws.Length; i++) {
 				var screw = screws[i];
 				newScrews[i] = screw.CloneToNew();
 			}
 
 			return newScrews;
+		}
+
+		/// <summary>
+		/// Finds an fsm state by name
+		/// </summary>
+		/// <param name="fsm">The PlayMakerFSM object to search in</param>
+		/// <param name="stateName">The name of the state to find</param>
+		/// <returns>The found FsmState or null</returns>
+		public static FsmState FindState(this PlayMakerFSM fsm, string stateName)
+		{
+			foreach (var fsmState in fsm.FsmStates) {
+				if (fsmState.Name == stateName) {
+					return fsmState;
+				}
+			}
+
+			return null;
 		}
 
 		public static string ToStringOrEmpty(this object value)

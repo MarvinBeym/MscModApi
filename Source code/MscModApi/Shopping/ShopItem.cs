@@ -27,7 +27,8 @@ namespace MscModApi.Shopping
 		internal GameObject cartItemGameObject;
 		private bool buyable = true;
 
-		public ShopItem(string name, float prize, Vector3 spawnLocation, Action onPurchaseAction, string imageAssetName = "", bool multiPurchase = true)
+		public ShopItem(string name, float prize, Vector3 spawnLocation, Action onPurchaseAction,
+			string imageAssetName = "", bool multiPurchase = true)
 		{
 			SetMultiPurchase(multiPurchase);
 			Setup(name, prize, spawnLocation, imageAssetName);
@@ -37,29 +38,26 @@ namespace MscModApi.Shopping
 		public ShopItem(string name, float prize, Vector3 spawnLocation, PartBox partBox, string imageAssetName = "")
 		{
 			Setup(name, prize, spawnLocation, imageAssetName);
-			foreach (Part part in partBox.GetParts())
-			{
-				part.SetDefaultPosition(spawnLocation);
-				part.SetActive(part.IsBought());
+			foreach (Part part in partBox.parts) {
+				part.defaultPosition = spawnLocation;
+				part.active = part.bought;
 			}
 
-			buyable = !partBox.GetParts().Any(part => part.IsBought());
+			buyable = !partBox.parts.Any(part => part.bought);
 			onPurchaseAction = delegate
 			{
-				foreach (Part part in partBox.GetParts())
-				{
-					part.SetBought(true);
-					part.SetDefaultPosition(spawnLocation);
-
+				foreach (Part part in partBox.parts) {
+					part.bought = true;
+					part.defaultPosition = spawnLocation;
 				}
 
-				if (!multiPurchase)
-				{
+				if (!multiPurchase) {
 					buyable = false;
 				}
-				partBox.GetBoxGameObject().SetActive(true);
-				partBox.GetBoxGameObject().transform.position = spawnLocation;
-				partBox.GetBoxGameObject().transform.rotation = Quaternion.Euler(new Vector3(0, 0, 0));
+
+				partBox.active = true;
+				partBox.position = spawnLocation;
+				partBox.rotation = new Vector3(0, 0, 0);
 			};
 		}
 
@@ -67,19 +65,16 @@ namespace MscModApi.Shopping
 		public ShopItem(string name, float prize, Vector3 spawnLocation, Part part, string imageAssetName = "")
 		{
 			Setup(name, prize, spawnLocation, imageAssetName);
-			
+
 			if (part.partSave.bought == PartSave.BoughtState.NotConfigured) {
 				part.partSave.bought = PartSave.BoughtState.No;
 			}
 
-			part.SetDefaultPosition(spawnLocation);
-			part.SetActive(part.IsBought());
-			buyable = !part.IsBought();
+			part.defaultPosition = spawnLocation;
+			part.active = part.bought;
+			buyable = !part.bought;
 
-			onPurchaseAction = delegate
-			{
-				OnPartPurchase(part);
-			};
+			onPurchaseAction = delegate { OnPartPurchase(part); };
 		}
 
 		internal bool IsBuyable()
@@ -103,14 +98,13 @@ namespace MscModApi.Shopping
 			var partImageComp = partItemGameObject.FindChild("panel/part_image").GetComponent<Image>();
 			if (imageAssetName == "") {
 				partImageComp.enabled = false;
-			} else {
+			}
+			else {
 				partImageComp.sprite = baseInfo.assetBundle.LoadAsset<Sprite>(imageAssetName) ?? partImageComp.sprite;
 			}
 
 			var btnAddToCart = partItemGameObject.FindChild("panel/part_add_to_cart").GetComponent<Button>();
-			btnAddToCart.onClick.AddListener(delegate {
-				shopInterface.OnAddToCart(this);
-			});
+			btnAddToCart.onClick.AddListener(delegate { shopInterface.OnAddToCart(this); });
 
 			var partNameComp = partItemGameObject.FindChild("panel/part_name").GetComponent<Text>();
 			partNameComp.text = name;
@@ -123,12 +117,11 @@ namespace MscModApi.Shopping
 
 		private void OnPartPurchase(Part part)
 		{
-			part.SetBought(true);
-			part.SetActive(true);
+			part.bought = true;
+			part.active = true;
 			part.ResetToDefault();
 
-			if (!IsMultiPurchase())
-			{
+			if (!IsMultiPurchase()) {
 				buyable = false;
 			}
 		}

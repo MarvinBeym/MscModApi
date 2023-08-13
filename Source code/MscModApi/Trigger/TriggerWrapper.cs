@@ -4,6 +4,9 @@ using UnityEngine;
 
 namespace MscModApi.Trigger
 {
+	/// <summary>
+	/// Wrapper around trigger logic of parts
+	/// </summary>
 	public class TriggerWrapper
 	{
 		private Trigger logic;
@@ -11,45 +14,98 @@ namespace MscModApi.Trigger
 		private Renderer renderer;
 		private static readonly Vector3 defaultScale = new Vector3(0.05f, 0.05f, 0.05f);
 
+		/// <summary>
+		/// A wrapper class around the trigger logic of a Part
+		/// </summary>
+		/// <param name="part">The part object the trigger will be added to</param>
+		/// <param name="parentGameObject">The gameObject the trigger will be added to as a child</param>
+		/// <param name="disableCollisionWhenInstalled">Disable the collision of the part when the part gets installed</param>
 		public TriggerWrapper(Part part, GameObject parentGameObject, bool disableCollisionWhenInstalled)
 		{
 			triggerGameObject = GameObject.CreatePrimitive(PrimitiveType.Cube);
 			triggerGameObject.transform.SetParent(parentGameObject.transform, false);
 			triggerGameObject.name = part.gameObject.name + "_trigger";
-			SetPosition(part.installPosition);
-			SetRotation(part.installRotation);
-			SetScale(defaultScale);
+			position = part.installPosition;
+			rotation = part.installRotation;
+			scale = defaultScale;
 
 			var collider = triggerGameObject.GetComponent<Collider>();
 			collider.isTrigger = true;
 
 			renderer = triggerGameObject.GetComponent<Renderer>();
-			SetVisible(false);
+			visible = false;
 			logic = triggerGameObject.AddComponent<Trigger>();
 			logic.Init(part, parentGameObject, disableCollisionWhenInstalled);
 		}
 
+		/// <summary>
+		/// Render of trigger gameObject visible
+		/// </summary>
+		public bool visible
+		{
+			get => renderer.enabled;
+			set => renderer.enabled = value;
+		}
+
+		/// <summary>
+		/// Scale of the trigger gameObject
+		/// </summary>
+		public Vector3 scale
+		{
+			get => triggerGameObject.transform.localScale;
+			set => triggerGameObject.transform.localScale = value;
+		}
+
+		/// <summary>
+		/// Position of the trigger gameObject
+		/// </summary>
+		public Vector3 position
+		{
+			get => triggerGameObject.transform.localPosition;
+			set => triggerGameObject.transform.localPosition = value;
+		}
+
+		/// <summary>
+		/// Rotation of the trigger gameObject
+		/// </summary>
+		public Vector3 rotation
+		{
+			get => triggerGameObject.transform.localRotation.eulerAngles;
+			set => triggerGameObject.transform.localRotation = Quaternion.Euler(value);
+		}
+
+		/// <summary>
+		/// Executes the install logic
+		/// </summary>
+		public void Install() => logic.Install();
+
+		/// <summary>
+		/// Executed the uninstall logic
+		/// </summary>
+		public void Uninstall() => logic.Uninstall();
+
+		[Obsolete("Use 'scale' property instead", true)]
 		public void SetScale(Vector3 scale)
 		{
-			triggerGameObject.transform.localScale = scale;
+			this.scale = scale;
 		}
 
+		[Obsolete("Use 'position' property instead", true)]
 		public void SetPosition(Vector3 position)
 		{
-			triggerGameObject.transform.localPosition = position;
+			this.position = position;
 		}
 
+		[Obsolete("Use 'rotation' property instead", true)]
 		public void SetRotation(Vector3 rotation)
 		{
-			triggerGameObject.transform.localRotation = Quaternion.Euler(rotation);
+			this.rotation = rotation;
 		}
 
+		[Obsolete("Use 'visible' property instead", true)]
 		public void SetVisible(bool show)
 		{
-			renderer.enabled = show;
+			visible = show;
 		}
-
-		internal void Install() => logic.Install();
-		internal void Uninstall() => logic.Uninstall();
 	}
 }

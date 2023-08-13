@@ -125,13 +125,11 @@ namespace MscModApi.Tools
 
 		public static void PlayTouch(this GameObject gameObject)
 		{
-			if (touchAudio == null)
-			{
+			if (touchAudio == null) {
 				var audioGameObject = Cache.Find("MasterAudio/CarFoley/dash_button");
 				if (!audioGameObject) return;
 				var audioSource = audioGameObject.GetComponent<AudioSource>();
-				if (audioSource)
-				{
+				if (audioSource) {
 					touchAudio = audioSource;
 				}
 			}
@@ -143,8 +141,7 @@ namespace MscModApi.Tools
 
 		public static void PlayBuy(this GameObject gameObject)
 		{
-			if (buyAudio == null)
-			{
+			if (buyAudio == null) {
 				var audioGameObject = Cache.Find("MasterAudio/Store/cash_register_1");
 				if (!audioGameObject) return;
 				var audioSource = audioGameObject.GetComponent<AudioSource>();
@@ -195,7 +192,8 @@ namespace MscModApi.Tools
 				if (itemPivot == null) {
 					itemPivot = PlayMakerGlobals.Instance.Variables.FindFsmGameObject("ItemPivot").Value;
 				}
-			} catch (Exception) {
+			}
+			catch (Exception) {
 				return false;
 			}
 
@@ -220,6 +218,20 @@ namespace MscModApi.Tools
 		{
 			public static bool Up => Input.GetAxis("Mouse ScrollWheel") > 0f;
 			public static bool Down => Input.GetAxis("Mouse ScrollWheel") < 0f;
+		}
+
+		public static void LoadCleanup()
+		{
+			assembleAudio = null;
+			disassembleAudio = null;
+			touchAudio = null;
+			buyAudio = null;
+			checkoutAudio = null;
+			guiInteraction = null;
+			guiAssemble = null;
+			guiDisassemble = null;
+			guiUse = null;
+			itemPivot = null;
 		}
 	}
 }

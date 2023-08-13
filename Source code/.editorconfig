@@ -5,3 +5,9 @@ dotnet_diagnostic.IDE0002.severity = none
 
 # IDE0044: Modifizierer "readonly" hinzufügen
 dotnet_diagnostic.IDE0044.severity = none
+
+# IDE1006: Benennungsstile
+dotnet_diagnostic.IDE1006.severity = none
+
+# CS0618: Typ oder Element ist veraltet
+dotnet_diagnostic.CS0618.severity = error

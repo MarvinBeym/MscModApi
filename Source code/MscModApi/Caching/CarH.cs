@@ -14,7 +14,7 @@ namespace MscModApi.Caching
 		private static GameObject _electricity;
 		private static FsmString _playerCurrentVehicle;
 
-		public static bool running => drivetrain.rpm > 0;
+		public static bool running => drivetrain.rpm > 20;
 		public static bool playerInCar => playerCurrentVehicle == "Satsuma";
 
 		public static string playerCurrentVehicle
@@ -28,7 +28,8 @@ namespace MscModApi.Caching
 			}
 		}
 
-		public static GameObject electricity {
+		public static GameObject electricity
+		{
 			get
 			{
 				if (_electricity != null) return _electricity;
@@ -38,7 +39,8 @@ namespace MscModApi.Caching
 			}
 		}
 
-		public static bool hasPower {
+		public static bool hasPower
+		{
 			get
 			{
 				if (_electricsOk != null) return _electricsOk.Value;
@@ -48,7 +50,8 @@ namespace MscModApi.Caching
 			}
 		}
 
-		public static CarController carController {
+		public static CarController carController
+		{
 			get
 			{
 				if (_carController != null) return _carController;
@@ -58,7 +61,8 @@ namespace MscModApi.Caching
 			}
 		}
 
-		public static AxisCarController axisCarController {
+		public static AxisCarController axisCarController
+		{
 			get
 			{
 				if (_axisController != null) return _axisController;
@@ -68,7 +72,8 @@ namespace MscModApi.Caching
 			}
 		}
 
-		public static Drivetrain drivetrain {
+		public static Drivetrain drivetrain
+		{
 			get
 			{
 				if (_drivetrain != null) return _drivetrain;
@@ -78,7 +83,8 @@ namespace MscModApi.Caching
 			}
 		}
 
-		public static GameObject satsuma {
+		public static GameObject satsuma
+		{
 			get
 			{
 				if (_satsuma != null) return _satsuma;
@@ -86,6 +92,18 @@ namespace MscModApi.Caching
 
 				return _satsuma;
 			}
+		}
+
+		public static void LoadCleanup()
+		{
+			_satsuma = null;
+			_satsuma = null;
+			_drivetrain = null;
+			_axisController = null;
+			_carController = null;
+			_electricsOk = null;
+			_electricity = null;
+			_playerCurrentVehicle = null;
 		}
 	}
 }

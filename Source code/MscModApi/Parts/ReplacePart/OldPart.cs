@@ -8,18 +8,19 @@ using UnityEngine;
 
 namespace MscModApi.Parts.ReplacePart
 {
-	public class OldPart
+	public class OldPart : BasicPart
 	{
-		private PlayMakerFSM fsm;
-		private GameObject gameObject;
-		private GameObject trigger;
-		private FsmBool installed;
-		private FsmBool bolted;
-		private PlayMakerFSM assembleFsm;
-		private PlayMakerFSM removalFsm;
-		private GameObject oldFsmGameObject;
-		private bool allowSettingFakedStatus;
-		internal bool justUninstalled = false;
+		protected PlayMakerFSM fsm;
+		protected GameObject gameObject;
+		protected GameObject trigger;
+		protected FsmBool installedFsm;
+		protected FsmBool boltedFsm;
+		protected FsmBool purchased;
+		protected PlayMakerFSM assembleFsm;
+		protected PlayMakerFSM removalFsm;
+		protected GameObject oldFsmGameObject;
+		protected bool allowSettingFakedStatus;
+		protected bool justUninstalled = false;
 
 		public OldPart(GameObject oldFsmGameObject, bool allowSettingFakedStatus = true)
 		{
@@ -28,59 +29,65 @@ namespace MscModApi.Parts.ReplacePart
 			fsm = oldFsmGameObject.FindFsm("Data");
 			gameObject = fsm.FsmVariables.FindFsmGameObject("ThisPart").Value;
 			trigger = fsm.FsmVariables.FindFsmGameObject("Trigger").Value;
-			installed = fsm.FsmVariables.FindFsmBool("Installed");
-			bolted = fsm.FsmVariables.FindFsmBool("Bolted");
-
+			installedFsm = fsm.FsmVariables.FindFsmBool("Installed");
+			boltedFsm = fsm.FsmVariables.FindFsmBool("Bolted");
+			purchased = fsm.FsmVariables.FindFsmBool("Purchased");
 			assembleFsm = GetFsmByName(trigger, "Assembly");
 			removalFsm = GetFsmByName(gameObject, "Removal");
 
-			if (!assembleFsm.Fsm.Initialized)
-			{
+			if (!assembleFsm.Fsm.Initialized) {
 				assembleFsm.InitializeFSM();
 			}
 
-			if (!removalFsm.Fsm.Initialized)
-			{
+			if (!removalFsm.Fsm.Initialized) {
 				removalFsm.InitializeFSM();
 			}
 		}
 
-		private static PlayMakerFSM GetFsmByName(GameObject gameObject, string fsmName)
+		/// <inheritdoc />
+		public override bool isHolding => gameObject.IsHolding();
+
+		/// <inheritdoc />
+		public override bool isLookingAt => gameObject.IsLookingAt();
+
+		/// <inheritdoc />
+		public override string name => gameObject.name;
+
+		public bool installBlocked
 		{
-			return gameObject.GetComponents<PlayMakerFSM>().FirstOrDefault(comp => comp.FsmName == fsmName);
+			get => !assembleFsm.enabled;
+			set => assembleFsm.enabled = !value;
 		}
 
-		public bool IsInstallBlocked()
+		public override bool installed
 		{
-			return !assembleFsm.enabled;
-		}
-
-		public void BlockInstall(bool blocked)
-		{
-			assembleFsm.enabled = !blocked;
-		}
-
-		public bool IsInstalled()
-		{
-			if (justUninstalled)
+			get
 			{
-				justUninstalled = false;
-				return false;
+				if (justUninstalled) {
+					justUninstalled = false;
+					return false;
+				}
+
+				return installedFsm.Value;
+			}
+		}
+
+		public void Install(bool install)
+		{
+			if (!allowSettingFakedStatus) {
+				return;
 			}
 
-			return installed.Value;
+			installedFsm.Value = install;
+			boltedFsm.Value = install;
 		}
 
-		public bool IsFixed() => IsInstalled() && bolted.Value;
+		public override bool bolted => boltedFsm.Value;
+
+		[Obsolete("Use 'bolted' property instead", true)]
+		public bool IsFixed() => bolted;
 
 		public void Uninstall() => removalFsm.SendEvent("REMOVE");
-
-		internal void SetFakedInstallStatus(bool status)
-		{
-			if (!allowSettingFakedStatus) return;
-			installed.Value = status;
-			bolted.Value = status;
-		}
 
 		internal void Setup(ReplacePart.ReplacementPart replacementPart)
 		{
@@ -99,6 +106,64 @@ namespace MscModApi.Parts.ReplacePart
 				justUninstalled = true;
 				uninstallAction.Invoke();
 			});
+		}
+
+		public override bool bought
+		{
+			get => purchased != null && purchased.Value;
+			set => throw new NotImplementedException();
+		}
+
+		public override Vector3 position
+		{
+			get => gameObject.transform.position;
+			set => gameObject.transform.position = value;
+		}
+
+		public override Vector3 rotation
+		{
+			get => gameObject.transform.rotation.eulerAngles;
+			set => gameObject.transform.rotation = Quaternion.Euler(value);
+		}
+
+		public override bool active
+		{
+			get => gameObject.activeSelf;
+			set => gameObject.SetActive(value);
+		}
+
+		private static PlayMakerFSM GetFsmByName(GameObject gameObject, string fsmName)
+		{
+			return gameObject.GetComponents<PlayMakerFSM>().FirstOrDefault(comp => comp.FsmName == fsmName);
+		}
+
+		public override void ResetToDefault(bool uninstall = false)
+		{
+			//Don't implement
+		}
+
+		[Obsolete("Use 'Install' method instead", true)]
+		internal void SetFakedInstallStatus(bool status)
+		{
+			Install(status);
+		}
+
+		[Obsolete("Use 'installBlocked' property instead", true)]
+		public bool IsInstallBlocked()
+		{
+			return installBlocked;
+		}
+
+		[Obsolete("Use 'installBlocked' property instead", true)]
+		public void BlockInstall(bool blocked)
+		{
+			installBlocked = blocked;
+		}
+
+		[Obsolete("Use 'installed' property instead", true)]
+		public bool IsInstalled()
+		{
+			return installed;
 		}
 	}
 }

@@ -34,8 +34,7 @@ namespace MscModApi.Parts
 		internal GameObject gameObject;
 		private MeshRenderer renderer;
 
-		[JsonProperty]
-		internal int tightness;
+		[JsonProperty] internal int tightness;
 
 		internal bool showSize;
 		private Collider collider;
@@ -46,7 +45,7 @@ namespace MscModApi.Parts
 		internal static GameObject screwModel;
 		internal static GameObject normalModel;
 		internal static GameObject longModel;
-		private static readonly int Color1 = Shader.PropertyToID("_Color");
+		private static int color1;
 		internal static AudioClip soundClip;
 
 		public Screw(Vector3 position, Vector3 rotation, Type type = Type.Normal, float scale = 1, float size = 10,
@@ -138,7 +137,7 @@ namespace MscModApi.Parts
 
 		public void In(bool useAudio = true)
 		{
-			if (tightness >= maxTightness || !part.IsInstalled()) return;
+			if (tightness >= maxTightness || !part.installed) return;
 
 			if (useAudio) {
 				AudioSource.PlayClipAtPoint(soundClip, gameObject.transform.position);
@@ -146,20 +145,32 @@ namespace MscModApi.Parts
 
 			gameObject.transform.Rotate(0, 0, rotationStep);
 			gameObject.transform.Translate(0f, 0f, -transformStep);
+
+			bool changingToFixedState = false;
+			if (tightness + 1 == maxTightness) {
+				int screwCount = part.screws.Count;
+				int totalTightness = 0;
+				part.screws.ForEach((Screw screw) => { totalTightness += screw.tightness; });
+
+				if (totalTightness + 1 == screwCount * maxTightness) {
+					changingToFixedState = true;
+				}
+			}
+
+			if (changingToFixedState) {
+				part.GetEvents(EventTime.Pre, EventType.Bolted).InvokeAll();
+			}
+
 			tightness++;
 
-			if (tightness == maxTightness) {
-				if (part.partSave.screws.All(screw => screw.tightness == maxTightness) && !part.IsFixed()) {
-					part.preFixedActions.InvokeAll();
-					part.SetFixed(true);
-					part.postFixedActions.InvokeAll();
-				}
+			if (changingToFixedState) {
+				part.GetEvents(EventTime.Post, EventType.Bolted).InvokeAll();
 			}
 		}
 
 		public void Out(bool useAudio = true)
 		{
-			if (!part.IsInstalled() || tightness == 0) return;
+			if (!part.installed || tightness == 0) return;
 
 			if (useAudio) {
 				AudioSource.PlayClipAtPoint(soundClip, gameObject.transform.position);
@@ -167,13 +178,17 @@ namespace MscModApi.Parts
 
 			gameObject.transform.Rotate(0, 0, -rotationStep);
 			gameObject.transform.Translate(0f, 0f, transformStep);
+
+			bool changingToUnfixed = part.bolted;
+
+			if (changingToUnfixed) {
+				part.GetEvents(EventTime.Pre, EventType.Unbolted).InvokeAll();
+			}
+
 			tightness--;
 
-			if (tightness < maxTightness)
-			{
-				part.preUnfixedActions.InvokeAll();
-				part.SetFixed(false);
-				part.postUnfixedActions.InvokeAll();
+			if (changingToUnfixed) {
+				part.GetEvents(EventTime.Post, EventType.Unbolted).InvokeAll();
 			}
 		}
 
@@ -203,8 +218,9 @@ namespace MscModApi.Parts
 		{
 			if (highlight) {
 				renderer.material.shader = textShader;
-				renderer.material.SetColor(Color1, Color.green);
-			} else {
+				renderer.material.SetColor(color1, Color.green);
+			}
+			else {
 				renderer.material = material;
 			}
 		}
@@ -217,6 +233,18 @@ namespace MscModApi.Parts
 			screwModel = assetBundle.LoadAsset<GameObject>("screw.prefab");
 			normalModel = assetBundle.LoadAsset<GameObject>("screw_normal.prefab");
 			longModel = assetBundle.LoadAsset<GameObject>("screw_long.prefab");
+		}
+
+		public static void LoadCleanup()
+		{
+			material = null;
+			textShader = null;
+			nutModel = null;
+			screwModel = null;
+			normalModel = null;
+			longModel = null;
+			color1 = Shader.PropertyToID("_Color");
+			soundClip = null;
 		}
 	}
 }
