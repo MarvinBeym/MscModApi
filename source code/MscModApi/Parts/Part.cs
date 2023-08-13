@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using HutongGames.PlayMaker;
+using MscModApi.Caching;
 using UnityEngine;
 
 namespace MscModApi.Parts
@@ -12,38 +13,9 @@ namespace MscModApi.Parts
 	public class Part : BasicPart, SupportsPartEvents
 	{
 		protected static GameObject clampModel;
-
 		protected int clampsAdded;
-
-		public List<Part> childParts { get; protected set; } = new List<Part>();
-
-		public string id { get; protected set; }
-
-		public PartBaseInfo partBaseInfo { get; protected set; }
-
-		public GameObject gameObject { get; protected set; }
 		internal PartSave partSave;
-
-		public Vector3 installPosition { get; protected set; }
-		public Vector3 installRotation { get; protected set; }
-
-		public bool uninstallWhenParentUninstalls { get; protected set; }
-
-		public GameObject parentGameObject { get; protected set; }
-		public Part parentPart { get; protected set; }
-		protected List<Screw> savedScrews;
-
-		public Collider collider { get; protected set; }
-
-		public TriggerWrapper trigger { get; protected set; }
-
-		public Transform transform => gameObject.transform;
-
-		public GameObject gameObjectUsedForInstantiation { get; protected set; }
-		public bool usingPartParent => parentPart != null;
-
 		protected Dictionary<Screw, int> preScrewPlacementModeEnableTightnessMap = new Dictionary<Screw, int>();
-
 		private bool _screwPlacementMode;
 		protected bool injectedScrewPlacementDisablePreUninstall = false;
 		private FsmBool parentGameObjectBolted = new FsmBool("Bolted");
@@ -53,58 +25,6 @@ namespace MscModApi.Parts
 		/// </summary>
 		protected Dictionary<EventTime, Dictionary<EventType, List<Action>>> events =
 			new Dictionary<EventTime, Dictionary<EventType, List<Action>>>();
-
-		public bool screwPlacementMode
-		{
-			get => _screwPlacementMode;
-			set
-			{
-				if (!installed) {
-					return;
-				}
-
-				if (!injectedScrewPlacementDisablePreUninstall) {
-					injectedScrewPlacementDisablePreUninstall = true;
-					AddEventListener(EventTime.Pre, EventType.Uninstall, () => { this.screwPlacementMode = false; });
-				}
-
-				foreach (Screw screw in screws) {
-					if (!value) {
-						if (!preScrewPlacementModeEnableTightnessMap.TryGetValue(screw, out int preEnableTightness)) {
-							continue;
-						}
-
-						screw.tightness = Screw.maxTightness;
-						screw.OutBy(Screw.maxTightness);
-						screw.InBy(preEnableTightness);
-						preScrewPlacementModeEnableTightnessMap.Remove(screw);
-						continue;
-					}
-
-					if (preScrewPlacementModeEnableTightnessMap.ContainsKey(screw)) {
-						continue;
-					}
-
-					preScrewPlacementModeEnableTightnessMap.Add(screw, screw.tightness);
-					screw.InBy(Screw.maxTightness);
-					screw.tightness = 0;
-				}
-
-				if (!value && ScrewPlacementAssist.selectedPart == this) {
-					ScrewPlacementAssist.HidePartInteraction();
-				}
-
-				_screwPlacementMode = value;
-			}
-		}
-
-		public bool hasParent => trigger != null;
-
-		public bool installBlocked { get; set; }
-
-		public List<Screw> screws => partSave.screws;
-
-		public override bool installed => partSave.installed;
 
 		/// <inheritdoc />
 		protected Part()
@@ -150,6 +70,182 @@ namespace MscModApi.Parts
 			parentPart.childParts.Add(this);
 		}
 
+		public List<Part> childParts { get; protected set; } = new List<Part>();
+
+		public string id { get; protected set; }
+
+		public PartBaseInfo partBaseInfo { get; protected set; }
+
+		public GameObject gameObject { get; protected set; }
+
+		public Vector3 installPosition { get; protected set; }
+		
+		public Vector3 installRotation { get; protected set; }
+
+		public bool uninstallWhenParentUninstalls { get; protected set; }
+
+		public GameObject parentGameObject { get; protected set; }
+		
+		public Part parentPart { get; protected set; }
+		
+		protected List<Screw> savedScrews;
+
+		public Collider collider { get; protected set; }
+
+		public TriggerWrapper trigger { get; protected set; }
+
+		public Transform transform => gameObject.transform;
+
+		public GameObject gameObjectUsedForInstantiation { get; protected set; }
+		
+		public bool usingPartParent => parentPart != null;
+		
+		public bool hasParent => trigger != null;
+
+		public bool installBlocked { get; set; }
+
+		public List<Screw> screws => partSave.screws;
+
+		public override bool installed => partSave.installed;
+
+		public bool screwPlacementMode
+		{
+			get => _screwPlacementMode;
+			set
+			{
+				if (!installed)
+				{
+					return;
+				}
+
+				if (!injectedScrewPlacementDisablePreUninstall)
+				{
+					injectedScrewPlacementDisablePreUninstall = true;
+					AddEventListener(EventTime.Pre, EventType.Uninstall, () => { this.screwPlacementMode = false; });
+				}
+
+				foreach (Screw screw in screws)
+				{
+					if (!value)
+					{
+						if (!preScrewPlacementModeEnableTightnessMap.TryGetValue(screw, out int preEnableTightness))
+						{
+							continue;
+						}
+
+						screw.tightness = Screw.maxTightness;
+						screw.OutBy(Screw.maxTightness);
+						screw.InBy(preEnableTightness);
+						preScrewPlacementModeEnableTightnessMap.Remove(screw);
+						continue;
+					}
+
+					if (preScrewPlacementModeEnableTightnessMap.ContainsKey(screw))
+					{
+						continue;
+					}
+
+					preScrewPlacementModeEnableTightnessMap.Add(screw, screw.tightness);
+					screw.InBy(Screw.maxTightness);
+					screw.tightness = 0;
+				}
+
+				if (!value && ScrewPlacementAssist.selectedPart == this)
+				{
+					ScrewPlacementAssist.HidePartInteraction();
+				}
+
+				_screwPlacementMode = value;
+			}
+		}
+
+		/// <inheritdoc />
+		public override string name => gameObject.name;
+
+		/// <inheritdoc />
+		public override bool isLookingAt => gameObject.IsLookingAt();
+
+		/// <inheritdoc />
+		public override bool isHolding => gameObject.IsHolding();
+
+		public bool installPossible => !installBlocked && bought && trigger != null;
+
+
+		public bool parentInstalled
+		{
+			get
+			{
+				if (usingPartParent)
+				{
+					return parentPart.installed;
+				}
+				else
+				{
+					return parentGameObject.transform.parent != null;
+				}
+			}
+		}
+
+		public bool parentBolted
+		{
+			get
+			{
+				if (usingPartParent)
+				{
+					return parentPart.bolted;
+				}
+				else
+				{
+					return parentGameObjectBolted.Value;
+				}
+			}
+		}
+
+		/// <inheritdoc />
+		public override bool bought
+		{
+			get => partSave.bought == PartSave.BoughtState.Yes || partSave.bought == PartSave.BoughtState.NotConfigured;
+			set => partSave.bought = value ? PartSave.BoughtState.Yes : PartSave.BoughtState.No;
+		}
+
+		/// <inheritdoc />
+		public override Vector3 position
+		{
+			get => gameObject.transform.position;
+			set
+			{
+				if (!installed)
+				{
+					gameObject.transform.position = value;
+				}
+			}
+		}
+
+		/// <inheritdoc />
+		public override Vector3 rotation
+		{
+			get => gameObject.transform.rotation.eulerAngles;
+			set
+			{
+				if (!installed)
+				{
+					gameObject.transform.rotation = Quaternion.Euler(value);
+				}
+			}
+		}
+
+		/// <inheritdoc />
+		public override bool active
+		{
+			get => gameObject.activeSelf;
+			set => gameObject.SetActive(value);
+		}
+
+		public override bool bolted
+		{
+			get { return screws.Count > 0 && screws.All(screw => screw.tightness == Screw.maxTightness) && installed; }
+		}
+        
 		protected void Setup(string id, string name, GameObject parentGameObject, Vector3 installPosition,
 			Vector3 installRotation, PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls,
 			bool disableCollisionWhenInstalled, string prefabName)
@@ -249,94 +345,11 @@ namespace MscModApi.Parts
 			}
 		}
 
-		/// <inheritdoc />
-		public override string name => gameObject.name;
-
-		/// <inheritdoc />
-		public override bool isLookingAt => gameObject.IsLookingAt();
-
-
-		/// <inheritdoc />
-		public override bool isHolding => gameObject.IsHolding();
-
-		public bool installPossible => !installBlocked && bought && trigger != null;
-
-
-		public bool parentInstalled
-		{
-			get
-			{
-				if (usingPartParent) {
-					return parentPart.installed;
-				}
-				else {
-					return parentGameObject.transform.parent != null;
-				}
-			}
-		}
-
-		public bool parentBolted
-		{
-			get
-			{
-				if (usingPartParent) {
-					return parentPart.bolted;
-				}
-				else {
-					return parentGameObjectBolted.Value;
-				}
-			}
-		}
-
-		/// <inheritdoc />
-		public override bool bought
-		{
-			get => partSave.bought == PartSave.BoughtState.Yes || partSave.bought == PartSave.BoughtState.NotConfigured;
-			set => partSave.bought = value ? PartSave.BoughtState.Yes : PartSave.BoughtState.No;
-		}
-
-		/// <inheritdoc />
-		public override Vector3 position
-		{
-			get => gameObject.transform.position;
-			set
-			{
-				if (!installed) {
-					gameObject.transform.position = value;
-				}
-			}
-		}
-
-		/// <inheritdoc />
-		public override Vector3 rotation
-		{
-			get => gameObject.transform.rotation.eulerAngles;
-			set
-			{
-				if (!installed) {
-					gameObject.transform.rotation = Quaternion.Euler(value);
-				}
-			}
-		}
-
-		/// <inheritdoc />
-		public override bool active
-		{
-			get => gameObject.activeSelf;
-			set => gameObject.SetActive(value);
-		}
-
 		internal void ResetScrews()
 		{
 			foreach (var screw in partSave.screws) {
 				screw.OutBy(screw.tightness);
 			}
-		}
-
-		[Obsolete("Use 'screws' property instead", true)]
-		public List<Screw> GetScrews()
-		{
-			return screws;
 		}
 
 		internal void SetScrewsActive(bool active)
@@ -349,50 +362,9 @@ namespace MscModApi.Parts
 			trigger?.Install();
 		}
 
-		[Obsolete("Use 'installed' property instead", true)]
-		public bool IsInstalled()
-		{
-			return installed;
-		}
-
-		[Obsolete("Use 'bolted' property instead", true)]
-		public bool IsFixed(bool ignoreUnsetScrews = true)
-		{
-			return bolted;
-		}
-
-		public override bool bolted
-		{
-			get { return screws.Count > 0 && screws.All(screw => screw.tightness == Screw.maxTightness) && installed; }
-		}
-
 		public void Uninstall()
 		{
 			trigger?.Uninstall();
-		}
-
-		public void AddClampModel(Vector3 position, Vector3 rotation, Vector3 scale)
-		{
-			var clamp = GameObject.Instantiate(clampModel);
-			clamp.name = $"{gameObject.name}_clamp_{clampsAdded}";
-			clampsAdded++;
-			clamp.transform.SetParent(gameObject.transform);
-			clamp.transform.localPosition = position;
-			clamp.transform.localScale = scale;
-			clamp.transform.localRotation = new Quaternion { eulerAngles = rotation };
-		}
-
-
-		[Obsolete("Use 'parentInstalled' property instead", true)]
-		internal bool ParentInstalled()
-		{
-			return parentInstalled;
-		}
-
-		[Obsolete("Use 'parentBolted' property instead", true)]
-		public bool ParentFixed()
-		{
-			return parentBolted;
 		}
 
 		private void LoadPartPositionAndRotation(GameObject gameObject, PartSave partSave)
@@ -428,17 +400,157 @@ namespace MscModApi.Parts
 
 		public void AddScrews(Screw[] screws, float overrideScale = 0f, float overrideSize = 0f)
 		{
-			foreach (var screw in screws) {
-				if (overrideScale != 0f) {
+			foreach (var screw in screws)
+			{
+				if (overrideScale != 0f)
+				{
 					screw.scale = overrideScale;
 				}
 
-				if (overrideSize != 0f) {
+				if (overrideSize != 0f)
+				{
 					screw.size = overrideSize;
 				}
 
 				AddScrew(screw);
 			}
+		}
+		public T AddWhenInstalledBehaviour<T>() where T : Behaviour
+		{
+			var behaviour = AddComponent<T>();
+			behaviour.enabled = installed;
+
+
+			AddEventListener(EventTime.Post, EventType.Install, delegate { behaviour.enabled = true; });
+
+			AddEventListener(EventTime.Post, EventType.Uninstall, delegate { behaviour.enabled = false; });
+			return behaviour;
+		}
+
+		public T AddWhenUninstalledBehaviour<T>() where T : Behaviour
+		{
+			var behaviour = AddComponent<T>();
+			behaviour.enabled = !installed;
+
+			AddEventListener(EventTime.Post, EventType.Install, delegate { behaviour.enabled = false; });
+
+			AddEventListener(EventTime.Post, EventType.Uninstall, delegate { behaviour.enabled = true; });
+			return behaviour;
+		}
+
+		public void AddEventListener(EventTime eventTime, EventType eventType, Action action)
+		{
+			events[eventTime][eventType].Add(action);
+
+			if (eventTime == EventTime.Post)
+			{
+				switch (eventType)
+				{
+					//ToDo: check if invoking just the newly added action is enough of if all have to be invoked
+					case EventType.Install:
+						if (installed)
+						{
+							action.Invoke();
+						}
+
+						break;
+					case EventType.Uninstall:
+						if (!installed)
+						{
+							action.Invoke();
+						}
+
+						break;
+					case EventType.Bolted:
+						if (bolted)
+						{
+							action.Invoke();
+						}
+
+						break;
+					case EventType.Unbolted:
+						if (!bolted)
+						{
+							action.Invoke();
+						}
+						break;
+					case EventType.InstallOnCar:
+						if (installedOnCar)
+						{
+							action.Invoke();
+						}
+						break;
+					case EventType.UninstallFromCar:
+						if (!installedOnCar)
+						{
+							action.Invoke();
+						}
+						break;
+				}
+			}
+		}
+
+		public List<Action> GetEvents(EventTime eventTime, EventType eventType)
+		{
+			return events[eventTime][eventType];
+		}
+
+		public T AddComponent<T>() where T : Component => gameObject.AddComponent(typeof(T)) as T;
+
+		public T GetComponent<T>() => gameObject.GetComponent<T>();
+
+		/// <inheritdoc />
+		public override void ResetToDefault(bool uninstall = false)
+		{
+			if (uninstall && installed)
+			{
+				Uninstall();
+			}
+
+			position = defaultPosition;
+			rotation = defaultRotation;
+		}
+
+		public void AddClampModel(Vector3 position, Vector3 rotation, Vector3 scale)
+		{
+			var clamp = GameObject.Instantiate(clampModel);
+			clamp.name = $"{gameObject.name}_clamp_{clampsAdded}";
+			clampsAdded++;
+			clamp.transform.SetParent(gameObject.transform);
+			clamp.transform.localPosition = position;
+			clamp.transform.localScale = scale;
+			clamp.transform.localRotation = new Quaternion { eulerAngles = rotation };
+		}
+
+		[Obsolete("Use 'screws' property instead", true)]
+		public List<Screw> GetScrews()
+		{
+			return screws;
+		}
+
+
+		[Obsolete("Use 'installed' property instead", true)]
+		public bool IsInstalled()
+		{
+			return installed;
+		}
+
+		[Obsolete("Use 'bolted' property instead", true)]
+		public bool IsFixed(bool ignoreUnsetScrews = true)
+		{
+			return bolted;
+		}
+
+		[Obsolete("Use 'parentInstalled' property instead", true)]
+		internal bool ParentInstalled()
+		{
+			return parentInstalled;
+		}
+
+		[Obsolete("Use 'parentBolted' property instead", true)]
+		public bool ParentFixed()
+		{
+			return parentBolted;
 		}
 
 		[Obsolete("Use cleaner 'AddEventListener' method instead", true)]
@@ -505,84 +617,6 @@ namespace MscModApi.Parts
 		public T AddWhenUninstalledMono<T>() where T : MonoBehaviour
 		{
 			return AddWhenUninstalledBehaviour<T>();
-		}
-
-		public T AddWhenInstalledBehaviour<T>() where T : Behaviour
-		{
-			var behaviour = AddComponent<T>();
-			behaviour.enabled = installed;
-
-
-			AddEventListener(EventTime.Post, EventType.Install, delegate { behaviour.enabled = true; });
-
-			AddEventListener(EventTime.Post, EventType.Uninstall, delegate { behaviour.enabled = false; });
-			return behaviour;
-		}
-
-		public T AddWhenUninstalledBehaviour<T>() where T : Behaviour
-		{
-			var behaviour = AddComponent<T>();
-			behaviour.enabled = !installed;
-
-			AddEventListener(EventTime.Post, EventType.Install, delegate { behaviour.enabled = false; });
-
-			AddEventListener(EventTime.Post, EventType.Uninstall, delegate { behaviour.enabled = true; });
-			return behaviour;
-		}
-
-		public void AddEventListener(EventTime eventTime, EventType eventType, Action action)
-		{
-			events[eventTime][eventType].Add(action);
-
-			if (eventTime == EventTime.Post) {
-				switch (eventType) {
-					//ToDo: check if invoking just the newly added action is enough of if all have to be invoked
-					case EventType.Install:
-						if (installed) {
-							action.Invoke();
-						}
-
-						break;
-					case EventType.Uninstall:
-						if (!installed) {
-							action.Invoke();
-						}
-
-						break;
-					case EventType.Bolted:
-						if (bolted) {
-							action.Invoke();
-						}
-
-						break;
-					case EventType.Unbolted:
-						if (!bolted) {
-							action.Invoke();
-						}
-
-						break;
-				}
-			}
-		}
-
-		public List<Action> GetEvents(EventTime eventTime, EventType eventType)
-		{
-			return events[eventTime][eventType];
-		}
-
-		public T AddComponent<T>() where T : Component => gameObject.AddComponent(typeof(T)) as T;
-
-		public T GetComponent<T>() => gameObject.GetComponent<T>();
-
-		/// <inheritdoc />
-		public override void ResetToDefault(bool uninstall = false)
-		{
-			if (uninstall && installed) {
-				Uninstall();
-			}
-
-			position = defaultPosition;
-			rotation = defaultRotation;
 		}
 
 		[Obsolete("Use 'installBlocked' property instead", true)]
