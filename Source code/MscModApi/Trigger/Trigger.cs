@@ -100,6 +100,14 @@ namespace MscModApi.Trigger
 			if (part.installedOnCar)
 			{
 				part.GetEvents(EventTime.Post, EventType.InstallOnCar).InvokeAll();
+
+				foreach (Part childPart in part.childParts)
+				{
+					if (childPart.installedOnCar)
+					{
+						childPart.GetEvents(EventTime.Post, EventType.InstallOnCar).InvokeAll();
+					}
+				}
 			}
 		}
 
@@ -123,6 +131,14 @@ namespace MscModApi.Trigger
 			{
 				//Probably called always because installedOnCar is likely already false at this point (can't be still installed on car)
 				part.GetEvents(EventTime.Post, EventType.UninstallFromCar).InvokeAll();
+
+				foreach (Part childPart in part.childParts)
+				{
+					if (!childPart.installedOnCar)
+					{
+						childPart.GetEvents(EventTime.Post, EventType.UninstallFromCar).InvokeAll();
+					}
+				}
 			}
 		}
 
