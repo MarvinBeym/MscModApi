@@ -206,6 +206,10 @@ namespace MscModApi.Parts.ReplacePart
 				}
 
 				GetEvents(EventTime.Pre, EventType.Unbolted).InvokeAll();
+				if (installedOnCar)
+				{
+					GetEvents(EventTime.Pre, EventType.UnboltedOnCar).InvokeAll();
+				}
 			});
 			AddActionAsLast(boltCheckFsm.FindState("Bolts OFF"), () =>
 			{
@@ -217,6 +221,10 @@ namespace MscModApi.Parts.ReplacePart
 				}
 
 				GetEvents(EventTime.Post, EventType.Unbolted).InvokeAll();
+				if (installedOnCar)
+				{
+					GetEvents(EventTime.Post, EventType.UnboltedOnCar).InvokeAll();
+				}
 			});
 
 
@@ -229,6 +237,10 @@ namespace MscModApi.Parts.ReplacePart
 				}
 
 				GetEvents(EventTime.Pre, EventType.Bolted).InvokeAll();
+				if (installedOnCar)
+				{
+					GetEvents(EventTime.Pre, EventType.BoltedOnCar).InvokeAll();
+				}
 			});
 			AddActionAsLast(boltCheckFsm.FindState("Bolts ON"), () =>
 			{
@@ -240,6 +252,10 @@ namespace MscModApi.Parts.ReplacePart
 				}
 
 				GetEvents(EventTime.Post, EventType.Bolted).InvokeAll();
+				if (installedOnCar)
+				{
+					GetEvents(EventTime.Post, EventType.BoltedOnCar).InvokeAll();
+				}
 			});
 		}
 
@@ -472,6 +488,10 @@ namespace MscModApi.Parts.ReplacePart
 
 					alreadyCalledPreUnbolted = true;
 					GetEvents(EventTime.Pre, EventType.Unbolted).InvokeAll();
+					if (installedOnCar)
+					{
+						GetEvents(EventTime.Pre, EventType.UnboltedOnCar).InvokeAll();
+					}
 					break;
 				case EventTime.Post:
 					if (alreadyCalledPostUnbolted) {
@@ -480,6 +500,10 @@ namespace MscModApi.Parts.ReplacePart
 
 					alreadyCalledPostUnbolted = true;
 					GetEvents(EventTime.Post, EventType.Unbolted).InvokeAll();
+					if (installedOnCar)
+					{
+						GetEvents(EventTime.Post, EventType.UnboltedOnCar).InvokeAll();
+					}
 					break;
 			}
 		}
@@ -506,6 +530,10 @@ namespace MscModApi.Parts.ReplacePart
 
 					alreadyCalledPreBolted = true;
 					GetEvents(EventTime.Pre, EventType.Bolted).InvokeAll();
+					if (installedOnCar)
+					{
+						GetEvents(EventTime.Pre, EventType.BoltedOnCar).InvokeAll();
+					}
 					break;
 				case EventTime.Post:
 					if (alreadyCalledPostBolted) {
@@ -514,6 +542,10 @@ namespace MscModApi.Parts.ReplacePart
 
 					alreadyCalledPostBolted = true;
 					GetEvents(EventTime.Post, EventType.Bolted).InvokeAll();
+					if (installedOnCar)
+					{
+						GetEvents(EventTime.Post, EventType.BoltedOnCar).InvokeAll();
+					}
 					break;
 			}
 		}
@@ -577,6 +609,18 @@ namespace MscModApi.Parts.ReplacePart
 						break;
 					case EventType.UninstallFromCar:
 						if (!installedOnCar)
+						{
+							action.Invoke();
+						}
+						break;
+					case EventType.BoltedOnCar:
+						if (bolted && installedOnCar)
+						{
+							action.Invoke();
+						}
+						break;
+					case EventType.UnboltedOnCar:
+						if (!bolted && installedOnCar)
 						{
 							action.Invoke();
 						}

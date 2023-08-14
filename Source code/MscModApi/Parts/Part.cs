@@ -246,7 +246,7 @@ namespace MscModApi.Parts
 			get { return screws.Count > 0 && screws.All(screw => screw.tightness == Screw.maxTightness) && installed; }
 		}
 
-		public override bool installedOnCar => gameObject.transform.root == CarH.satsuma.transform;
+		public override bool installedOnCar => installed && gameObject.transform.root == CarH.satsuma.transform;
 
 		protected void Setup(string id, string name, GameObject parentGameObject, Vector3 installPosition,
 			Vector3 installRotation, PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls,
@@ -454,6 +454,16 @@ namespace MscModApi.Parts
 					AddEventListener(EventTime.Post, eventType, () => behaviour.enabled = true);
 					AddEventListener(EventTime.Post, EventType.Bolted, () => behaviour.enabled = false);
 					break;
+				case EventType.BoltedOnCar:
+					behaviour.enabled = bolted && installedOnCar;
+					AddEventListener(EventTime.Post, eventType, () => behaviour.enabled = true);
+					AddEventListener(EventTime.Post, EventType.UnboltedOnCar, () => behaviour.enabled = false);
+					break;
+				case EventType.UnboltedOnCar:
+					behaviour.enabled = !bolted && installedOnCar;
+					AddEventListener(EventTime.Post, eventType, () => behaviour.enabled = true);
+					AddEventListener(EventTime.Post, EventType.BoltedOnCar, () => behaviour.enabled = false);
+					break;
 			}
 
 			return behaviour;
@@ -511,6 +521,18 @@ namespace MscModApi.Parts
 						break;
 					case EventType.UninstallFromCar:
 						if (!installedOnCar)
+						{
+							action.Invoke();
+						}
+						break;
+					case EventType.BoltedOnCar:
+						if (bolted && installedOnCar)
+						{
+							action.Invoke();
+						}
+						break;
+					case EventType.UnboltedOnCar:
+						if (!bolted && installedOnCar)
 						{
 							action.Invoke();
 						}

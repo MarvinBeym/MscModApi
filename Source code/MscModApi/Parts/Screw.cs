@@ -159,12 +159,36 @@ namespace MscModApi.Parts
 
 			if (changingToFixedState) {
 				part.GetEvents(EventTime.Pre, EventType.Bolted).InvokeAll();
+				if (part.installedOnCar)
+				{
+					part.GetEvents(EventTime.Pre, EventType.BoltedOnCar).InvokeAll();
+
+					foreach (Part childPart in part.childParts)
+					{
+						if (childPart.bolted && childPart.installedOnCar)
+						{
+							childPart.GetEvents(EventTime.Pre, EventType.BoltedOnCar).InvokeAll();
+						}
+					}
+				}
 			}
 
 			tightness++;
 
 			if (changingToFixedState) {
 				part.GetEvents(EventTime.Post, EventType.Bolted).InvokeAll();
+				if (part.installedOnCar)
+				{
+					part.GetEvents(EventTime.Post, EventType.BoltedOnCar).InvokeAll();
+
+					foreach (Part childPart in part.childParts)
+					{
+						if (childPart.bolted && childPart.installedOnCar)
+						{
+							childPart.GetEvents(EventTime.Post, EventType.BoltedOnCar).InvokeAll();
+						}
+					}
+				}
 			}
 		}
 
@@ -183,12 +207,36 @@ namespace MscModApi.Parts
 
 			if (changingToUnfixed) {
 				part.GetEvents(EventTime.Pre, EventType.Unbolted).InvokeAll();
+				if (part.installedOnCar)
+				{
+					part.GetEvents(EventTime.Pre, EventType.UnboltedOnCar).InvokeAll();
+
+					foreach (Part childPart in part.childParts)
+					{
+						if (!childPart.bolted && childPart.installedOnCar)
+						{
+							childPart.GetEvents(EventTime.Pre, EventType.UnboltedOnCar).InvokeAll();
+						}
+					}
+				}
 			}
 
 			tightness--;
 
 			if (changingToUnfixed) {
 				part.GetEvents(EventTime.Post, EventType.Unbolted).InvokeAll();
+				if (part.installedOnCar)
+				{
+					part.GetEvents(EventTime.Post, EventType.UnboltedOnCar).InvokeAll();
+
+					foreach (Part childPart in part.childParts)
+					{
+						if (!childPart.bolted && childPart.installedOnCar)
+						{
+							childPart.GetEvents(EventTime.Post, EventType.UnboltedOnCar).InvokeAll();
+						}
+					}
+				}
 			}
 		}
 
