@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace MscModApi.Parts
@@ -8,6 +9,8 @@ namespace MscModApi.Parts
 	/// </summary>
 	public abstract class BasicPart
 	{
+		protected List<BasicPart> childParts = new List<BasicPart>();
+
 		public abstract GameObject gameObject { get; protected set; }
 
 		/// <summary>
@@ -19,6 +22,8 @@ namespace MscModApi.Parts
 		/// The default rotation, used for example when resetting.
 		/// </summary>
 		public Vector3 defaultRotation { get; set; } = Vector3.zero;
+
+		public bool uninstallWhenParentUninstalls { get; protected set; }
 
 		/// <summary>
 		/// Is the part bought
@@ -75,6 +80,29 @@ namespace MscModApi.Parts
 		/// Returns if the part is currently installed on the car
 		/// </summary>
 		public abstract bool installedOnCar { get; }
+
+		/// <summary>
+		/// Add a part object as the child of this part
+		/// Should only be used by logic itself, never by mod makers!
+		/// </summary>
+		/// <param name="part"></param>
+		public void AddChild(BasicPart part)
+		{
+			childParts.Add(part);
+		}
+
+		/// <summary>
+		/// Returns a list of all child parts of this part
+		/// </summary>
+		/// <returns></returns>
+		public List<BasicPart> GetChilds()
+		{
+			return new List<BasicPart>(childParts);
+		}
+
+		/// <summary>
+		/// Uninstalls the part
+		/// </summary>
 		public abstract void Uninstall();
 
 		/// <summary>

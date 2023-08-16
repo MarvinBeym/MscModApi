@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using HutongGames.PlayMaker;
 using MscModApi.Caching;
+using MscModApi.Parts.ReplacePart;
 using UnityEngine;
 
 namespace MscModApi.Parts
@@ -18,7 +19,6 @@ namespace MscModApi.Parts
 		protected Dictionary<Screw, int> preScrewPlacementModeEnableTightnessMap = new Dictionary<Screw, int>();
 		private bool _screwPlacementMode;
 		protected bool injectedScrewPlacementDisablePreUninstall = false;
-		private FsmBool parentGameObjectBolted = new FsmBool("Bolted");
 
 		/// <summary>
 		/// Stores all events that a developer may have added to this part object
@@ -31,26 +31,29 @@ namespace MscModApi.Parts
 		{
 		}
 
-		public Part(string id, string name, GameObject part, Part parentPart, Vector3 installPosition,
+		public Part(string id, string name, GameObject part, Part parent, Vector3 installPosition,
+			Vector3 installRotation,
+			PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls = true,
+			bool disableCollisionWhenInstalled = true) : this(id, name, part, (BasicPart) parent, installPosition, installRotation, partBaseInfo, uninstallWhenParentUninstalls, disableCollisionWhenInstalled)
+		{
+		}
+
+		public Part(string id, string name, GameObject part, GamePart parent, Vector3 installPosition,
+			Vector3 installRotation,
+			PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls = true,
+			bool disableCollisionWhenInstalled = true) : this(id, name, part, (BasicPart)parent, installPosition, installRotation, partBaseInfo, uninstallWhenParentUninstalls, disableCollisionWhenInstalled)
+		{
+		}
+
+		protected Part(string id, string name, GameObject part, BasicPart parent, Vector3 installPosition,
 			Vector3 installRotation,
 			PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls = true,
 			bool disableCollisionWhenInstalled = true)
 		{
 			gameObjectUsedForInstantiation = part;
 
-			this.parentPart = parentPart;
-
-			Setup(id, name, parentPart.gameObject, installPosition, installRotation, partBaseInfo,
-				uninstallWhenParentUninstalls, disableCollisionWhenInstalled, null);
-			parentPart.childParts.Add(this);
-		}
-
-		public Part(string id, string name, GameObject parent, Vector3 installPosition, Vector3 installRotation,
-			PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls = true,
-			bool disableCollisionWhenInstalled = true, string prefabName = null)
-		{
 			Setup(id, name, parent, installPosition, installRotation, partBaseInfo,
-				uninstallWhenParentUninstalls, disableCollisionWhenInstalled, prefabName);
+				uninstallWhenParentUninstalls, disableCollisionWhenInstalled, null);
 		}
 
 		public Part(string id, string name, PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls = true,
@@ -60,33 +63,62 @@ namespace MscModApi.Parts
 				uninstallWhenParentUninstalls, disableCollisionWhenInstalled, prefabName);
 		}
 
-		public Part(string id, string name, Part parentPart, Vector3 installPosition, Vector3 installRotation,
+		public Part(string id, string name, Part parent, Vector3 installPosition, Vector3 installRotation,
+			PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls = true,
+			bool disableCollisionWhenInstalled = true, string prefabName = null) : this(id, name, (BasicPart) parent, installPosition, installRotation, partBaseInfo, uninstallWhenParentUninstalls, disableCollisionWhenInstalled, prefabName)
+		{
+		}
+
+		public Part(string id, string name, GamePart parent, Vector3 installPosition, Vector3 installRotation,
+			PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls = true,
+			bool disableCollisionWhenInstalled = true, string prefabName = null) : this(id, name, (BasicPart) parent, installPosition, installRotation, partBaseInfo, uninstallWhenParentUninstalls, disableCollisionWhenInstalled, prefabName)
+		{
+		}
+
+		protected Part(string id, string name, BasicPart parent, Vector3 installPosition, Vector3 installRotation,
 			PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls = true,
 			bool disableCollisionWhenInstalled = true, string prefabName = null)
 		{
-			this.parentPart = parentPart;
-			Setup(id, name, parentPart.gameObject, installPosition, installRotation, partBaseInfo,
+			Setup(id, name, parent, installPosition, installRotation, partBaseInfo,
 				uninstallWhenParentUninstalls, disableCollisionWhenInstalled, prefabName);
-			parentPart.childParts.Add(this);
 		}
 
-		public List<Part> childParts { get; protected set; } = new List<Part>();
+		/// <summary>
+		/// Using this constructor is highly discouraged!
+		/// If possible, a GamePart or Part object should be used as the parent.
+		/// This constructor should only be used if there is no other way (Like when a part has to be installed on the car itself.
+		/// </summary>
+		/// <param name="id"></param>
+		/// <param name="name"></param>
+		/// <param name="parent"></param>
+		/// <param name="installPosition"></param>
+		/// <param name="installRotation"></param>
+		/// <param name="partBaseInfo"></param>
+		/// <param name="uninstallWhenParentUninstalls"></param>
+		/// <param name="disableCollisionWhenInstalled"></param>
+		/// <param name="prefabName"></param>
+		protected Part(string id, string name, GameObject parent, Vector3 installPosition, Vector3 installRotation,
+			PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls = true,
+			bool disableCollisionWhenInstalled = true, string prefabName = null)
+		{
+			gameObjectParent = parent;
+			Setup(id, name, null, installPosition, installRotation, partBaseInfo,
+				uninstallWhenParentUninstalls, disableCollisionWhenInstalled, prefabName);
+		}
+
+		public GameObject gameObjectParent { get; protected set; }
 
 		public string id { get; protected set; }
 
 		public PartBaseInfo partBaseInfo { get; protected set; }
 
-		public GameObject gameObject { get; protected set; }
+		public override GameObject gameObject { get; protected set; }
 
 		public Vector3 installPosition { get; protected set; }
 		
 		public Vector3 installRotation { get; protected set; }
 
-		public bool uninstallWhenParentUninstalls { get; protected set; }
-
-		public GameObject parentGameObject { get; protected set; }
-		
-		public Part parentPart { get; protected set; }
+		public BasicPart parent { get; protected set; }
 		
 		protected List<Screw> savedScrews;
 
@@ -98,9 +130,7 @@ namespace MscModApi.Parts
 
 		public GameObject gameObjectUsedForInstantiation { get; protected set; }
 		
-		public bool usingPartParent => parentPart != null;
-		
-		public bool hasParent => trigger != null;
+		public bool hasParent => parent != null || gameObjectParent != null;
 
 		public bool installBlocked { get; set; }
 
@@ -170,34 +200,33 @@ namespace MscModApi.Parts
 
 		public bool installPossible => !installBlocked && bought && trigger != null;
 
-
+		/// <summary>
+		/// Use parent.installed instead if GamePart or Part object was used for parent
+		/// </summary>
 		public bool parentInstalled
 		{
 			get
 			{
-				if (usingPartParent)
+				if (gameObjectParent != null)
 				{
-					return parentPart.installed;
+					return gameObjectParent.transform.parent != null;
 				}
-				else
-				{
-					return parentGameObject.transform.parent != null;
-				}
+				return parent.installed;
 			}
 		}
 
+		/// <summary>
+		/// Use parent.bolted instead if GamePart or Part object was used for parent
+		/// </summary>
 		public bool parentBolted
 		{
 			get
 			{
-				if (usingPartParent)
+				if (gameObjectParent != null)
 				{
-					return parentPart.bolted;
+					return true;
 				}
-				else
-				{
-					return parentGameObjectBolted.Value;
-				}
+				return parent.bolted;
 			}
 		}
 
@@ -248,7 +277,7 @@ namespace MscModApi.Parts
 
 		public override bool installedOnCar => installed && gameObject.transform.root == CarH.satsuma.transform;
 
-		protected void Setup(string id, string name, GameObject parentGameObject, Vector3 installPosition,
+		protected void Setup(string id, string name, BasicPart parent, Vector3 installPosition,
 			Vector3 installRotation, PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls,
 			bool disableCollisionWhenInstalled, string prefabName)
 		{
@@ -258,30 +287,6 @@ namespace MscModApi.Parts
 			this.installPosition = installPosition;
 			this.uninstallWhenParentUninstalls = uninstallWhenParentUninstalls;
 			this.installRotation = installRotation;
-			this.parentGameObject = parentGameObject;
-
-			if (!usingPartParent) {
-				try {
-					PlayMakerFSM parentRemovalFsm = parentGameObject.FindFsm("Removal");
-
-					/*
-					 * 					if (!removalFsm.Fsm.Initialized)
-					{
-						removalFsm.InitializeFSM();
-					}
-					 */
-					if (!parentRemovalFsm.Fsm.Initialized) {
-						parentRemovalFsm.InitializeFSM();
-					}
-
-					GameObject fsmPartGameObject = parentRemovalFsm.FsmVariables.FindFsmGameObject("db_ThisPart").Value;
-					PlayMakerFSM fsmPartDataFsm = fsmPartGameObject.FindFsm("Data");
-					parentGameObjectBolted = fsmPartDataFsm.FsmVariables.FindFsmBool("Bolted");
-				}
-				catch (Exception) {
-					// ignored
-				}
-			}
 
 			if (gameObjectUsedForInstantiation != null) {
 				gameObject = GameObject.Instantiate(gameObjectUsedForInstantiation);
@@ -307,8 +312,13 @@ namespace MscModApi.Parts
 
 			collider = gameObject.GetComponent<Collider>();
 
-			if (parentGameObject != null) {
-				trigger = new TriggerWrapper(this, parentGameObject, disableCollisionWhenInstalled);
+			if (parent != null) {
+				trigger = new TriggerWrapper(this, parent, disableCollisionWhenInstalled);
+			}
+
+			if (parent == null && gameObjectParent != null)
+			{
+				trigger = new TriggerWrapper(this, gameObjectParent, disableCollisionWhenInstalled);
 			}
 
 			if (partSave.installed) {
@@ -332,6 +342,7 @@ namespace MscModApi.Parts
 			}
 
 			partBaseInfo.AddToPartsList(this);
+			this.parent = parent;
 		}
 
 		protected void InitEventStorage()
@@ -364,7 +375,7 @@ namespace MscModApi.Parts
 			trigger?.Install();
 		}
 
-		public void Uninstall()
+		public override void Uninstall()
 		{
 			trigger?.Uninstall();
 		}

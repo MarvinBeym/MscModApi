@@ -20,22 +20,26 @@ namespace MscModApi.Trigger
 		/// <param name="part">The part object the trigger will be added to</param>
 		/// <param name="parentGameObject">The gameObject the trigger will be added to as a child</param>
 		/// <param name="disableCollisionWhenInstalled">Disable the collision of the part when the part gets installed</param>
-		public TriggerWrapper(Part part, GameObject parentGameObject, bool disableCollisionWhenInstalled)
+		public TriggerWrapper(Part part, BasicPart parent, bool disableCollisionWhenInstalled)
 		{
-			triggerGameObject = GameObject.CreatePrimitive(PrimitiveType.Cube);
-			triggerGameObject.transform.SetParent(parentGameObject.transform, false);
-			triggerGameObject.name = part.gameObject.name + "_trigger";
-			position = part.installPosition;
-			rotation = part.installRotation;
-			scale = defaultScale;
-
-			var collider = triggerGameObject.GetComponent<Collider>();
-			collider.isTrigger = true;
-
-			renderer = triggerGameObject.GetComponent<Renderer>();
-			visible = false;
+			Setup(part, parent.gameObject, disableCollisionWhenInstalled);
 			logic = triggerGameObject.AddComponent<Trigger>();
-			logic.Init(part, parentGameObject, disableCollisionWhenInstalled);
+			logic.Init(part, parent, disableCollisionWhenInstalled);
+		}
+
+		/// <summary>
+		/// Usage of a GameObject as the parent is discouraged, a GamePart or Part should be used instead,
+		/// this should only be used if something has to be installed to the car itself,
+		/// when no other part can be used instead
+		/// </summary>
+		/// <param name="part"></param>
+		/// <param name="parent"></param>
+		/// <param name="disableCollisionWhenInstalled"></param>
+		public TriggerWrapper(Part part, GameObject parent, bool disableCollisionWhenInstalled)
+		{
+			Setup(part, parent, disableCollisionWhenInstalled);
+			logic = triggerGameObject.AddComponent<Trigger>();
+			logic.Init(part, parent, disableCollisionWhenInstalled);
 		}
 
 		/// <summary>
@@ -83,6 +87,22 @@ namespace MscModApi.Trigger
 		/// Executed the uninstall logic
 		/// </summary>
 		public void Uninstall() => logic.Uninstall();
+
+		protected void Setup(Part part, GameObject parent, bool disableCollisionWhenInstalled)
+		{
+			triggerGameObject = GameObject.CreatePrimitive(PrimitiveType.Cube);
+			triggerGameObject.transform.SetParent(parent.transform, false);
+			triggerGameObject.name = part.gameObject.name + "_trigger";
+			position = part.installPosition;
+			rotation = part.installRotation;
+			scale = defaultScale;
+
+			var collider = triggerGameObject.GetComponent<Collider>();
+			collider.isTrigger = true;
+
+			renderer = triggerGameObject.GetComponent<Renderer>();
+			visible = false;
+		}
 
 		[Obsolete("Use 'scale' property instead", true)]
 		public void SetScale(Vector3 scale)

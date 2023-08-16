@@ -2,7 +2,9 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using MSCLoader;
+using MscModApi.Caching;
 using MscModApi.Parts;
 using UnityEngine;
 using EventType = MscModApi.Parts.EventType;
@@ -22,7 +24,12 @@ namespace MscModApi.Trigger
 		/// <summary>
 		/// The parent gameObject of the part
 		/// </summary>
-		protected GameObject parentGameObject;
+		protected BasicPart parent;
+
+		/// <summary>
+		/// Only used when no GamePart or Part can be used as the parent, highly discouraged if it can be avoided
+		/// </summary>
+		protected GameObject gameObjectParent;
 
 		/// <summary>
 		/// If the collider of the part should be disabled on installation (Improved performance)
@@ -82,14 +89,31 @@ namespace MscModApi.Trigger
 		}
 
 		/// <summary>
+		/// Returns the Transform object of the parent
+		/// (Wrapper for if parent is GameObject)
+		/// </summary>
+		protected Transform parentTransform
+		{
+			get
+			{
+				if (gameObjectParent != null)
+				{
+					return gameObjectParent.transform;
+				}
+
+				return parent.gameObject.transform;
+			}
+		}
+
+		/// <summary>
 		/// Verifies the installation
 		/// </summary>
 		/// <returns></returns>
 		protected IEnumerator VerifyInstalled()
 		{
-			while (part.installed && part.gameObject.transform.parent != parentGameObject.transform) {
+			while (part.installed && part.gameObject.transform.parent != parentTransform) {
 				Destroy(rigidBody);
-				part.gameObject.transform.parent = parentGameObject.transform;
+				part.gameObject.transform.parent = parentTransform;
 				part.gameObject.transform.localPosition = part.installPosition;
 				part.gameObject.transform.localRotation = Quaternion.Euler(part.installRotation);
 				yield return null;
@@ -101,11 +125,13 @@ namespace MscModApi.Trigger
 			{
 				part.GetEvents(EventTime.Post, EventType.InstallOnCar).InvokeAll();
 
-				foreach (Part childPart in part.childParts)
+				foreach (BasicPart child in part.GetChilds())
 				{
-					if (childPart.installedOnCar)
+					//Part was installed on car so installed childs will as well.
+					if (child.installed && child.GetType().GetInterfaces().Contains(typeof(SupportsPartEvents)))
 					{
-						childPart.GetEvents(EventTime.Post, EventType.InstallOnCar).InvokeAll();
+						SupportsPartEvents partEventSupportingPart = (SupportsPartEvents)child;
+						partEventSupportingPart.GetEvents(EventTime.Post, EventType.InstallOnCar).InvokeAll();
 					}
 				}
 			}
@@ -117,8 +143,18 @@ namespace MscModApi.Trigger
 		/// <returns></returns>
 		protected IEnumerator VerifyUninstalled()
 		{
-			while (!part.installed && part.gameObject.transform.parent == parentGameObject.transform) {
-				rigidBody = part.gameObject.AddComponent<Rigidbody>();
+			while (!part.installed && part.gameObject.transform.parent == parentTransform) {
+				Rigidbody existingRigidBody = part.gameObject.GetComponent<Rigidbody>();
+				if (existingRigidBody != null)
+				{
+					//May happen if a different component is adding a RigidBody itself (Like a HingeJoint)
+					rigidBody = existingRigidBody;
+				}
+				else
+				{
+					rigidBody = part.gameObject.AddComponent<Rigidbody>();
+				}
+
 				rigidBody.mass = 3;
 				part.gameObject.transform.parent = null;
 				part.gameObject.transform.Translate(Vector3.up * 0.025f);
@@ -132,11 +168,13 @@ namespace MscModApi.Trigger
 				//Probably called always because installedOnCar is likely already false at this point (can't be still installed on car)
 				part.GetEvents(EventTime.Post, EventType.UninstallFromCar).InvokeAll();
 
-				foreach (Part childPart in part.childParts)
+				foreach (BasicPart child in part.GetChilds())
 				{
-					if (!childPart.installedOnCar)
+					//Part was uninstalled from car so installed childs are as well.
+					if (child.installed && child.GetType().GetInterfaces().Contains(typeof(SupportsPartEvents)))
 					{
-						childPart.GetEvents(EventTime.Post, EventType.UninstallFromCar).InvokeAll();
+						SupportsPartEvents partEventSupportingPart = (SupportsPartEvents)child;
+						partEventSupportingPart.GetEvents(EventTime.Post, EventType.UninstallFromCar).InvokeAll();
 					}
 				}
 			}
@@ -152,6 +190,22 @@ namespace MscModApi.Trigger
 			}
 
 			part.GetEvents(EventTime.Pre, EventType.Install).InvokeAll();
+
+			if (parent != null && parent.installedOnCar)
+			{
+				//Parent is installed on car so part is also gonna be installed on the car soon
+				part.GetEvents(EventTime.Pre, EventType.InstallOnCar).InvokeAll();
+
+				foreach (BasicPart child in part.GetChilds())
+				{
+					//Part will soon be installed on car so installed childs will as well.
+					if (child.installed && child.GetType().GetInterfaces().Contains(typeof(SupportsPartEvents)))
+					{
+						SupportsPartEvents partEventSupportingPart = (SupportsPartEvents)child;
+						partEventSupportingPart.GetEvents(EventTime.Pre, EventType.InstallOnCar).InvokeAll();
+					}
+				}
+			}
 
 			part.partSave.installed = true;
 			part.gameObject.tag = "Untagged";
@@ -181,11 +235,32 @@ namespace MscModApi.Trigger
 		{
 			part.GetEvents(EventTime.Pre, EventType.Uninstall).InvokeAll();
 
+			if (parent != null && parent.installedOnCar)
+			{
+				part.GetEvents(EventTime.Pre, EventType.UninstallFromCar).InvokeAll();
+			}
+
+			if (parent != null && parent.installedOnCar)
+			{
+				//Parent is installed on car so part is also gonna be uninstalled from the car soon
+				part.GetEvents(EventTime.Pre, EventType.UninstallFromCar).InvokeAll();
+
+				foreach (BasicPart child in part.GetChilds())
+				{
+					//Part will soon be uninstalled from car so installed childs will as well.
+					if (child.installed && child.GetType().GetInterfaces().Contains(typeof(SupportsPartEvents)))
+					{
+						SupportsPartEvents partEventSupportingPart = (SupportsPartEvents)child;
+						partEventSupportingPart.GetEvents(EventTime.Pre, EventType.UninstallFromCar).InvokeAll();
+					}
+				}
+			}
+
 			part.ResetScrews();
 
-			part.childParts.ForEach(delegate(Part part)
-			{
-				if (part.uninstallWhenParentUninstalls) {
+			part.GetChilds().ForEach((BasicPart part) => {
+				if (part.uninstallWhenParentUninstalls)
+				{ 
 					part.Uninstall();
 				}
 			});
@@ -255,13 +330,25 @@ namespace MscModApi.Trigger
 		/// <param name="part">The part</param>
 		/// <param name="parentGameObject">Parent GameObject</param>
 		/// <param name="disableCollisionWhenInstalled">Should the collider be disabled when the part installs</param>
-		public void Init(Part part, GameObject parentGameObject, bool disableCollisionWhenInstalled)
+		public void Init(Part part, BasicPart parent, bool disableCollisionWhenInstalled)
 		{
 			this.part = part;
-			this.parentGameObject = parentGameObject;
+			this.parent = parent;
 			this.disableCollisionWhenInstalled = disableCollisionWhenInstalled;
 			rigidBody = part.gameObject.GetComponent<Rigidbody>();
 			if (!rigidBody) {
+				rigidBody = part.gameObject.AddComponent<Rigidbody>();
+			}
+		}
+
+		public void Init(Part part, GameObject parent, bool disableCollisionWhenInstalled)
+		{
+			this.part = part;
+			this.gameObjectParent = parent;
+			this.disableCollisionWhenInstalled = disableCollisionWhenInstalled;
+			rigidBody = part.gameObject.GetComponent<Rigidbody>();
+			if (!rigidBody)
+			{
 				rigidBody = part.gameObject.AddComponent<Rigidbody>();
 			}
 		}

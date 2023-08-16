@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using MscModApi.Parts.ReplacePart;
+using UnityEngine;
 
 namespace MscModApi.Parts
 {
@@ -9,22 +10,51 @@ namespace MscModApi.Parts
 		protected abstract string partName { get; }
 		protected abstract string partId { get; }
 
-		protected DerivablePart(GameObject part, Part parentPart, PartBaseInfo partBaseInfo,
+		protected DerivablePart(GameObject part, Part parent, PartBaseInfo partBaseInfo,
 			bool uninstallWhenParentUninstalls = true, bool disableCollisionWhenInstalled = true)
 		{
 			gameObjectUsedForInstantiation = part;
 
-			this.parentPart = parentPart;
-
-			Setup(partId, partName, parentPart.gameObject, partInstallPosition, partInstallRotation, partBaseInfo,
+			Setup(partId, partName, parent, partInstallPosition, partInstallRotation, partBaseInfo,
 				uninstallWhenParentUninstalls, disableCollisionWhenInstalled, null);
-			parentPart.childParts.Add(this);
 		}
 
-		protected DerivablePart(GameObject parent, PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls = true,
+		protected DerivablePart(GameObject part, GamePart parent, PartBaseInfo partBaseInfo,
+			bool uninstallWhenParentUninstalls = true, bool disableCollisionWhenInstalled = true)
+		{
+			gameObjectUsedForInstantiation = part;
+
+			Setup(partId, partName, parent, partInstallPosition, partInstallRotation, partBaseInfo,
+				uninstallWhenParentUninstalls, disableCollisionWhenInstalled, null);
+		}
+
+		protected DerivablePart(Part parent, PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls = true,
 			bool disableCollisionWhenInstalled = true, string prefabName = null)
 		{
 			Setup(partId, partName, parent, partInstallPosition, partInstallRotation, partBaseInfo,
+				uninstallWhenParentUninstalls, disableCollisionWhenInstalled, prefabName);
+		}
+
+		protected DerivablePart(GamePart parent, PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls = true,
+			bool disableCollisionWhenInstalled = true, string prefabName = null)
+		{
+			Setup(partId, partName, parent, partInstallPosition, partInstallRotation, partBaseInfo,
+				uninstallWhenParentUninstalls, disableCollisionWhenInstalled, prefabName);
+		}
+
+		/// <summary>
+		/// Usage of this constructor is highly discouraged, if possible a GamePart or Part object should be used as the parent
+		/// </summary>
+		/// <param name="parent"></param>
+		/// <param name="partBaseInfo"></param>
+		/// <param name="uninstallWhenParentUninstalls"></param>
+		/// <param name="disableCollisionWhenInstalled"></param>
+		/// <param name="prefabName"></param>
+		protected DerivablePart(GameObject parent, PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls = true,
+			bool disableCollisionWhenInstalled = true, string prefabName = null)
+		{
+			gameObjectParent = parent;
+			Setup(partId, partName, null, partInstallPosition, partInstallRotation, partBaseInfo,
 				uninstallWhenParentUninstalls, disableCollisionWhenInstalled, prefabName);
 		}
 
@@ -33,15 +63,6 @@ namespace MscModApi.Parts
 		{
 			Setup(partId, partName, null, Vector3.zero, Vector3.zero, partBaseInfo,
 				uninstallWhenParentUninstalls, disableCollisionWhenInstalled, prefabName);
-		}
-
-		protected DerivablePart(Part parentPart, PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls = true,
-			bool disableCollisionWhenInstalled = true, string prefabName = null)
-		{
-			this.parentPart = parentPart;
-			Setup(partId, partName, parentPart.gameObject, partInstallPosition, partInstallRotation, partBaseInfo,
-				uninstallWhenParentUninstalls, disableCollisionWhenInstalled, prefabName);
-			parentPart.childParts.Add(this);
 		}
 	}
 }
