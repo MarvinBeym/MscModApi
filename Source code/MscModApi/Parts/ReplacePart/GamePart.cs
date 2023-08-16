@@ -143,6 +143,16 @@ namespace MscModApi.Parts.ReplacePart
 		}
 
 		/// <summary>
+		/// Usable when wanting to extend from GamePart and implement everything yourself.
+		/// An Example for the usability of this is the Class "SatsumaGamePart" which is a wrapper to make the Satsuma
+		/// (which has no part logic from the game) to allow using as a parent for "Part" objects
+		/// </summary>
+		protected GamePart()
+		{
+
+		}
+
+		/// <summary>
 		/// Setups the advanced bolted state detection requiring all bolts of the part to be tight before bolted events get called
 		/// </summary>
 		protected void SetupAdvancedBoltedStateDetection()

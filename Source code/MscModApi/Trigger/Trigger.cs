@@ -27,11 +27,6 @@ namespace MscModApi.Trigger
 		protected BasicPart parent;
 
 		/// <summary>
-		/// Only used when no GamePart or Part can be used as the parent, highly discouraged if it can be avoided
-		/// </summary>
-		protected GameObject gameObjectParent;
-
-		/// <summary>
 		/// If the collider of the part should be disabled on installation (Improved performance)
 		/// </summary>
 		protected bool disableCollisionWhenInstalled;
@@ -92,18 +87,7 @@ namespace MscModApi.Trigger
 		/// Returns the Transform object of the parent
 		/// (Wrapper for if parent is GameObject)
 		/// </summary>
-		protected Transform parentTransform
-		{
-			get
-			{
-				if (gameObjectParent != null)
-				{
-					return gameObjectParent.transform;
-				}
-
-				return parent.gameObject.transform;
-			}
-		}
+		protected Transform parentTransform => parent.gameObject.transform;
 
 		/// <summary>
 		/// Verifies the installation
@@ -337,18 +321,6 @@ namespace MscModApi.Trigger
 			this.disableCollisionWhenInstalled = disableCollisionWhenInstalled;
 			rigidBody = part.gameObject.GetComponent<Rigidbody>();
 			if (!rigidBody) {
-				rigidBody = part.gameObject.AddComponent<Rigidbody>();
-			}
-		}
-
-		public void Init(Part part, GameObject parent, bool disableCollisionWhenInstalled)
-		{
-			this.part = part;
-			this.gameObjectParent = parent;
-			this.disableCollisionWhenInstalled = disableCollisionWhenInstalled;
-			rigidBody = part.gameObject.GetComponent<Rigidbody>();
-			if (!rigidBody)
-			{
 				rigidBody = part.gameObject.AddComponent<Rigidbody>();
 			}
 		}

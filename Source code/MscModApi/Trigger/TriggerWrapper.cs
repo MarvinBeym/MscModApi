@@ -28,21 +28,6 @@ namespace MscModApi.Trigger
 		}
 
 		/// <summary>
-		/// Usage of a GameObject as the parent is discouraged, a GamePart or Part should be used instead,
-		/// this should only be used if something has to be installed to the car itself,
-		/// when no other part can be used instead
-		/// </summary>
-		/// <param name="part"></param>
-		/// <param name="parent"></param>
-		/// <param name="disableCollisionWhenInstalled"></param>
-		public TriggerWrapper(Part part, GameObject parent, bool disableCollisionWhenInstalled)
-		{
-			Setup(part, parent, disableCollisionWhenInstalled);
-			logic = triggerGameObject.AddComponent<Trigger>();
-			logic.Init(part, parent, disableCollisionWhenInstalled);
-		}
-
-		/// <summary>
 		/// Render of trigger gameObject visible
 		/// </summary>
 		public bool visible

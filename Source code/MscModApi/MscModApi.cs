@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using MscModApi.Caching;
 using MscModApi.Commands;
 using MscModApi.PaintingSystem;
+using MscModApi.Parts.ReplacePart;
 using UnityEngine;
 using EventType = MscModApi.Parts.EventType;
 
@@ -108,6 +109,7 @@ namespace MscModApi
 			ScrewPlacementAssist.LoadCleanup();
 			UserInteraction.LoadCleanup();
 			Tool.LoadCleanup();
+			SatsumaGamePart.LoadCleanup();
 
 			Logger.InitLogger(this);
 			LoadAssets();

@@ -83,31 +83,6 @@ namespace MscModApi.Parts
 				uninstallWhenParentUninstalls, disableCollisionWhenInstalled, prefabName);
 		}
 
-		/// <summary>
-		/// Using this constructor is highly discouraged!
-		/// If possible, a GamePart or Part object should be used as the parent.
-		/// This constructor should only be used if there is no other way (Like when a part has to be installed on the car itself.
-		/// </summary>
-		/// <param name="id"></param>
-		/// <param name="name"></param>
-		/// <param name="parent"></param>
-		/// <param name="installPosition"></param>
-		/// <param name="installRotation"></param>
-		/// <param name="partBaseInfo"></param>
-		/// <param name="uninstallWhenParentUninstalls"></param>
-		/// <param name="disableCollisionWhenInstalled"></param>
-		/// <param name="prefabName"></param>
-		protected Part(string id, string name, GameObject parent, Vector3 installPosition, Vector3 installRotation,
-			PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls = true,
-			bool disableCollisionWhenInstalled = true, string prefabName = null)
-		{
-			gameObjectParent = parent;
-			Setup(id, name, null, installPosition, installRotation, partBaseInfo,
-				uninstallWhenParentUninstalls, disableCollisionWhenInstalled, prefabName);
-		}
-
-		public GameObject gameObjectParent { get; protected set; }
-
 		public string id { get; protected set; }
 
 		public PartBaseInfo partBaseInfo { get; protected set; }
@@ -130,7 +105,7 @@ namespace MscModApi.Parts
 
 		public GameObject gameObjectUsedForInstantiation { get; protected set; }
 		
-		public bool hasParent => parent != null || gameObjectParent != null;
+		public bool hasParent => parent != null;
 
 		public bool installBlocked { get; set; }
 
@@ -199,36 +174,6 @@ namespace MscModApi.Parts
 		public override bool isHolding => gameObject.IsHolding();
 
 		public bool installPossible => !installBlocked && bought && trigger != null;
-
-		/// <summary>
-		/// Use parent.installed instead if GamePart or Part object was used for parent
-		/// </summary>
-		public bool parentInstalled
-		{
-			get
-			{
-				if (gameObjectParent != null)
-				{
-					return gameObjectParent.transform.parent != null;
-				}
-				return parent.installed;
-			}
-		}
-
-		/// <summary>
-		/// Use parent.bolted instead if GamePart or Part object was used for parent
-		/// </summary>
-		public bool parentBolted
-		{
-			get
-			{
-				if (gameObjectParent != null)
-				{
-					return true;
-				}
-				return parent.bolted;
-			}
-		}
 
 		/// <inheritdoc />
 		public override bool bought
@@ -314,11 +259,6 @@ namespace MscModApi.Parts
 
 			if (parent != null) {
 				trigger = new TriggerWrapper(this, parent, disableCollisionWhenInstalled);
-			}
-
-			if (parent == null && gameObjectParent != null)
-			{
-				trigger = new TriggerWrapper(this, gameObjectParent, disableCollisionWhenInstalled);
 			}
 
 			if (partSave.installed) {
@@ -619,13 +559,13 @@ namespace MscModApi.Parts
 		[Obsolete("Use 'parentInstalled' property instead", true)]
 		internal bool ParentInstalled()
 		{
-			return parentInstalled;
+			return parent.installed;
 		}
 
 		[Obsolete("Use 'parentBolted' property instead", true)]
 		public bool ParentFixed()
 		{
-			return parentBolted;
+			return parent.bolted;
 		}
 
 		[Obsolete("Use cleaner 'AddEventListener' method instead", true)]

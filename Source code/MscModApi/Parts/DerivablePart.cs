@@ -42,22 +42,6 @@ namespace MscModApi.Parts
 				uninstallWhenParentUninstalls, disableCollisionWhenInstalled, prefabName);
 		}
 
-		/// <summary>
-		/// Usage of this constructor is highly discouraged, if possible a GamePart or Part object should be used as the parent
-		/// </summary>
-		/// <param name="parent"></param>
-		/// <param name="partBaseInfo"></param>
-		/// <param name="uninstallWhenParentUninstalls"></param>
-		/// <param name="disableCollisionWhenInstalled"></param>
-		/// <param name="prefabName"></param>
-		protected DerivablePart(GameObject parent, PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls = true,
-			bool disableCollisionWhenInstalled = true, string prefabName = null)
-		{
-			gameObjectParent = parent;
-			Setup(partId, partName, null, partInstallPosition, partInstallRotation, partBaseInfo,
-				uninstallWhenParentUninstalls, disableCollisionWhenInstalled, prefabName);
-		}
-
 		protected DerivablePart(PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls = true,
 			bool disableCollisionWhenInstalled = true, string prefabName = null)
 		{
