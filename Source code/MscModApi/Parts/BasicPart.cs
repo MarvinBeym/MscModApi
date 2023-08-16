@@ -75,6 +75,7 @@ namespace MscModApi.Parts
 		/// Returns if the part is currently installed on the car
 		/// </summary>
 		public abstract bool installedOnCar { get; }
+		public abstract void Uninstall();
 
 		/// <summary>
 		/// Resets the part to its defaultPosition & defaultRotation

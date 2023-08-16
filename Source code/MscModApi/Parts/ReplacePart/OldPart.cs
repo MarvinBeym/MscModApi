@@ -90,7 +90,7 @@ namespace MscModApi.Parts.ReplacePart
 		[Obsolete("Use 'bolted' property instead", true)]
 		public bool IsFixed() => bolted;
 
-		public void Uninstall() => removalFsm.SendEvent("REMOVE");
+		public override void Uninstall() => removalFsm.SendEvent("REMOVE");
 
 		internal void Setup(ReplacePart.ReplacementPart replacementPart)
 		{

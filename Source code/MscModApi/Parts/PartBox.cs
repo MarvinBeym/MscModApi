@@ -178,6 +178,12 @@ namespace MscModApi.Parts
 			}
 		}
 
+		/// <inheritdoc />
+		public override void Uninstall()
+		{
+			//Not Implemented for PartBox
+		}
+
 		[Obsolete("Use 'AddParts' method instead, this method actually doesn't set but Add parts", true)]
 		protected void SetParts(IEnumerable<Part> parts)
 		{

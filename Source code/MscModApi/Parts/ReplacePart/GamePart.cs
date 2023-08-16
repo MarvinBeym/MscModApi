@@ -429,7 +429,7 @@ namespace MscModApi.Parts.ReplacePart
 		/// <summary>
 		/// Sends the REMOVE event to the Part
 		/// </summary>
-		public void Uninstall()
+		public override void Uninstall()
 		{
 			removalFsm.SendEvent("REMOVE");
 		}

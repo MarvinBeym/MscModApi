@@ -364,7 +364,7 @@ namespace MscModApi.Parts
 			trigger?.Install();
 		}
 
-		public void Uninstall()
+		public override void Uninstall()
 		{
 			trigger?.Uninstall();
 		}

@@ -66,6 +66,11 @@ namespace MscModApi.Parts.ReplacePart
 			set => part.active = value;
 		}
 
+		public override void Uninstall()
+		{
+			part.Uninstall();
+		}
+
 		public override void ResetToDefault(bool uninstall = false)
 		{
 			part.ResetToDefault(uninstall);
