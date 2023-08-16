@@ -72,8 +72,8 @@ namespace MscModApi.Parts.ReplacePart
 					$"Unable to find trigger GameObject on GameObject with name '{mainFsmGameObject.name}'");
 			}
 
-			partFsmGameObject = dataFsm.FsmVariables.FindFsmGameObject("ThisPart").Value;
-			if (!partFsmGameObject) {
+			gameObject = dataFsm.FsmVariables.FindFsmGameObject("ThisPart").Value;
+			if (!gameObject) {
 				throw new Exception(
 					$"Unable to find part GameObject on GameObject with name '{mainFsmGameObject.name}'");
 			}
@@ -84,8 +84,8 @@ namespace MscModApi.Parts.ReplacePart
 			purchasedState = dataFsm.FsmVariables.FindFsmBool("Purchased") ?? new FsmBool("Purchased");
 
 			assemblyFsm = triggerFsmGameObject.FindFsm("Assembly");
-			removalFsm = partFsmGameObject.FindFsm("Removal");
-			boltCheckFsm = partFsmGameObject.FindFsm("BoltCheck");
+			removalFsm = gameObject.FindFsm("Removal");
+			boltCheckFsm = gameObject.FindFsm("BoltCheck");
 
 			if (!assemblyFsm.Fsm.Initialized) {
 				assemblyFsm.InitializeFSM();
@@ -126,7 +126,7 @@ namespace MscModApi.Parts.ReplacePart
 				});
 
 			if (tightness == null) {
-				throw new Exception($"Unable to find tightness on bolt check fsm of part '{partFsmGameObject.name}'");
+				throw new Exception($"Unable to find tightness on bolt check fsm of part '{gameObject.name}'");
 			}
 
 			if (boltedState != null) {
@@ -147,10 +147,10 @@ namespace MscModApi.Parts.ReplacePart
 		/// </summary>
 		protected void SetupAdvancedBoltedStateDetection()
 		{
-			GameObject boltsGameObject = partFsmGameObject.FindChild("Bolts");
+			GameObject boltsGameObject = gameObject.FindChild("Bolts");
 			if (!boltsGameObject) {
 				ModConsole.Print(
-					$"GamePart: Unable to find 'Bolts' child of '{partFsmGameObject.name}'. Bolted event listening not possible");
+					$"GamePart: Unable to find 'Bolts' child of '{gameObject.name}'. Bolted event listening not possible");
 			}
 
 			for (int i = 0; i < boltsGameObject.transform.childCount; i++) {
@@ -349,7 +349,7 @@ namespace MscModApi.Parts.ReplacePart
 		/// <summary>
 		/// The part fsm gameObject (The one you can pickup)
 		/// </summary>
-		public GameObject partFsmGameObject { get; protected set; }
+		public override GameObject gameObject { get; protected set; }
 
 		/// <summary>
 		/// The trigger fsm gameObject (deals with installing the part onto the car)
@@ -366,11 +366,11 @@ namespace MscModApi.Parts.ReplacePart
 		/// <inheritdoc />
 		public override Vector3 position
 		{
-			get => partFsmGameObject.transform.position;
+			get => gameObject.transform.position;
 			set
 			{
 				if (!installed) {
-					partFsmGameObject.transform.position = value;
+					gameObject.transform.position = value;
 				}
 			}
 		}
@@ -378,11 +378,11 @@ namespace MscModApi.Parts.ReplacePart
 		/// <inheritdoc />
 		public override Vector3 rotation
 		{
-			get => partFsmGameObject.transform.rotation.eulerAngles;
+			get => gameObject.transform.rotation.eulerAngles;
 			set
 			{
 				if (!installed) {
-					partFsmGameObject.transform.rotation = Quaternion.Euler(value);
+					gameObject.transform.rotation = Quaternion.Euler(value);
 				}
 			}
 		}
@@ -408,23 +408,23 @@ namespace MscModApi.Parts.ReplacePart
 		}
 
 		/// <inheritdoc />
-		public override bool installedOnCar => partFsmGameObject.transform.root == CarH.satsuma.transform;
+		public override bool installedOnCar => gameObject.transform.root == CarH.satsuma.transform;
 
 		/// <inheritdoc />
 		public override bool active
 		{
-			get => partFsmGameObject.activeSelf;
-			set => partFsmGameObject.SetActive(value);
+			get => gameObject.activeSelf;
+			set => gameObject.SetActive(value);
 		}
 
 		/// <inheritdoc />
-		public override string name => partFsmGameObject.name;
+		public override string name => gameObject.name;
 
 		/// <inheritdoc />
-		public override bool isLookingAt => partFsmGameObject.IsLookingAt();
+		public override bool isLookingAt => gameObject.IsLookingAt();
 
 		/// <inheritdoc />
-		public override bool isHolding => partFsmGameObject.IsHolding();
+		public override bool isHolding => gameObject.IsHolding();
 
 		/// <summary>
 		/// Sends the REMOVE event to the Part

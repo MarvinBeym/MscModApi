@@ -12,7 +12,7 @@ namespace MscModApi.Parts.ReplacePart
 	public class OldPart : BasicPart
 	{
 		protected PlayMakerFSM fsm;
-		protected GameObject gameObject;
+		public override GameObject gameObject { get; protected set; }
 		protected GameObject trigger;
 		protected FsmBool installedFsm;
 		protected FsmBool boltedFsm;

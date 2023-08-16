@@ -106,7 +106,7 @@ namespace MscModApi.Parts
 			bool uninstallWhenParentUninstalls, bool disableCollisionWhenInstalled)
 		{
 			boxModel.SetNameLayerTag(boxName + "(Clone)");
-			this.boxModel = boxModel;
+			gameObject = boxModel;
 
 			PartBaseInfo partBaseInfo = parent.partBaseInfo;
 
@@ -127,7 +127,7 @@ namespace MscModApi.Parts
 			}
 
 			active = false;
-			logic = this.boxModel.AddComponent<BoxLogic>();
+			logic = gameObject.AddComponent<BoxLogic>();
 			logic.Init(this);
 		}
 

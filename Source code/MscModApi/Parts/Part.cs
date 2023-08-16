@@ -76,7 +76,7 @@ namespace MscModApi.Parts
 
 		public PartBaseInfo partBaseInfo { get; protected set; }
 
-		public GameObject gameObject { get; protected set; }
+		public override GameObject gameObject { get; protected set; }
 
 		public Vector3 installPosition { get; protected set; }
 		

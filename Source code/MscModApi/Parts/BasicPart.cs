@@ -8,6 +8,8 @@ namespace MscModApi.Parts
 	/// </summary>
 	public abstract class BasicPart
 	{
+		public abstract GameObject gameObject { get; protected set; }
+
 		/// <summary>
 		/// The default position, used for example when resetting.
 		/// </summary>

@@ -17,6 +17,12 @@ namespace MscModApi.Parts.ReplacePart
 			this.canBeInstalledWithoutReplacing = canBeInstalledWithoutReplacing;
 		}
 
+		public override GameObject gameObject
+		{
+			get => part.gameObject;
+			protected set { }
+		}
+
 		/// <inheritdoc />
 		public override bool isLookingAt => part.isLookingAt;
 

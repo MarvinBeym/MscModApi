@@ -16,20 +16,22 @@ namespace MscModApi.Parts
 		/// </summary>
 		public int partsUnpackedCount { get; protected set; } = 0;
 
+		public override GameObject gameObject { get; protected set; }
+
 		/// <summary>
 		/// Returns the name of the box model
 		/// </summary>
-		public override string name => boxModel.name;
+		public override string name => gameObject.name;
 
 		/// <summary>
 		/// Returns if the player is currently looking at the box
 		/// </summary>
-		public override bool isLookingAt => boxModel.IsLookingAt();
+		public override bool isLookingAt => gameObject.IsLookingAt();
 
 		/// <summary>
 		/// Returns if the player is currently holding the box
 		/// </summary>
-		public override bool isHolding => boxModel.IsHolding();
+		public override bool isHolding => gameObject.IsHolding();
 
 		internal void IncrementUnpackedCount()
 		{
@@ -46,11 +48,6 @@ namespace MscModApi.Parts
 		public bool hasPartsToUnpack => partsUnpackedCount < partsCount;
 
 		/// <summary>
-		/// Returns the box GameObject model
-		/// </summary>
-		public GameObject boxModel { get; protected set; }
-
-		/// <summary>
 		/// Returns the list of parts contained in this box
 		/// </summary>
 		public List<Part> parts { get; protected set; } = new List<Part>();
@@ -65,8 +62,8 @@ namespace MscModApi.Parts
 		/// </summary>
 		public override Vector3 position
 		{
-			get => boxModel.transform.position;
-			set => boxModel.transform.position = value;
+			get => gameObject.transform.position;
+			set => gameObject.transform.position = value;
 		}
 
 		/// <summary>
@@ -74,8 +71,8 @@ namespace MscModApi.Parts
 		/// </summary>
 		public override Vector3 rotation
 		{
-			get => boxModel.transform.rotation.eulerAngles;
-			set => boxModel.transform.rotation = Quaternion.Euler(value);
+			get => gameObject.transform.rotation.eulerAngles;
+			set => gameObject.transform.rotation = Quaternion.Euler(value);
 		}
 
 		/// <summary>
@@ -115,8 +112,8 @@ namespace MscModApi.Parts
 		/// </summary>
 		public override bool active
 		{
-			get => boxModel.activeSelf;
-			set => boxModel.SetActive(value);
+			get => gameObject.activeSelf;
+			set => gameObject.SetActive(value);
 		}
 
 		/// <summary>
@@ -130,14 +127,14 @@ namespace MscModApi.Parts
 
 			if (hasPartsToUnpack) {
 				foreach (var part in parts.Where(part => !part.installed && !part.gameObject.activeSelf)) {
-					part.position = boxModel.transform.position;
+					part.position = gameObject.transform.position;
 					part.active = active;
 				}
 			}
 
-			boxModel.SetActive(false);
-			boxModel.transform.position = new Vector3(0, 0, 0);
-			boxModel.transform.localPosition = new Vector3(0, 0, 0);
+			gameObject.SetActive(false);
+			gameObject.transform.position = new Vector3(0, 0, 0);
+			gameObject.transform.localPosition = new Vector3(0, 0, 0);
 		}
 
 		/// <summary>
@@ -199,16 +196,16 @@ namespace MscModApi.Parts
 			return parts.Count;
 		}
 
-		[Obsolete("Use 'boxModel' property instead", true)]
+		[Obsolete("Use 'gameObject' property instead", true)]
 		public GameObject GetBoxGameObject()
 		{
-			return boxModel;
+			return gameObject;
 		}
 
-		[Obsolete("Use 'boxModel' property instead", true)]
+		[Obsolete("Use 'gameObject' property instead", true)]
 		internal void SetBoxGameObject(GameObject box)
 		{
-			boxModel = box;
+			gameObject = box;
 		}
 
 		[Obsolete("Use 'bought' property instead.", true)]
