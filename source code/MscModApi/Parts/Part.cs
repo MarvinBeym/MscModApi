@@ -107,7 +107,7 @@ namespace MscModApi.Parts
 		
 		public bool hasParent => parent != null;
 
-		public bool installBlocked { get; set; }
+		public override bool installBlocked { get; set; }
 
 		public List<Screw> screws => partSave.screws;
 
@@ -418,6 +418,42 @@ namespace MscModApi.Parts
 			}
 
 			return behaviour;
+		}
+
+		/// <summary>
+		/// When this part installs, the "partsToBlock" parts will be blocked from being installed (installBlocked = true)
+		/// When this part uninstalls (opposite of "eventType") the "partsToBlock" parts will be unblocked from being installed (installBlocked = false)
+		/// </summary>
+		/// <param name="eventType">The event of this part after which installation of the "partsToBlock" will be blocked/unblocked</param>
+		/// <param name="partsToBlock">The parts to block when the "eventType" is called on this part</param>
+		public void BlockOtherPartInstallOnEvent(PartEvent.EventType eventType, IEnumerable<BasicPart> partsToBlock)
+		{
+			AddEventListener(EventTime.Post, eventType, () =>
+			{
+				foreach (BasicPart partToBlock in partsToBlock)
+				{
+					partToBlock.installBlocked = true;
+				}
+			});
+			AddEventListener(EventTime.Post, GetOppositeEvent(eventType), () =>
+			{
+				foreach (BasicPart partToBlock in partsToBlock)
+				{
+					partToBlock.installBlocked = false;
+				}
+			});
+		}
+
+		/// <summary>
+		/// When this part installs, the "partToBlock" part will be blocked from being installed (installBlocked = true)
+		/// When this part uninstalls (opposite of "eventType") the "partToBlock" part will be unblocked from being installed (installBlocked = false)
+		/// </summary>
+		/// <param name="eventType">The event of this part after which installation of the "partToBlock" will be blocked/unblocked</param>
+		/// <param name="partToBlock">The part to block when the "eventType" is called on this part</param>
+		public void BlockOtherPartInstallOnEvent(PartEvent.EventType eventType, BasicPart partToBlock)
+		{
+			AddEventListener(EventTime.Post, eventType, () => { partToBlock.installBlocked = true;});
+			AddEventListener(EventTime.Post, GetOppositeEvent(eventType), () => { partToBlock.installBlocked = false; });
 		}
 
 		public void AddEventListener(EventTime eventTime, PartEvent.EventType eventType, Action action)
