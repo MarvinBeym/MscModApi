@@ -638,5 +638,41 @@ namespace MscModApi.Parts.ReplacePart
 				}
 			}
 		}
+
+		/// <summary>
+		/// When this part installs, the "partsToBlock" parts will be blocked from being installed (installBlocked = true)
+		/// When this part uninstalls (opposite of "Type") the "partsToBlock" parts will be unblocked from being installed (installBlocked = false)
+		/// </summary>
+		/// <param name="Type">The event of this part after which installation of the "partsToBlock" will be blocked/unblocked</param>
+		/// <param name="partsToBlock">The parts to block when the "Type" is called on this part</param>
+		public void BlockOtherPartInstallOnEvent(PartEvent.Type Type, IEnumerable<BasicPart> partsToBlock)
+		{
+			AddEventListener(PartEvent.Time.Post, Type, () =>
+			{
+				foreach (BasicPart partToBlock in partsToBlock)
+				{
+					partToBlock.installBlocked = true;
+				}
+			});
+			AddEventListener(PartEvent.Time.Post, PartEvent.GetOppositeEvent(Type), () =>
+			{
+				foreach (BasicPart partToBlock in partsToBlock)
+				{
+					partToBlock.installBlocked = false;
+				}
+			});
+		}
+
+		/// <summary>
+		/// When this part installs, the "partToBlock" part will be blocked from being installed (installBlocked = true)
+		/// When this part uninstalls (opposite of "Type") the "partToBlock" part will be unblocked from being installed (installBlocked = false)
+		/// </summary>
+		/// <param name="Type">The event of this part after which installation of the "partToBlock" will be blocked/unblocked</param>
+		/// <param name="partToBlock">The part to block when the "Type" is called on this part</param>
+		public void BlockOtherPartInstallOnEvent(PartEvent.Type Type, BasicPart partToBlock)
+		{
+			AddEventListener(PartEvent.Time.Post, Type, () => { partToBlock.installBlocked = true; });
+			AddEventListener(PartEvent.Time.Post, PartEvent.GetOppositeEvent(Type), () => { partToBlock.installBlocked = false; });
+		}
 	}
 }
