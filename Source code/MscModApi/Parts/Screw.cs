@@ -163,7 +163,7 @@ namespace MscModApi.Parts
 				{
 					part.GetEvents(PartEvent.EventTime.Pre, PartEvent.EventType.BoltedOnCar).InvokeAll();
 
-					foreach (Part childPart in part.GetChilds())
+					foreach (Part childPart in part.childs)
 					{
 						if (childPart.bolted && childPart.installedOnCar)
 						{
@@ -181,7 +181,7 @@ namespace MscModApi.Parts
 				{
 					part.GetEvents(PartEvent.EventTime.Post, PartEvent.EventType.BoltedOnCar).InvokeAll();
 
-					foreach (Part childPart in part.GetChilds())
+					foreach (Part childPart in part.childs)
 					{
 						if (childPart.bolted && childPart.installedOnCar)
 						{
@@ -211,7 +211,7 @@ namespace MscModApi.Parts
 				{
 					part.GetEvents(PartEvent.EventTime.Pre, PartEvent.EventType.UnboltedOnCar).InvokeAll();
 
-					foreach (Part childPart in part.GetChilds())
+					foreach (Part childPart in part.childs)
 					{
 						if (!childPart.bolted && childPart.installedOnCar)
 						{
@@ -229,7 +229,7 @@ namespace MscModApi.Parts
 				{
 					part.GetEvents(PartEvent.EventTime.Post, PartEvent.EventType.UnboltedOnCar).InvokeAll();
 
-					foreach (Part childPart in part.GetChilds())
+					foreach (Part childPart in part.childs)
 					{
 						if (!childPart.bolted && childPart.installedOnCar)
 						{

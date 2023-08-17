@@ -36,7 +36,7 @@ namespace MscModApi.Parts
 			AddParts(parts);
 
 			if (!bought) {
-				foreach (Part part in this.parts) {
+				foreach (Part part in childs) {
 					part.Uninstall();
 					part.active = false;
 				}

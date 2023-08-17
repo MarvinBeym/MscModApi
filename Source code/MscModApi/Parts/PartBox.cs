@@ -42,20 +42,27 @@ namespace MscModApi.Parts
 			partsUnpackedCount++;
 		}
 
+		public override bool installBlocked
+		{
+			get => childs.All(childPart => childPart.installBlocked);
+			set
+			{
+				foreach (Part childPart in childs)
+				{
+					childPart.installBlocked = value;
+				}
+			}
+		}
+
 		/// <summary>
 		/// Returns if there are still parts that can be unpacked
 		/// </summary>
 		public bool hasPartsToUnpack => partsUnpackedCount < partsCount;
 
 		/// <summary>
-		/// Returns the list of parts contained in this box
-		/// </summary>
-		public List<Part> parts { get; protected set; } = new List<Part>();
-
-		/// <summary>
 		/// Returns the number of parts contained in this box
 		/// </summary>
-		public int partsCount => parts.Count;
+		public int partsCount => childs.Count;
 
 		/// <summary>
 		/// The position of the box model
@@ -80,10 +87,10 @@ namespace MscModApi.Parts
 		/// </summary>
 		public override bool bought
 		{
-			get { return parts.Any(part => part.bought); }
+			get { return childs.Any(part => part.bought); }
 			set
 			{
-				foreach (Part part in parts) {
+				foreach (Part part in childs) {
 					part.bought = value;
 				}
 			}
@@ -93,19 +100,22 @@ namespace MscModApi.Parts
 		/// Returns if all parts contained in this box are installed
 		/// (Only made available through inheritance, rare use cases)
 		/// </summary>
-		public override bool installed => parts.All(part => part.installed);
+		public override bool installed => childs.All(part => part.installed);
+
+		public new List<Part> childs = new List<Part>();
+
 
 		/// <summary>
 		/// Returns if all parts contained in this box are bolted
 		/// (Only made available through inheritance, rare use cases)
 		/// </summary>
-		public override bool bolted => parts.All(part => part.bolted);
+		public override bool bolted => childs.All(part => part.bolted);
 
 
 		/// <summary>
 		/// Returns if all parts contained in this box are installed on the car
 		/// </summary>
-		public override bool installedOnCar => parts.All(part => part.installedOnCar);
+		public override bool installedOnCar => childs.All(part => part.installedOnCar);
 
 		/// <summary>
 		/// Is the box model gameObject active
@@ -126,7 +136,7 @@ namespace MscModApi.Parts
 			}
 
 			if (hasPartsToUnpack) {
-				foreach (var part in parts.Where(part => !part.installed && !part.gameObject.activeSelf)) {
+				foreach (var part in childs.Where(part => !part.installed && !part.gameObject.activeSelf)) {
 					part.position = gameObject.transform.position;
 					part.active = active;
 				}
@@ -148,7 +158,7 @@ namespace MscModApi.Parts
 				rotation = defaultRotation;
 			}
 
-			foreach (Part part in parts) {
+			foreach (Part part in childs) {
 				if (uninstall && part.installed) {
 					part.Uninstall();
 				}
@@ -164,8 +174,9 @@ namespace MscModApi.Parts
 		/// <param name="part"></param>
 		protected void AddPart(Part part)
 		{
-			parts.Add(part);
+			AddChild(part);
 		}
+        
 
 		/// <summary>
 		/// Adds multiple parts to the box
@@ -193,13 +204,13 @@ namespace MscModApi.Parts
 		[Obsolete("Use 'parts' property instead", true)]
 		public List<Part> GetParts()
 		{
-			return parts;
+			return childs;
 		}
 
 		[Obsolete("Use 'partsCount' property instead", true)]
 		public int GetPartCount()
 		{
-			return parts.Count;
+			return childs.Count;
 		}
 
 		[Obsolete("Use 'gameObject' property instead", true)]

@@ -139,7 +139,7 @@ namespace MscModApi.Parts
 		/// <param name="overrideSize"></param>
 		protected void AddScrews(Screw[] screws, float overrideScale = 0f, float overrideSize = 0f)
 		{
-			foreach (Part part in parts) {
+			foreach (Part part in childs) {
 				part.AddScrews(screws.CloneToNew(), overrideScale, overrideSize);
 			}
 		}

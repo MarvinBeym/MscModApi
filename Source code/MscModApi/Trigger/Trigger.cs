@@ -109,7 +109,7 @@ namespace MscModApi.Trigger
 			{
 				part.GetEvents(PartEvent.EventTime.Post, PartEvent.EventType.InstallOnCar).InvokeAll();
 
-				foreach (BasicPart child in part.GetChilds())
+				foreach (BasicPart child in part.childs)
 				{
 					//Part was installed on car so installed childs will as well.
 					if (child.installed && child.GetType().GetInterfaces().Contains(typeof(SupportsPartEvents)))
@@ -152,7 +152,7 @@ namespace MscModApi.Trigger
 				//Probably called always because installedOnCar is likely already false at this point (can't be still installed on car)
 				part.GetEvents(PartEvent.EventTime.Post, PartEvent.EventType.UninstallFromCar).InvokeAll();
 
-				foreach (BasicPart child in part.GetChilds())
+				foreach (BasicPart child in part.childs)
 				{
 					//Part was uninstalled from car so installed childs are as well.
 					if (child.installed && child.GetType().GetInterfaces().Contains(typeof(SupportsPartEvents)))
@@ -180,7 +180,7 @@ namespace MscModApi.Trigger
 				//Parent is installed on car so part is also gonna be installed on the car soon
 				part.GetEvents(PartEvent.EventTime.Pre, PartEvent.EventType.InstallOnCar).InvokeAll();
 
-				foreach (BasicPart child in part.GetChilds())
+				foreach (BasicPart child in part.childs)
 				{
 					//Part will soon be installed on car so installed childs will as well.
 					if (child.installed && child.GetType().GetInterfaces().Contains(typeof(SupportsPartEvents)))
@@ -229,7 +229,7 @@ namespace MscModApi.Trigger
 				//Parent is installed on car so part is also gonna be uninstalled from the car soon
 				part.GetEvents(PartEvent.EventTime.Pre, PartEvent.EventType.UninstallFromCar).InvokeAll();
 
-				foreach (BasicPart child in part.GetChilds())
+				foreach (BasicPart child in part.childs)
 				{
 					//Part will soon be uninstalled from car so installed childs will as well.
 					if (child.installed && child.GetType().GetInterfaces().Contains(typeof(SupportsPartEvents)))
@@ -242,7 +242,7 @@ namespace MscModApi.Trigger
 
 			part.ResetScrews();
 
-			part.GetChilds().ForEach((BasicPart part) => {
+			part.childs.ForEach((BasicPart part) => {
 				if (part.uninstallWhenParentUninstalls)
 				{ 
 					part.Uninstall();

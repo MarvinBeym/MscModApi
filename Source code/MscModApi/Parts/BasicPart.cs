@@ -9,7 +9,8 @@ namespace MscModApi.Parts
 	/// </summary>
 	public abstract class BasicPart
 	{
-		protected List<BasicPart> childParts = new List<BasicPart>();
+		private List<BasicPart> _childs = new List<BasicPart>();
+		public List<BasicPart> childs => new List<BasicPart>(_childs);
 
 		public abstract GameObject gameObject { get; protected set; }
 
@@ -88,16 +89,7 @@ namespace MscModApi.Parts
 		/// <param name="part"></param>
 		public void AddChild(BasicPart part)
 		{
-			childParts.Add(part);
-		}
-
-		/// <summary>
-		/// Returns a list of all child parts of this part
-		/// </summary>
-		/// <returns></returns>
-		public List<BasicPart> GetChilds()
-		{
-			return new List<BasicPart>(childParts);
+			_childs.Add(part);
 		}
 
 		/// <summary>
@@ -110,6 +102,16 @@ namespace MscModApi.Parts
 		/// </summary>
 		/// <param name="uninstall">Should an installed part be uninstalled prior to resetting</param>
 		public abstract void ResetToDefault(bool uninstall = false);
+
+		/// <summary>
+		/// Returns a list of all child parts of this part
+		/// </summary>
+		/// <returns></returns>
+		[Obsolete("use 'childs' property instead", true)]
+		public List<BasicPart> GetChilds()
+		{
+			return new List<BasicPart>(_childs);
+		}
 
 		[Obsolete("Use 'active' property instead", true)]
 		public void SetActive(bool active)
