@@ -23,8 +23,8 @@ namespace MscModApi.Parts
 		/// <summary>
 		/// Stores all events that a developer may have added to this part object
 		/// </summary>
-		protected Dictionary<EventTime, Dictionary<PartEvent.EventType, List<Action>>> events =
-			new Dictionary<EventTime, Dictionary<PartEvent.EventType, List<Action>>>();
+		protected Dictionary<PartEvent.Time, Dictionary<PartEvent.Type, List<Action>>> events =
+			new Dictionary<PartEvent.Time, Dictionary<PartEvent.Type, List<Action>>>();
 
 		/// <inheritdoc />
 		protected Part()
@@ -126,7 +126,7 @@ namespace MscModApi.Parts
 				if (!injectedScrewPlacementDisablePreUninstall)
 				{
 					injectedScrewPlacementDisablePreUninstall = true;
-					AddEventListener(EventTime.Pre, PartEvent.EventType.Uninstall, () => { screwPlacementMode = false; });
+					AddEventListener(PartEvent.Time.Pre, PartEvent.Type.Uninstall, () => { screwPlacementMode = false; });
 				}
 
 				foreach (Screw screw in screws)
@@ -287,14 +287,14 @@ namespace MscModApi.Parts
 
 		protected void InitEventStorage()
 		{
-			foreach (EventTime eventTime in Enum.GetValues(typeof(EventTime))) {
-				Dictionary<PartEvent.EventType, List<Action>> eventTypeDict = new Dictionary<PartEvent.EventType, List<Action>>();
+			foreach (PartEvent.Time eventTime in Enum.GetValues(typeof(PartEvent.Time))) {
+				Dictionary<PartEvent.Type, List<Action>> TypeDict = new Dictionary<PartEvent.Type, List<Action>>();
 
-				foreach (PartEvent.EventType eventType in Enum.GetValues(typeof(PartEvent.EventType))) {
-					eventTypeDict.Add(eventType, new List<Action>());
+				foreach (PartEvent.Type Type in Enum.GetValues(typeof(PartEvent.Type))) {
+					TypeDict.Add(Type, new List<Action>());
 				}
 
-				events.Add(eventTime, eventTypeDict);
+				events.Add(eventTime, TypeDict);
 			}
 		}
 
@@ -370,50 +370,50 @@ namespace MscModApi.Parts
 		}
 
 		/// <inheritdoc />
-		public T AddEventBehaviour<T>(PartEvent.EventType eventType) where T : Behaviour
+		public T AddEventBehaviour<T>(PartEvent.Type Type) where T : Behaviour
 		{
 			var behaviour = AddComponent<T>();
-			switch (eventType)
+			switch (Type)
 			{
-				case PartEvent.EventType.Install:
+				case PartEvent.Type.Install:
 					behaviour.enabled = installed;
-					AddEventListener(EventTime.Post, eventType, () => behaviour.enabled = true);
-					AddEventListener(EventTime.Post, PartEvent.EventType.Uninstall, () => behaviour.enabled = false);
+					AddEventListener(PartEvent.Time.Post, Type, () => behaviour.enabled = true);
+					AddEventListener(PartEvent.Time.Post, PartEvent.Type.Uninstall, () => behaviour.enabled = false);
 					break;
-				case PartEvent.EventType.Uninstall:
+				case PartEvent.Type.Uninstall:
 					behaviour.enabled = !installed;
-					AddEventListener(EventTime.Post, eventType, () => behaviour.enabled = true);
-					AddEventListener(EventTime.Post, PartEvent.EventType.Install, () => behaviour.enabled = false);
+					AddEventListener(PartEvent.Time.Post, Type, () => behaviour.enabled = true);
+					AddEventListener(PartEvent.Time.Post, PartEvent.Type.Install, () => behaviour.enabled = false);
 					break;
-				case PartEvent.EventType.InstallOnCar:
+				case PartEvent.Type.InstallOnCar:
 					behaviour.enabled = installedOnCar;
-					AddEventListener(EventTime.Post, eventType, () => behaviour.enabled = true);
-					AddEventListener(EventTime.Post, PartEvent.EventType.UninstallFromCar, () => behaviour.enabled = false);
+					AddEventListener(PartEvent.Time.Post, Type, () => behaviour.enabled = true);
+					AddEventListener(PartEvent.Time.Post, PartEvent.Type.UninstallFromCar, () => behaviour.enabled = false);
 					break;
-				case PartEvent.EventType.UninstallFromCar:
+				case PartEvent.Type.UninstallFromCar:
 					behaviour.enabled = !installedOnCar;
-					AddEventListener(EventTime.Post, eventType, () => behaviour.enabled = true);
-					AddEventListener(EventTime.Post, PartEvent.EventType.InstallOnCar, () => behaviour.enabled = false);
+					AddEventListener(PartEvent.Time.Post, Type, () => behaviour.enabled = true);
+					AddEventListener(PartEvent.Time.Post, PartEvent.Type.InstallOnCar, () => behaviour.enabled = false);
 					break;
-				case PartEvent.EventType.Bolted:
+				case PartEvent.Type.Bolted:
 					behaviour.enabled = bolted;
-					AddEventListener(EventTime.Post, eventType, () => behaviour.enabled = true);
-					AddEventListener(EventTime.Post, PartEvent.EventType.Unbolted, () => behaviour.enabled = false);
+					AddEventListener(PartEvent.Time.Post, Type, () => behaviour.enabled = true);
+					AddEventListener(PartEvent.Time.Post, PartEvent.Type.Unbolted, () => behaviour.enabled = false);
 					break;
-				case PartEvent.EventType.Unbolted:
+				case PartEvent.Type.Unbolted:
 					behaviour.enabled = !bolted;
-					AddEventListener(EventTime.Post, eventType, () => behaviour.enabled = true);
-					AddEventListener(EventTime.Post, PartEvent.EventType.Bolted, () => behaviour.enabled = false);
+					AddEventListener(PartEvent.Time.Post, Type, () => behaviour.enabled = true);
+					AddEventListener(PartEvent.Time.Post, PartEvent.Type.Bolted, () => behaviour.enabled = false);
 					break;
-				case PartEvent.EventType.BoltedOnCar:
+				case PartEvent.Type.BoltedOnCar:
 					behaviour.enabled = bolted && installedOnCar;
-					AddEventListener(EventTime.Post, eventType, () => behaviour.enabled = true);
-					AddEventListener(EventTime.Post, PartEvent.EventType.UnboltedOnCar, () => behaviour.enabled = false);
+					AddEventListener(PartEvent.Time.Post, Type, () => behaviour.enabled = true);
+					AddEventListener(PartEvent.Time.Post, PartEvent.Type.UnboltedOnCar, () => behaviour.enabled = false);
 					break;
-				case PartEvent.EventType.UnboltedOnCar:
+				case PartEvent.Type.UnboltedOnCar:
 					behaviour.enabled = !bolted && installedOnCar;
-					AddEventListener(EventTime.Post, eventType, () => behaviour.enabled = true);
-					AddEventListener(EventTime.Post, PartEvent.EventType.BoltedOnCar, () => behaviour.enabled = false);
+					AddEventListener(PartEvent.Time.Post, Type, () => behaviour.enabled = true);
+					AddEventListener(PartEvent.Time.Post, PartEvent.Type.BoltedOnCar, () => behaviour.enabled = false);
 					break;
 			}
 
@@ -422,20 +422,20 @@ namespace MscModApi.Parts
 
 		/// <summary>
 		/// When this part installs, the "partsToBlock" parts will be blocked from being installed (installBlocked = true)
-		/// When this part uninstalls (opposite of "eventType") the "partsToBlock" parts will be unblocked from being installed (installBlocked = false)
+		/// When this part uninstalls (opposite of "Type") the "partsToBlock" parts will be unblocked from being installed (installBlocked = false)
 		/// </summary>
-		/// <param name="eventType">The event of this part after which installation of the "partsToBlock" will be blocked/unblocked</param>
-		/// <param name="partsToBlock">The parts to block when the "eventType" is called on this part</param>
-		public void BlockOtherPartInstallOnEvent(PartEvent.EventType eventType, IEnumerable<BasicPart> partsToBlock)
+		/// <param name="Type">The event of this part after which installation of the "partsToBlock" will be blocked/unblocked</param>
+		/// <param name="partsToBlock">The parts to block when the "Type" is called on this part</param>
+		public void BlockOtherPartInstallOnEvent(PartEvent.Type Type, IEnumerable<BasicPart> partsToBlock)
 		{
-			AddEventListener(EventTime.Post, eventType, () =>
+			AddEventListener(PartEvent.Time.Post, Type, () =>
 			{
 				foreach (BasicPart partToBlock in partsToBlock)
 				{
 					partToBlock.installBlocked = true;
 				}
 			});
-			AddEventListener(EventTime.Post, GetOppositeEvent(eventType), () =>
+			AddEventListener(PartEvent.Time.Post, GetOppositeEvent(Type), () =>
 			{
 				foreach (BasicPart partToBlock in partsToBlock)
 				{
@@ -446,79 +446,79 @@ namespace MscModApi.Parts
 
 		/// <summary>
 		/// When this part installs, the "partToBlock" part will be blocked from being installed (installBlocked = true)
-		/// When this part uninstalls (opposite of "eventType") the "partToBlock" part will be unblocked from being installed (installBlocked = false)
+		/// When this part uninstalls (opposite of "Type") the "partToBlock" part will be unblocked from being installed (installBlocked = false)
 		/// </summary>
-		/// <param name="eventType">The event of this part after which installation of the "partToBlock" will be blocked/unblocked</param>
-		/// <param name="partToBlock">The part to block when the "eventType" is called on this part</param>
-		public void BlockOtherPartInstallOnEvent(PartEvent.EventType eventType, BasicPart partToBlock)
+		/// <param name="Type">The event of this part after which installation of the "partToBlock" will be blocked/unblocked</param>
+		/// <param name="partToBlock">The part to block when the "Type" is called on this part</param>
+		public void BlockOtherPartInstallOnEvent(PartEvent.Type Type, BasicPart partToBlock)
 		{
-			AddEventListener(EventTime.Post, eventType, () => { partToBlock.installBlocked = true;});
-			AddEventListener(EventTime.Post, GetOppositeEvent(eventType), () => { partToBlock.installBlocked = false; });
+			AddEventListener(PartEvent.Time.Post, Type, () => { partToBlock.installBlocked = true;});
+			AddEventListener(PartEvent.Time.Post, GetOppositeEvent(Type), () => { partToBlock.installBlocked = false; });
 		}
 
-		public void AddEventListener(EventTime eventTime, PartEvent.EventType eventType, Action action)
+		public void AddEventListener(PartEvent.Time eventTime, PartEvent.Type Type, Action action)
 		{
 			if (
-				eventTime == EventTime.Pre
-				&& (eventType == PartEvent.EventType.InstallOnCar || eventType == PartEvent.EventType.UninstallFromCar)
+				eventTime == PartEvent.Time.Pre
+				&& (Type == PartEvent.Type.InstallOnCar || Type == PartEvent.Type.UninstallFromCar)
 			)
 			{
-				throw new Exception($"Event {eventType} can't be detected at '{eventTime}'. Unsupported!");
+				throw new Exception($"Event {Type} can't be detected at '{eventTime}'. Unsupported!");
 			}
 
-			events[eventTime][eventType].Add(action);
+			events[eventTime][Type].Add(action);
 
-			if (eventTime == EventTime.Post)
+			if (eventTime == PartEvent.Time.Post)
 			{
-				switch (eventType)
+				switch (Type)
 				{
 					//ToDo: check if invoking just the newly added action is enough of if all have to be invoked
-					case PartEvent.EventType.Install:
+					case PartEvent.Type.Install:
 						if (installed)
 						{
 							action.Invoke();
 						}
 
 						break;
-					case PartEvent.EventType.Uninstall:
+					case PartEvent.Type.Uninstall:
 						if (!installed)
 						{
 							action.Invoke();
 						}
 
 						break;
-					case PartEvent.EventType.Bolted:
+					case PartEvent.Type.Bolted:
 						if (bolted)
 						{
 							action.Invoke();
 						}
 
 						break;
-					case PartEvent.EventType.Unbolted:
+					case PartEvent.Type.Unbolted:
 						if (!bolted)
 						{
 							action.Invoke();
 						}
 						break;
-					case PartEvent.EventType.InstallOnCar:
+					case PartEvent.Type.InstallOnCar:
 						if (installedOnCar)
 						{
 							action.Invoke();
 						}
 						break;
-					case PartEvent.EventType.UninstallFromCar:
+					case PartEvent.Type.UninstallFromCar:
 						if (!installedOnCar)
 						{
 							action.Invoke();
 						}
 						break;
-					case PartEvent.EventType.BoltedOnCar:
+					case PartEvent.Type.BoltedOnCar:
 						if (bolted && installedOnCar)
 						{
 							action.Invoke();
 						}
 						break;
-					case PartEvent.EventType.UnboltedOnCar:
+					case PartEvent.Type.UnboltedOnCar:
 						if (!bolted && installedOnCar)
 						{
 							action.Invoke();
@@ -528,9 +528,9 @@ namespace MscModApi.Parts
 			}
 		}
 
-		public List<Action> GetEvents(EventTime eventTime, PartEvent.EventType eventType)
+		public List<Action> GetEvents(PartEvent.Time eventTime, PartEvent.Type Type)
 		{
-			return events[eventTime][eventType];
+			return events[eventTime][Type];
 		}
 
 		public T AddComponent<T>() where T : Component => gameObject.AddComponent(typeof(T)) as T;
@@ -564,13 +564,13 @@ namespace MscModApi.Parts
 		[Obsolete("Use 'AddEventBehaviour' method instead", true)]
 		public T AddWhenInstalledBehaviour<T>() where T : Behaviour
 		{
-			return AddEventBehaviour<T>(PartEvent.EventType.Install);
+			return AddEventBehaviour<T>(PartEvent.Type.Install);
 		}
 
 		[Obsolete("Use 'AddEventBehaviour' method instead", true)]
 		public T AddWhenUninstalledBehaviour<T>() where T : Behaviour
 		{
-			return AddEventBehaviour<T>(PartEvent.EventType.Uninstall);
+			return AddEventBehaviour<T>(PartEvent.Type.Uninstall);
 		}
 
 		[Obsolete("Use 'screws' property instead", true)]
@@ -607,55 +607,55 @@ namespace MscModApi.Parts
 		[Obsolete("Use cleaner 'AddEventListener' method instead", true)]
 		public void AddPreSaveAction(Action action)
 		{
-			AddEventListener(EventTime.Pre, PartEvent.EventType.Save, action);
+			AddEventListener(PartEvent.Time.Pre, PartEvent.Type.Save, action);
 		}
 
 		[Obsolete("Use cleaner 'AddEventListener' method instead", true)]
 		public void AddPreInstallAction(Action action)
 		{
-			AddEventListener(EventTime.Pre, PartEvent.EventType.Install, action);
+			AddEventListener(PartEvent.Time.Pre, PartEvent.Type.Install, action);
 		}
 
 		[Obsolete("Use cleaner 'AddEventListener' method instead", true)]
 		public void AddPostInstallAction(Action action)
 		{
-			AddEventListener(EventTime.Post, PartEvent.EventType.Install, action);
+			AddEventListener(PartEvent.Time.Post, PartEvent.Type.Install, action);
 		}
 
 		[Obsolete("Use cleaner 'AddEventListener' method instead", true)]
 		public void AddPreUninstallAction(Action action)
 		{
-			AddEventListener(EventTime.Pre, PartEvent.EventType.Uninstall, action);
+			AddEventListener(PartEvent.Time.Pre, PartEvent.Type.Uninstall, action);
 		}
 
 		[Obsolete("Use cleaner 'AddEventListener' method instead", true)]
 		public void AddPostUninstallAction(Action action)
 		{
-			AddEventListener(EventTime.Post, PartEvent.EventType.Uninstall, action);
+			AddEventListener(PartEvent.Time.Post, PartEvent.Type.Uninstall, action);
 		}
 
 		[Obsolete("Use cleaner 'AddEventListener' method instead", true)]
 		public void AddPostFixedAction(Action action)
 		{
-			AddEventListener(EventTime.Post, PartEvent.EventType.Bolted, action);
+			AddEventListener(PartEvent.Time.Post, PartEvent.Type.Bolted, action);
 		}
 
 		[Obsolete("Use cleaner 'AddEventListener' method instead", true)]
 		public void AddPreFixedAction(Action action)
 		{
-			AddEventListener(EventTime.Pre, PartEvent.EventType.Bolted, action);
+			AddEventListener(PartEvent.Time.Pre, PartEvent.Type.Bolted, action);
 		}
 
 		[Obsolete("Use cleaner 'AddEventListener' method instead", true)]
 		public void AddPreUnfixedActions(Action action)
 		{
-			AddEventListener(EventTime.Pre, PartEvent.EventType.Unbolted, action);
+			AddEventListener(PartEvent.Time.Pre, PartEvent.Type.Unbolted, action);
 		}
 
 		[Obsolete("Use cleaner 'AddEventListener' method instead", true)]
 		public void AddPostUnfixedActions(Action action)
 		{
-			AddEventListener(EventTime.Post, PartEvent.EventType.Unbolted, action);
+			AddEventListener(PartEvent.Time.Post, PartEvent.Type.Unbolted, action);
 		}
 
 		[Obsolete("Use AddWhenInstalledBehaviour instead. Will be removed in a later version", true)]

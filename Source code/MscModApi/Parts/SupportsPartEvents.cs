@@ -6,9 +6,9 @@ namespace MscModApi.Parts
 {
 	public interface SupportsPartEvents
 	{
-		void AddEventListener(PartEvent.EventTime eventTime, PartEvent.EventType eventType, Action action);
+		void AddEventListener(PartEvent.Time eventTime, PartEvent.Type Type, Action action);
 
-		List<Action> GetEvents(PartEvent.EventTime eventTime, PartEvent.EventType eventType);
+		List<Action> GetEvents(PartEvent.Time eventTime, PartEvent.Type Type);
 
 	}
 }

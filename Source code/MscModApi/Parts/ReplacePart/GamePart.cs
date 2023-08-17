@@ -18,8 +18,8 @@ namespace MscModApi.Parts.ReplacePart
 		/// <summary>
 		/// Stores all events that a developer may have added to this GamePart object
 		/// </summary>
-		protected Dictionary<PartEvent.EventTime, Dictionary<PartEvent.EventType, List<Action>>> events =
-			new Dictionary<PartEvent.EventTime, Dictionary<PartEvent.EventType, List<Action>>>();
+		protected Dictionary<PartEvent.Time, Dictionary<PartEvent.Type, List<Action>>> events =
+			new Dictionary<PartEvent.Time, Dictionary<PartEvent.Type, List<Action>>>();
 
 		/// <summary>
 		/// Flag used to avoid calling the pre bolted event multiple times
@@ -102,26 +102,26 @@ namespace MscModApi.Parts.ReplacePart
 			tightness = boltCheckFsm.FsmVariables.FindFsmFloat("Tightness");
 
 			AddActionAsFirst(assemblyFsm.FindState("Assemble"),
-				() => { GetEvents(PartEvent.EventTime.Pre, PartEvent.EventType.Install).InvokeAll(); });
+				() => { GetEvents(PartEvent.Time.Pre, PartEvent.Type.Install).InvokeAll(); });
 
 			AddActionAsLast(assemblyFsm.FindState("End"), () =>
 				{
-					GetEvents(PartEvent.EventTime.Post, PartEvent.EventType.Install).InvokeAll();
+					GetEvents(PartEvent.Time.Post, PartEvent.Type.Install).InvokeAll();
 					if (installedOnCar)
 					{
-						GetEvents(PartEvent.EventTime.Post, PartEvent.EventType.InstallOnCar).InvokeAll();
+						GetEvents(PartEvent.Time.Post, PartEvent.Type.InstallOnCar).InvokeAll();
 					}
 				});
 
 			AddActionAsFirst(removalFsm.FindState("Remove part"),
-				() => { GetEvents(PartEvent.EventTime.Pre, PartEvent.EventType.Uninstall).InvokeAll(); });
+				() => { GetEvents(PartEvent.Time.Pre, PartEvent.Type.Uninstall).InvokeAll(); });
 			AddActionAsLast(removalFsm.FindState("Remove part"), () =>
 				{
-					GetEvents(PartEvent.EventTime.Post, PartEvent.EventType.Uninstall).InvokeAll();
+					GetEvents(PartEvent.Time.Post, PartEvent.Type.Uninstall).InvokeAll();
 					if (!installedOnCar)
 					{
 						//Check probably not needed, likely already not on car because part can't be connected to something else after being uninstalled
-						GetEvents(PartEvent.EventTime.Post, PartEvent.EventType.UninstallFromCar).InvokeAll();
+						GetEvents(PartEvent.Time.Post, PartEvent.Type.UninstallFromCar).InvokeAll();
 					}
 				});
 
@@ -192,11 +192,11 @@ namespace MscModApi.Parts.ReplacePart
 					boltFsm.InitializeFSM();
 				}
 
-				AddActionAsFirst(tightState, () => OnTight(PartEvent.EventTime.Pre));
-				AddActionAsLast(tightState, () => OnTight(PartEvent.EventTime.Post));
+				AddActionAsFirst(tightState, () => OnTight(PartEvent.Time.Pre));
+				AddActionAsLast(tightState, () => OnTight(PartEvent.Time.Post));
 
-				AddActionAsFirst(unscrewPreState, () => OnUnscrew(PartEvent.EventTime.Pre));
-				AddActionAsLast(unscrewPostState, () => OnUnscrew(PartEvent.EventTime.Post));
+				AddActionAsFirst(unscrewPreState, () => OnUnscrew(PartEvent.Time.Pre));
+				AddActionAsLast(unscrewPostState, () => OnUnscrew(PartEvent.Time.Post));
 				maxTightness += 8;
 			}
 		}
@@ -215,10 +215,10 @@ namespace MscModApi.Parts.ReplacePart
 					return;
 				}
 
-				GetEvents(PartEvent.EventTime.Pre, PartEvent.EventType.Unbolted).InvokeAll();
+				GetEvents(PartEvent.Time.Pre, PartEvent.Type.Unbolted).InvokeAll();
 				if (installedOnCar)
 				{
-					GetEvents(PartEvent.EventTime.Pre, PartEvent.EventType.UnboltedOnCar).InvokeAll();
+					GetEvents(PartEvent.Time.Pre, PartEvent.Type.UnboltedOnCar).InvokeAll();
 				}
 			});
 			AddActionAsLast(boltCheckFsm.FindState("Bolts OFF"), () =>
@@ -230,10 +230,10 @@ namespace MscModApi.Parts.ReplacePart
 					return;
 				}
 
-				GetEvents(PartEvent.EventTime.Post, PartEvent.EventType.Unbolted).InvokeAll();
+				GetEvents(PartEvent.Time.Post, PartEvent.Type.Unbolted).InvokeAll();
 				if (installedOnCar)
 				{
-					GetEvents(PartEvent.EventTime.Post, PartEvent.EventType.UnboltedOnCar).InvokeAll();
+					GetEvents(PartEvent.Time.Post, PartEvent.Type.UnboltedOnCar).InvokeAll();
 				}
 			});
 
@@ -246,10 +246,10 @@ namespace MscModApi.Parts.ReplacePart
 					return;
 				}
 
-				GetEvents(PartEvent.EventTime.Pre, PartEvent.EventType.Bolted).InvokeAll();
+				GetEvents(PartEvent.Time.Pre, PartEvent.Type.Bolted).InvokeAll();
 				if (installedOnCar)
 				{
-					GetEvents(PartEvent.EventTime.Pre, PartEvent.EventType.BoltedOnCar).InvokeAll();
+					GetEvents(PartEvent.Time.Pre, PartEvent.Type.BoltedOnCar).InvokeAll();
 				}
 			});
 			AddActionAsLast(boltCheckFsm.FindState("Bolts ON"), () =>
@@ -261,10 +261,10 @@ namespace MscModApi.Parts.ReplacePart
 					return;
 				}
 
-				GetEvents(PartEvent.EventTime.Post, PartEvent.EventType.Bolted).InvokeAll();
+				GetEvents(PartEvent.Time.Post, PartEvent.Type.Bolted).InvokeAll();
 				if (installedOnCar)
 				{
-					GetEvents(PartEvent.EventTime.Post, PartEvent.EventType.BoltedOnCar).InvokeAll();
+					GetEvents(PartEvent.Time.Post, PartEvent.Type.BoltedOnCar).InvokeAll();
 				}
 			});
 		}
@@ -274,14 +274,14 @@ namespace MscModApi.Parts.ReplacePart
 		/// </summary>
 		protected void InitEventStorage()
 		{
-			foreach (PartEvent.EventTime eventTime in Enum.GetValues(typeof(PartEvent.EventTime))) {
-				Dictionary<PartEvent.EventType, List<Action>> eventTypeDict = new Dictionary<PartEvent.EventType, List<Action>>();
+			foreach (PartEvent.Time eventTime in Enum.GetValues(typeof(PartEvent.Time))) {
+				Dictionary<PartEvent.Type, List<Action>> TypeDict = new Dictionary<PartEvent.Type, List<Action>>();
 
-				foreach (PartEvent.EventType eventType in Enum.GetValues(typeof(PartEvent.EventType))) {
-					eventTypeDict.Add(eventType, new List<Action>());
+				foreach (PartEvent.Type Type in Enum.GetValues(typeof(PartEvent.Type))) {
+					TypeDict.Add(Type, new List<Action>());
 				}
 
-				events.Add(eventTime, eventTypeDict);
+				events.Add(eventTime, TypeDict);
 			}
 		}
 
@@ -485,34 +485,34 @@ namespace MscModApi.Parts.ReplacePart
 		/// Gets called by the advanced bolted state detection when Unscrewing a bolt
 		/// </summary>
 		/// <param name="eventTime"></param>
-		protected void OnUnscrew(PartEvent.EventTime eventTime)
+		protected void OnUnscrew(PartEvent.Time eventTime)
 		{
 			alreadyCalledPreBolted = false;
 			alreadyCalledPostBolted = false;
 
 			switch (eventTime) {
-				case PartEvent.EventTime.Pre:
+				case PartEvent.Time.Pre:
 					if (alreadyCalledPreUnbolted) {
 						return;
 					}
 
 					alreadyCalledPreUnbolted = true;
-					GetEvents(PartEvent.EventTime.Pre, PartEvent.EventType.Unbolted).InvokeAll();
+					GetEvents(PartEvent.Time.Pre, PartEvent.Type.Unbolted).InvokeAll();
 					if (installedOnCar)
 					{
-						GetEvents(PartEvent.EventTime.Pre, PartEvent.EventType.UnboltedOnCar).InvokeAll();
+						GetEvents(PartEvent.Time.Pre, PartEvent.Type.UnboltedOnCar).InvokeAll();
 					}
 					break;
-				case PartEvent.EventTime.Post:
+				case PartEvent.Time.Post:
 					if (alreadyCalledPostUnbolted) {
 						return;
 					}
 
 					alreadyCalledPostUnbolted = true;
-					GetEvents(PartEvent.EventTime.Post, PartEvent.EventType.Unbolted).InvokeAll();
+					GetEvents(PartEvent.Time.Post, PartEvent.Type.Unbolted).InvokeAll();
 					if (installedOnCar)
 					{
-						GetEvents(PartEvent.EventTime.Post, PartEvent.EventType.UnboltedOnCar).InvokeAll();
+						GetEvents(PartEvent.Time.Post, PartEvent.Type.UnboltedOnCar).InvokeAll();
 					}
 					break;
 			}
@@ -522,7 +522,7 @@ namespace MscModApi.Parts.ReplacePart
 		/// Gets called by the advanced bolted state detection when a bolt reaches the state "8" (tight)
 		/// </summary>
 		/// <param name="eventTime"></param>
-		protected void OnTight(PartEvent.EventTime eventTime)
+		protected void OnTight(PartEvent.Time eventTime)
 		{
 			if (tightness.Value < maxTightness) {
 				return; //Wait for all screws to be tight
@@ -533,28 +533,28 @@ namespace MscModApi.Parts.ReplacePart
 
 
 			switch (eventTime) {
-				case PartEvent.EventTime.Pre:
+				case PartEvent.Time.Pre:
 					if (alreadyCalledPreBolted) {
 						return;
 					}
 
 					alreadyCalledPreBolted = true;
-					GetEvents(PartEvent.EventTime.Pre, PartEvent.EventType.Bolted).InvokeAll();
+					GetEvents(PartEvent.Time.Pre, PartEvent.Type.Bolted).InvokeAll();
 					if (installedOnCar)
 					{
-						GetEvents(PartEvent.EventTime.Pre, PartEvent.EventType.BoltedOnCar).InvokeAll();
+						GetEvents(PartEvent.Time.Pre, PartEvent.Type.BoltedOnCar).InvokeAll();
 					}
 					break;
-				case PartEvent.EventTime.Post:
+				case PartEvent.Time.Post:
 					if (alreadyCalledPostBolted) {
 						return;
 					}
 
 					alreadyCalledPostBolted = true;
-					GetEvents(PartEvent.EventTime.Post, PartEvent.EventType.Bolted).InvokeAll();
+					GetEvents(PartEvent.Time.Post, PartEvent.Type.Bolted).InvokeAll();
 					if (installedOnCar)
 					{
-						GetEvents(PartEvent.EventTime.Post, PartEvent.EventType.BoltedOnCar).InvokeAll();
+						GetEvents(PartEvent.Time.Post, PartEvent.Type.BoltedOnCar).InvokeAll();
 					}
 					break;
 			}
@@ -564,72 +564,72 @@ namespace MscModApi.Parts.ReplacePart
 		/// Not implemented for the 
 		/// </summary>
 		/// <param name="eventTime"></param>
-		/// <param name="eventType"></param>
+		/// <param name="Type"></param>
 		/// <returns></returns>
-		public List<Action> GetEvents(PartEvent.EventTime eventTime, PartEvent.EventType eventType)
+		public List<Action> GetEvents(PartEvent.Time eventTime, PartEvent.Type Type)
 		{
-			return events[eventTime][eventType];
+			return events[eventTime][Type];
 		}
 
 		/// <inheritdoc />
-		public void AddEventListener(PartEvent.EventTime eventTime, PartEvent.EventType eventType, Action action)
+		public void AddEventListener(PartEvent.Time eventTime, PartEvent.Type Type, Action action)
 		{
 			if (
-				eventTime == PartEvent.EventTime.Pre 
-				&& (eventType == PartEvent.EventType.InstallOnCar || eventType == PartEvent.EventType.UninstallFromCar)
+				eventTime == PartEvent.Time.Pre 
+				&& (Type == PartEvent.Type.InstallOnCar || Type == PartEvent.Type.UninstallFromCar)
 			) {
-				throw new Exception($"Event {eventType} can't be detected at '{eventTime}'. Unsupported!");
+				throw new Exception($"Event {Type} can't be detected at '{eventTime}'. Unsupported!");
 			}
 
-			events[eventTime][eventType].Add(action);
+			events[eventTime][Type].Add(action);
 
-			if (eventTime == PartEvent.EventTime.Post) {
-				switch (eventType) {
+			if (eventTime == PartEvent.Time.Post) {
+				switch (Type) {
 					//ToDo: check if invoking just the newly added action is enough of if all have to be invoked
-					case PartEvent.EventType.Install:
+					case PartEvent.Type.Install:
 						if (installed) {
 							action.Invoke();
 						}
 
 						break;
-					case PartEvent.EventType.Uninstall:
+					case PartEvent.Type.Uninstall:
 						if (!installed) {
 							action.Invoke();
 						}
 
 						break;
-					case PartEvent.EventType.Bolted:
+					case PartEvent.Type.Bolted:
 						if (bolted) {
 							//ToDo: bolted state should only be true if maxTightness is also reached
 							action.Invoke();
 						}
 
 						break;
-					case PartEvent.EventType.Unbolted:
+					case PartEvent.Type.Unbolted:
 						if (!bolted) {
 							//ToDo: bolted state should only be true if maxTightness is also reached
 							action.Invoke();
 						}
 						break;
-					case PartEvent.EventType.InstallOnCar:
+					case PartEvent.Type.InstallOnCar:
 						if (installedOnCar)
 						{
 							action.Invoke();
 						}
 						break;
-					case PartEvent.EventType.UninstallFromCar:
+					case PartEvent.Type.UninstallFromCar:
 						if (!installedOnCar)
 						{
 							action.Invoke();
 						}
 						break;
-					case PartEvent.EventType.BoltedOnCar:
+					case PartEvent.Type.BoltedOnCar:
 						if (bolted && installedOnCar)
 						{
 							action.Invoke();
 						}
 						break;
-					case PartEvent.EventType.UnboltedOnCar:
+					case PartEvent.Type.UnboltedOnCar:
 						if (!bolted && installedOnCar)
 						{
 							action.Invoke();

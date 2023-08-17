@@ -4,13 +4,13 @@ namespace MscModApi.Parts
 {
 	public static class PartEvent
 	{
-		public enum EventTime
+		public enum Time
 		{
 			Pre,
 			Post
 		}
 
-		public enum EventType
+		public enum Type
 		{
 			/// <summary>
 			/// Called when part saves
@@ -55,32 +55,32 @@ namespace MscModApi.Parts
 		/// <summary>
 		/// Returns the opposite event to the one passed
 		/// </summary>
-		/// <param name="eventType">The event you want to get the opposite of</param>
+		/// <param name="Type">The event you want to get the opposite of</param>
 		/// <returns>The opposite event</returns>
 		/// <exception cref="Exception">When passed event is not supported by this method</exception>
-		public static PartEvent.EventType GetOppositeEvent(PartEvent.EventType eventType)
+		public static PartEvent.Type GetOppositeEvent(PartEvent.Type Type)
 		{
-			switch (eventType)
+			switch (Type)
 			{
-				case PartEvent.EventType.Install:
-					return PartEvent.EventType.Uninstall;
-				case PartEvent.EventType.Uninstall:
-					return PartEvent.EventType.Install;
-				case PartEvent.EventType.Bolted:
-					return PartEvent.EventType.Unbolted;
-				case PartEvent.EventType.Unbolted:
-					return PartEvent.EventType.Bolted;
-				case PartEvent.EventType.InstallOnCar:
-					return PartEvent.EventType.UninstallFromCar;
-				case PartEvent.EventType.UninstallFromCar:
-					return PartEvent.EventType.InstallOnCar;
-				case PartEvent.EventType.BoltedOnCar:
-					return PartEvent.EventType.UnboltedOnCar;
-				case PartEvent.EventType.UnboltedOnCar:
-					return PartEvent.EventType.BoltedOnCar;
+				case PartEvent.Type.Install:
+					return PartEvent.Type.Uninstall;
+				case PartEvent.Type.Uninstall:
+					return PartEvent.Type.Install;
+				case PartEvent.Type.Bolted:
+					return PartEvent.Type.Unbolted;
+				case PartEvent.Type.Unbolted:
+					return PartEvent.Type.Bolted;
+				case PartEvent.Type.InstallOnCar:
+					return PartEvent.Type.UninstallFromCar;
+				case PartEvent.Type.UninstallFromCar:
+					return PartEvent.Type.InstallOnCar;
+				case PartEvent.Type.BoltedOnCar:
+					return PartEvent.Type.UnboltedOnCar;
+				case PartEvent.Type.UnboltedOnCar:
+					return PartEvent.Type.BoltedOnCar;
 			}
 
-			throw new Exception($"Unsupported PartEvent.EventType '{eventType}' used");
+			throw new Exception($"Unsupported PartEvent.Type '{Type}' used");
 		}
 	}
 }

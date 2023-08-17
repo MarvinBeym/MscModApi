@@ -104,10 +104,10 @@ namespace MscModApi.Trigger
 			}
 
 			verifyInstalledRoutine = null;
-			part.GetEvents(PartEvent.EventTime.Post, PartEvent.EventType.Install).InvokeAll();
+			part.GetEvents(PartEvent.Time.Post, PartEvent.Type.Install).InvokeAll();
 			if (part.installedOnCar)
 			{
-				part.GetEvents(PartEvent.EventTime.Post, PartEvent.EventType.InstallOnCar).InvokeAll();
+				part.GetEvents(PartEvent.Time.Post, PartEvent.Type.InstallOnCar).InvokeAll();
 
 				foreach (BasicPart child in part.childs)
 				{
@@ -115,7 +115,7 @@ namespace MscModApi.Trigger
 					if (child.installed && child.GetType().GetInterfaces().Contains(typeof(SupportsPartEvents)))
 					{
 						SupportsPartEvents partEventSupportingPart = (SupportsPartEvents)child;
-						partEventSupportingPart.GetEvents(PartEvent.EventTime.Post, PartEvent.EventType.InstallOnCar).InvokeAll();
+						partEventSupportingPart.GetEvents(PartEvent.Time.Post, PartEvent.Type.InstallOnCar).InvokeAll();
 					}
 				}
 			}
@@ -146,11 +146,11 @@ namespace MscModApi.Trigger
 			}
 
 			verifyUninstalledRoutine = null;
-			part.GetEvents(PartEvent.EventTime.Post, PartEvent.EventType.Uninstall).InvokeAll();
+			part.GetEvents(PartEvent.Time.Post, PartEvent.Type.Uninstall).InvokeAll();
 			if (!part.installedOnCar)
 			{
 				//Probably called always because installedOnCar is likely already false at this point (can't be still installed on car)
-				part.GetEvents(PartEvent.EventTime.Post, PartEvent.EventType.UninstallFromCar).InvokeAll();
+				part.GetEvents(PartEvent.Time.Post, PartEvent.Type.UninstallFromCar).InvokeAll();
 
 				foreach (BasicPart child in part.childs)
 				{
@@ -158,7 +158,7 @@ namespace MscModApi.Trigger
 					if (child.installed && child.GetType().GetInterfaces().Contains(typeof(SupportsPartEvents)))
 					{
 						SupportsPartEvents partEventSupportingPart = (SupportsPartEvents)child;
-						partEventSupportingPart.GetEvents(PartEvent.EventTime.Post, PartEvent.EventType.UninstallFromCar).InvokeAll();
+						partEventSupportingPart.GetEvents(PartEvent.Time.Post, PartEvent.Type.UninstallFromCar).InvokeAll();
 					}
 				}
 			}
@@ -173,12 +173,12 @@ namespace MscModApi.Trigger
 				return;
 			}
 
-			part.GetEvents(PartEvent.EventTime.Pre, PartEvent.EventType.Install).InvokeAll();
+			part.GetEvents(PartEvent.Time.Pre, PartEvent.Type.Install).InvokeAll();
 
 			if (parent != null && parent.installedOnCar)
 			{
 				//Parent is installed on car so part is also gonna be installed on the car soon
-				part.GetEvents(PartEvent.EventTime.Pre, PartEvent.EventType.InstallOnCar).InvokeAll();
+				part.GetEvents(PartEvent.Time.Pre, PartEvent.Type.InstallOnCar).InvokeAll();
 
 				foreach (BasicPart child in part.childs)
 				{
@@ -186,7 +186,7 @@ namespace MscModApi.Trigger
 					if (child.installed && child.GetType().GetInterfaces().Contains(typeof(SupportsPartEvents)))
 					{
 						SupportsPartEvents partEventSupportingPart = (SupportsPartEvents)child;
-						partEventSupportingPart.GetEvents(PartEvent.EventTime.Pre, PartEvent.EventType.InstallOnCar).InvokeAll();
+						partEventSupportingPart.GetEvents(PartEvent.Time.Pre, PartEvent.Type.InstallOnCar).InvokeAll();
 					}
 				}
 			}
@@ -217,17 +217,17 @@ namespace MscModApi.Trigger
 		/// </summary>
 		public void Uninstall()
 		{
-			part.GetEvents(PartEvent.EventTime.Pre, PartEvent.EventType.Uninstall).InvokeAll();
+			part.GetEvents(PartEvent.Time.Pre, PartEvent.Type.Uninstall).InvokeAll();
 
 			if (parent != null && parent.installedOnCar)
 			{
-				part.GetEvents(PartEvent.EventTime.Pre, PartEvent.EventType.UninstallFromCar).InvokeAll();
+				part.GetEvents(PartEvent.Time.Pre, PartEvent.Type.UninstallFromCar).InvokeAll();
 			}
 
 			if (parent != null && parent.installedOnCar)
 			{
 				//Parent is installed on car so part is also gonna be uninstalled from the car soon
-				part.GetEvents(PartEvent.EventTime.Pre, PartEvent.EventType.UninstallFromCar).InvokeAll();
+				part.GetEvents(PartEvent.Time.Pre, PartEvent.Type.UninstallFromCar).InvokeAll();
 
 				foreach (BasicPart child in part.childs)
 				{
@@ -235,7 +235,7 @@ namespace MscModApi.Trigger
 					if (child.installed && child.GetType().GetInterfaces().Contains(typeof(SupportsPartEvents)))
 					{
 						SupportsPartEvents partEventSupportingPart = (SupportsPartEvents)child;
-						partEventSupportingPart.GetEvents(PartEvent.EventTime.Pre, PartEvent.EventType.UninstallFromCar).InvokeAll();
+						partEventSupportingPart.GetEvents(PartEvent.Time.Pre, PartEvent.Type.UninstallFromCar).InvokeAll();
 					}
 				}
 			}
