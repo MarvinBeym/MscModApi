@@ -54,7 +54,7 @@ namespace MscModApi.Parts.ReplacePart
 		/// <inheritdoc />
 		public override string name => gameObject.name;
 
-		public bool installBlocked
+		public override bool installBlocked
 		{
 			get => !assembleFsm.enabled;
 			set => assembleFsm.enabled = !value;

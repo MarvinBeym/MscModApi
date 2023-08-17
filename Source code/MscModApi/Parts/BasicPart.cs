@@ -83,6 +83,11 @@ namespace MscModApi.Parts
 		public abstract bool installedOnCar { get; }
 
 		/// <summary>
+		/// Blocks the part from being installed on the parent
+		/// </summary>
+		public abstract bool installBlocked { get; set; }
+
+		/// <summary>
 		/// Add a part object as the child of this part
 		/// Should only be used by logic itself, never by mod makers!
 		/// </summary>

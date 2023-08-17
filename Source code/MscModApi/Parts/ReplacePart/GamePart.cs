@@ -288,7 +288,7 @@ namespace MscModApi.Parts.ReplacePart
 		/// <summary>
 		/// Block installation of the part by disabling the trigger object
 		/// </summary>
-		public bool installBlocked
+		public override bool installBlocked
 		{
 			get => triggerFsmGameObject.activeSelf;
 			set => triggerFsmGameObject.SetActive(!value);

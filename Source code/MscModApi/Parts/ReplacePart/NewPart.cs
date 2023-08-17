@@ -76,7 +76,7 @@ namespace MscModApi.Parts.ReplacePart
 			part.ResetToDefault(uninstall);
 		}
 
-		public bool installBlocked
+		public override bool installBlocked
 		{
 			get => part.installBlocked;
 			set

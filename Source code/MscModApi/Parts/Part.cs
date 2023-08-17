@@ -107,7 +107,7 @@ namespace MscModApi.Parts
 		
 		public bool hasParent => parent != null;
 
-		public bool installBlocked { get; set; }
+		public override bool installBlocked { get; set; }
 
 		public List<Screw> screws => partSave.screws;
 
