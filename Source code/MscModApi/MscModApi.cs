@@ -147,7 +147,7 @@ namespace MscModApi
 					try {
 						part.CustomSaveSaving(mod, $"{id}_saveFile.json");
 					}
-					catch {
+					catch (Exception) {
 						// ignored
 					}
 

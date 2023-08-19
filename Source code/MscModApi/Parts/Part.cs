@@ -232,6 +232,7 @@ namespace MscModApi.Parts
 			this.installPosition = installPosition;
 			this.uninstallWhenParentUninstalls = uninstallWhenParentUninstalls;
 			this.installRotation = installRotation;
+			this.parent = parent;
 
 			if (gameObjectUsedForInstantiation != null) {
 				gameObject = GameObject.Instantiate(gameObjectUsedForInstantiation);
@@ -248,7 +249,8 @@ namespace MscModApi.Parts
 			try {
 				CustomSaveLoading(partBaseInfo.mod, $"{id}_saveFile.json");
 			}
-			catch {
+			catch (Exception)
+			{
 				// ignored
 			}
 
@@ -283,7 +285,6 @@ namespace MscModApi.Parts
 			}
 
 			partBaseInfo.AddToPartsList(this);
-			this.parent = parent;
 		}
 
 		protected void InitEventStorage()
