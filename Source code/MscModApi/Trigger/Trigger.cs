@@ -253,7 +253,7 @@ namespace MscModApi.Trigger
 				{
 					childsInstalledBeforeUninstall.Add(child);
 				}
-				if (child.uninstallWhenParentUninstalls)
+				if (child.GetType() == typeof(Part) && ((Part)child).uninstallWhenParentUninstalls)
 				{
 					child.Uninstall();
 				}

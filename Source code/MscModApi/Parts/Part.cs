@@ -114,7 +114,9 @@ namespace MscModApi.Parts
 		public Vector3 installRotation { get; protected set; }
 
 		public BasicPart parent { get; protected set; }
-		
+
+		public bool uninstallWhenParentUninstalls { get; protected set; }
+
 		protected List<Screw> savedScrews;
 
 		public Collider collider { get; protected set; }

@@ -37,8 +37,6 @@ namespace MscModApi.Parts
 		/// </summary>
 		public Vector3 defaultRotation { get; set; } = Vector3.zero;
 
-		public bool uninstallWhenParentUninstalls { get; protected set; }
-
 		/// <summary>
 		/// Is the part bought
 		/// </summary>
