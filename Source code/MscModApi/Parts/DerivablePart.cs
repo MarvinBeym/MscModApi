@@ -22,12 +22,15 @@ namespace MscModApi.Parts
 		/// </summary>
 		protected abstract string partId { get; }
 		/// <summary>
-		/// disabled collision when part is installed
+		/// Disables collision when part is installed
 		/// </summary>
 		protected virtual DisableCollision disableCollisionWhenInstalled => DisableCollision.InstalledOnCar;
+		/// <summary>
+		/// Should the part uninstall from it's parent when the parent itself uninstalls from it's parent
+		/// </summary>
+		protected virtual bool uninstallWhenParentUninstalls => false;
 
-		protected DerivablePart(GameObject part, Part parent, PartBaseInfo partBaseInfo,
-			bool uninstallWhenParentUninstalls = true)
+		protected DerivablePart(GameObject part, Part parent, PartBaseInfo partBaseInfo)
 		{
 			gameObjectUsedForInstantiation = part;
 
@@ -35,8 +38,7 @@ namespace MscModApi.Parts
 				uninstallWhenParentUninstalls, disableCollisionWhenInstalled, null);
 		}
 
-		protected DerivablePart(GameObject part, GamePart parent, PartBaseInfo partBaseInfo,
-			bool uninstallWhenParentUninstalls = true)
+		protected DerivablePart(GameObject part, GamePart parent, PartBaseInfo partBaseInfo)
 		{
 			gameObjectUsedForInstantiation = part;
 
@@ -44,19 +46,19 @@ namespace MscModApi.Parts
 				uninstallWhenParentUninstalls, disableCollisionWhenInstalled, null);
 		}
 
-		protected DerivablePart(Part parent, PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls = true, string prefabName = null)
+		protected DerivablePart(Part parent, PartBaseInfo partBaseInfo, string prefabName = null)
 		{
 			Setup(partId, partName, parent, partInstallPosition, partInstallRotation, partBaseInfo,
 				uninstallWhenParentUninstalls, disableCollisionWhenInstalled, prefabName);
 		}
 
-		protected DerivablePart(GamePart parent, PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls = true, string prefabName = null)
+		protected DerivablePart(GamePart parent, PartBaseInfo partBaseInfo, string prefabName = null)
 		{
 			Setup(partId, partName, parent, partInstallPosition, partInstallRotation, partBaseInfo,
 				uninstallWhenParentUninstalls, disableCollisionWhenInstalled, prefabName);
 		}
 
-		protected DerivablePart(PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls = true, string prefabName = null)
+		protected DerivablePart(PartBaseInfo partBaseInfo, string prefabName = null)
 		{
 			Setup(partId, partName, null, Vector3.zero, Vector3.zero, partBaseInfo,
 				uninstallWhenParentUninstalls, disableCollisionWhenInstalled, prefabName);

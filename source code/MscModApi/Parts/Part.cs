@@ -53,21 +53,21 @@ namespace MscModApi.Parts
 
 		public Part(string id, string name, GameObject part, Part parent, Vector3 installPosition,
 			Vector3 installRotation,
-			PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls = true,
+			PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls = false,
 			DisableCollision disableCollisionWhenInstalled = DisableCollision.InstalledOnCar) : this(id, name, part, (BasicPart) parent, installPosition, installRotation, partBaseInfo, uninstallWhenParentUninstalls, disableCollisionWhenInstalled)
 		{
 		}
 
 		public Part(string id, string name, GameObject part, GamePart parent, Vector3 installPosition,
 			Vector3 installRotation,
-			PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls = true,
+			PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls = false,
 			DisableCollision disableCollisionWhenInstalled = DisableCollision.InstalledOnCar) : this(id, name, part, (BasicPart)parent, installPosition, installRotation, partBaseInfo, uninstallWhenParentUninstalls, disableCollisionWhenInstalled)
 		{
 		}
 
 		protected Part(string id, string name, GameObject part, BasicPart parent, Vector3 installPosition,
 			Vector3 installRotation,
-			PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls = true,
+			PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls = false,
 			DisableCollision disableCollisionWhenInstalled = DisableCollision.InstalledOnCar)
 		{
 			gameObjectUsedForInstantiation = part;
@@ -76,7 +76,7 @@ namespace MscModApi.Parts
 				uninstallWhenParentUninstalls, disableCollisionWhenInstalled, null);
 		}
 
-		public Part(string id, string name, PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls = true,
+		public Part(string id, string name, PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls = false,
 			DisableCollision disableCollisionWhenInstalled = DisableCollision.InstalledOnCar, string prefabName = null)
 		{
 			Setup(id, name, null, Vector3.zero, Vector3.zero, partBaseInfo,
@@ -84,19 +84,19 @@ namespace MscModApi.Parts
 		}
 
 		public Part(string id, string name, Part parent, Vector3 installPosition, Vector3 installRotation,
-			PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls = true,
+			PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls = false,
 			DisableCollision disableCollisionWhenInstalled = DisableCollision.InstalledOnCar, string prefabName = null) : this(id, name, (BasicPart) parent, installPosition, installRotation, partBaseInfo, uninstallWhenParentUninstalls, disableCollisionWhenInstalled, prefabName)
 		{
 		}
 
 		public Part(string id, string name, GamePart parent, Vector3 installPosition, Vector3 installRotation,
-			PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls = true,
+			PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls = false,
 			DisableCollision disableCollisionWhenInstalled = DisableCollision.InstalledOnCar, string prefabName = null) : this(id, name, (BasicPart) parent, installPosition, installRotation, partBaseInfo, uninstallWhenParentUninstalls, disableCollisionWhenInstalled, prefabName)
 		{
 		}
 
 		protected Part(string id, string name, BasicPart parent, Vector3 installPosition, Vector3 installRotation,
-			PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls = true,
+			PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls = false,
 			DisableCollision disableCollisionWhenInstalled = DisableCollision.InstalledOnCar, string prefabName = null)
 		{
 			Setup(id, name, parent, installPosition, installRotation, partBaseInfo,

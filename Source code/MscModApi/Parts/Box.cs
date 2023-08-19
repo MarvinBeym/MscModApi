@@ -28,7 +28,7 @@ namespace MscModApi.Parts
 		/// <param name="disableCollisionWhenInstalled">Disables the collider of the part when installed to the parent (reduces lag, avoids problematic collisions)</param>
 		public Box(string boxName, string partId, string partName, GameObject partGameObject, int numberOfParts,
 			Part parent, Vector3[] installLocations, Vector3[] installRotations, Vector3 defaultPosition,
-			bool uninstallWhenParentUninstalls = true, DisableCollision disableCollisionWhenInstalled = DisableCollision.InstalledOnCar)
+			bool uninstallWhenParentUninstalls = false, DisableCollision disableCollisionWhenInstalled = DisableCollision.InstalledOnCar)
 
 		{
 			Setup(
@@ -66,7 +66,7 @@ namespace MscModApi.Parts
 		public Box(string boxName, string partId, string partName, GameObject customBoxModel, GameObject partGameObject,
 			int numberOfParts,
 			Part parent, Vector3[] installLocations, Vector3[] installRotations, Vector3 defaultPosition,
-			bool uninstallWhenParentUninstalls = true, DisableCollision disableCollisionWhenInstalled = DisableCollision.InstalledOnCar)
+			bool uninstallWhenParentUninstalls = false, DisableCollision disableCollisionWhenInstalled = DisableCollision.InstalledOnCar)
 		{
 			Setup(
 				boxName,
