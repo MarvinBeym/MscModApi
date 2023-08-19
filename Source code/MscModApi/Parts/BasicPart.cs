@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using UnityEngine;
 
 namespace MscModApi.Parts
@@ -8,9 +9,21 @@ namespace MscModApi.Parts
 	/// The absolute base class for objects acting like a part (Part, Box, Kit)
 	/// </summary>
 	public abstract class BasicPart
-	{
-		private List<BasicPart> _childs = new List<BasicPart>();
-		public List<BasicPart> childs => new List<BasicPart>(_childs);
+	{		
+		/// <summary>
+		/// Internal list of part objects that are a child of this part
+		/// </summary>
+		protected readonly List<BasicPart> _childs = new List<BasicPart>();
+
+		/// <summary>
+		/// A readonly list of BasicPart childs of this part
+		/// </summary>
+		public readonly ReadOnlyCollection<BasicPart> childs;
+
+		protected BasicPart()
+		{
+			this.childs = _childs.AsReadOnly();
+		}
 
 		public abstract GameObject gameObject { get; protected set; }
 
@@ -92,9 +105,22 @@ namespace MscModApi.Parts
 		/// Should only be used by logic itself, never by mod makers!
 		/// </summary>
 		/// <param name="part"></param>
-		public void AddChild(BasicPart part)
+		protected virtual void AddChild(BasicPart part)
 		{
 			_childs.Add(part);
+		}
+
+
+		/// <summary>
+		/// Adds multiple parts as a child
+		/// </summary>
+		/// <param name="parts"></param>
+		protected virtual void AddChilds(IEnumerable<BasicPart> parts)
+		{
+			foreach (BasicPart part in parts)
+			{
+				AddChild(part);
+			}
 		}
 
 		/// <summary>

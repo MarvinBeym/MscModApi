@@ -33,7 +33,7 @@ namespace MscModApi.Parts
 			boxModel.SetNameLayerTag(name + "(Clone)");
 			gameObject = boxModel;
 
-			AddParts(parts);
+			AddChilds(parts);
 
 			if (!bought) {
 				foreach (Part part in childs) {

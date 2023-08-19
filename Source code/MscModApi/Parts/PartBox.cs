@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using MscModApi.Tools;
 using UnityEngine;
@@ -32,15 +33,6 @@ namespace MscModApi.Parts
 		/// Returns if the player is currently holding the box
 		/// </summary>
 		public override bool isHolding => gameObject.IsHolding();
-
-		internal void IncrementUnpackedCount()
-		{
-			if (!hasPartsToUnpack) {
-				return;
-			}
-
-			partsUnpackedCount++;
-		}
 
 		public override bool installBlocked
 		{
@@ -102,9 +94,6 @@ namespace MscModApi.Parts
 		/// </summary>
 		public override bool installed => childs.All(part => part.installed);
 
-		public new List<Part> childs = new List<Part>();
-
-
 		/// <summary>
 		/// Returns if all parts contained in this box are bolted
 		/// (Only made available through inheritance, rare use cases)
@@ -126,10 +115,20 @@ namespace MscModApi.Parts
 			set => gameObject.SetActive(value);
 		}
 
+		internal void IncrementUnpackedCount()
+		{
+			if (!hasPartsToUnpack)
+			{
+				return;
+			}
+
+			partsUnpackedCount++;
+		}
+
 		/// <summary>
 		/// Executed when the game saves to make sure any parts not yet "manually" unpacked are unpacked and have a proper position on load.
 		/// </summary>
-		public void CheckUnpackedOnSave()
+		public virtual void CheckUnpackedOnSave()
 		{
 			if (!bought) {
 				return;
@@ -168,73 +167,10 @@ namespace MscModApi.Parts
 			}
 		}
 
-		/// <summary>
-		/// Adds a part to the box
-		/// </summary>
-		/// <param name="part"></param>
-		protected void AddPart(Part part)
-		{
-			AddChild(part);
-		}
-        
-
-		/// <summary>
-		/// Adds multiple parts to the box
-		/// </summary>
-		/// <param name="parts"></param>
-		protected void AddParts(IEnumerable<Part> parts)
-		{
-			foreach (Part part in parts) {
-				AddPart(part);
-			}
-		}
-
 		/// <inheritdoc />
 		public override void Uninstall()
 		{
 			//Not Implemented for PartBox
-		}
-
-		[Obsolete("Use 'AddParts' method instead, this method actually doesn't set but Add parts", true)]
-		protected void SetParts(IEnumerable<Part> parts)
-		{
-			AddParts(parts);
-		}
-
-		[Obsolete("Use 'parts' property instead", true)]
-		public List<Part> GetParts()
-		{
-			return childs;
-		}
-
-		[Obsolete("Use 'partsCount' property instead", true)]
-		public int GetPartCount()
-		{
-			return childs.Count;
-		}
-
-		[Obsolete("Use 'gameObject' property instead", true)]
-		public GameObject GetBoxGameObject()
-		{
-			return gameObject;
-		}
-
-		[Obsolete("Use 'gameObject' property instead", true)]
-		internal void SetBoxGameObject(GameObject box)
-		{
-			gameObject = box;
-		}
-
-		[Obsolete("Use 'bought' property instead.", true)]
-		public bool AnyBought()
-		{
-			return bought;
-		}
-
-		[Obsolete("Use 'bought' property instead.", true)]
-		public bool IsBought()
-		{
-			return bought;
 		}
 	}
 }

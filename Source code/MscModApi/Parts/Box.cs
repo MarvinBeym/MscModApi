@@ -123,7 +123,7 @@ namespace MscModApi.Parts
 					part.active = false;
 				}
 
-				AddPart(part);
+				AddChild(part);
 			}
 
 			active = false;

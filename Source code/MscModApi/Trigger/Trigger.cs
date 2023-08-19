@@ -242,12 +242,13 @@ namespace MscModApi.Trigger
 
 			part.ResetScrews();
 
-			part.childs.ForEach((BasicPart part) => {
-				if (part.uninstallWhenParentUninstalls)
-				{ 
-					part.Uninstall();
+			foreach (BasicPart child in part.childs)
+			{
+				if (child.uninstallWhenParentUninstalls)
+				{
+					child.Uninstall();
 				}
-			});
+			}
 
 			part.partSave.installed = false;
 			part.gameObject.tag = "PART";
