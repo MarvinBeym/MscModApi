@@ -1,8 +1,10 @@
-﻿using MscModApi.Parts.ReplacePart;
+﻿using System.Diagnostics.CodeAnalysis;
+using MscModApi.Parts.ReplacePart;
 using UnityEngine;
 
 namespace MscModApi.Parts
 {
+	[SuppressMessage("ReSharper", "VirtualMemberCallInConstructor")]
 	public abstract class DerivablePart : Part
 	{
 		/// <summary>
