@@ -11,7 +11,7 @@ namespace MscModApi.Parts
 		protected abstract string partId { get; }
 
 		protected DerivablePart(GameObject part, Part parent, PartBaseInfo partBaseInfo,
-			bool uninstallWhenParentUninstalls = true, bool disableCollisionWhenInstalled = true)
+			bool uninstallWhenParentUninstalls = true, DisableCollision disableCollisionWhenInstalled = DisableCollision.InstalledOnCar)
 		{
 			gameObjectUsedForInstantiation = part;
 
@@ -20,7 +20,7 @@ namespace MscModApi.Parts
 		}
 
 		protected DerivablePart(GameObject part, GamePart parent, PartBaseInfo partBaseInfo,
-			bool uninstallWhenParentUninstalls = true, bool disableCollisionWhenInstalled = true)
+			bool uninstallWhenParentUninstalls = true, DisableCollision disableCollisionWhenInstalled = DisableCollision.InstalledOnCar)
 		{
 			gameObjectUsedForInstantiation = part;
 
@@ -29,21 +29,21 @@ namespace MscModApi.Parts
 		}
 
 		protected DerivablePart(Part parent, PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls = true,
-			bool disableCollisionWhenInstalled = true, string prefabName = null)
+			DisableCollision disableCollisionWhenInstalled = DisableCollision.InstalledOnCar, string prefabName = null)
 		{
 			Setup(partId, partName, parent, partInstallPosition, partInstallRotation, partBaseInfo,
 				uninstallWhenParentUninstalls, disableCollisionWhenInstalled, prefabName);
 		}
 
 		protected DerivablePart(GamePart parent, PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls = true,
-			bool disableCollisionWhenInstalled = true, string prefabName = null)
+			DisableCollision disableCollisionWhenInstalled = DisableCollision.InstalledOnCar, string prefabName = null)
 		{
 			Setup(partId, partName, parent, partInstallPosition, partInstallRotation, partBaseInfo,
 				uninstallWhenParentUninstalls, disableCollisionWhenInstalled, prefabName);
 		}
 
 		protected DerivablePart(PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls = true,
-			bool disableCollisionWhenInstalled = true, string prefabName = null)
+			DisableCollision disableCollisionWhenInstalled = DisableCollision.InstalledOnCar, string prefabName = null)
 		{
 			Setup(partId, partName, null, Vector3.zero, Vector3.zero, partBaseInfo,
 				uninstallWhenParentUninstalls, disableCollisionWhenInstalled, prefabName);

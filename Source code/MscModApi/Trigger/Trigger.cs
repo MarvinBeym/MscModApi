@@ -32,11 +32,6 @@ namespace MscModApi.Trigger
 		/// </summary>
 		protected BasicPart parent;
 
-		/// <summary>
-		/// If the collider of the part should be disabled on installation (Improved performance)
-		/// </summary>
-		protected bool disableCollisionWhenInstalled;
-
 		private Rigidbody rigidBody;
 
 		/// <summary>
@@ -110,7 +105,10 @@ namespace MscModApi.Trigger
 			}
 
 			verifyInstalledRoutine = null;
+
 			part.GetEvents(PartEvent.Time.Post, PartEvent.Type.Install).InvokeAll();
+
+
 			if (part.installedOnCar)
 			{
 				part.GetEvents(PartEvent.Time.Post, PartEvent.Type.InstallOnCar).InvokeAll();
@@ -152,6 +150,7 @@ namespace MscModApi.Trigger
 			}
 
 			verifyUninstalledRoutine = null;
+
 			part.GetEvents(PartEvent.Time.Post, PartEvent.Type.Uninstall).InvokeAll();
 			if (!part.installedOnCar)
 			{
@@ -213,11 +212,6 @@ namespace MscModApi.Trigger
 				verifyInstalledRoutine = StartCoroutine(VerifyInstalled());
 			}
 
-
-			if (disableCollisionWhenInstalled) {
-				part.collider.isTrigger = true;
-			}
-
 			part.SetScrewsActive(true);
 
 			canBeInstalled = false;
@@ -272,10 +266,6 @@ namespace MscModApi.Trigger
 				verifyUninstalledRoutine = StartCoroutine(VerifyUninstalled());
 			}
 
-			if (disableCollisionWhenInstalled) {
-				part.collider.isTrigger = false;
-			}
-
 			part.SetScrewsActive(false);
 		}
 
@@ -328,12 +318,10 @@ namespace MscModApi.Trigger
 		/// </summary>
 		/// <param name="part">The part</param>
 		/// <param name="parent">Parent object</param>
-		/// <param name="disableCollisionWhenInstalled">Should the collider be disabled when the part installs</param>
-		public void Init(Part part, BasicPart parent, bool disableCollisionWhenInstalled)
+		public void Init(Part part, BasicPart parent)
 		{
 			this.part = part;
 			this.parent = parent;
-			this.disableCollisionWhenInstalled = disableCollisionWhenInstalled;
 			rigidBody = part.gameObject.GetComponent<Rigidbody>();
 			if (!rigidBody) {
 				rigidBody = part.gameObject.AddComponent<Rigidbody>();

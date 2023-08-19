@@ -20,11 +20,11 @@ namespace MscModApi.Trigger
 		/// <param name="part">The part object the trigger will be added to</param>
 		/// <param name="parentGameObject">The gameObject the trigger will be added to as a child</param>
 		/// <param name="disableCollisionWhenInstalled">Disable the collision of the part when the part gets installed</param>
-		public TriggerWrapper(Part part, BasicPart parent, bool disableCollisionWhenInstalled)
+		public TriggerWrapper(Part part, BasicPart parent, DisableCollision disableCollisionWhenInstalled = DisableCollision.InstalledOnCar)
 		{
 			Setup(part, parent.gameObject, disableCollisionWhenInstalled);
 			logic = triggerGameObject.AddComponent<Trigger>();
-			logic.Init(part, parent, disableCollisionWhenInstalled);
+			logic.Init(part, parent);
 		}
 
 		/// <summary>
@@ -73,7 +73,7 @@ namespace MscModApi.Trigger
 		/// </summary>
 		public void Uninstall() => logic.Uninstall();
 
-		protected void Setup(Part part, GameObject parent, bool disableCollisionWhenInstalled)
+		protected void Setup(Part part, GameObject parent, DisableCollision disableCollisionWhenInstalled = DisableCollision.InstalledOnCar)
 		{
 			triggerGameObject = GameObject.CreatePrimitive(PrimitiveType.Cube);
 			triggerGameObject.transform.SetParent(parent.transform, false);
@@ -87,6 +87,18 @@ namespace MscModApi.Trigger
 
 			renderer = triggerGameObject.GetComponent<Renderer>();
 			visible = false;
+
+			switch (disableCollisionWhenInstalled)
+			{
+				case DisableCollision.InstalledOnCar:
+					part.AddEventListener(PartEvent.Time.Post, PartEvent.Type.InstallOnCar, () => part.collider.isTrigger = true);
+					part.AddEventListener(PartEvent.Time.Post, PartEvent.Type.UninstallFromCar, () => part.collider.isTrigger = false);
+					break;
+				case DisableCollision.InstalledOnParent:
+					part.AddEventListener(PartEvent.Time.Post, PartEvent.Type.Install, () => part.collider.isTrigger = true);
+					part.AddEventListener(PartEvent.Time.Post, PartEvent.Type.Uninstall, () => part.collider.isTrigger = false);
+					break;
+			}
 		}
 
 		[Obsolete("Use 'scale' property instead", true)]
