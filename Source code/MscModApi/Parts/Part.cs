@@ -480,19 +480,11 @@ namespace MscModApi.Parts
 			AddEventListener(PartEvent.Time.Post, GetOppositeEvent(Type), () => { partToBlock.installBlocked = false; });
 		}
 
-		public void AddEventListener(PartEvent.Time eventTime, PartEvent.Type Type, Action action)
+		public void AddEventListener(PartEvent.Time eventTime, PartEvent.Type Type, Action action, bool invokeActionIfConditionMet = true)
 		{
-			if (
-				eventTime == PartEvent.Time.Pre
-				&& (Type == PartEvent.Type.InstallOnCar || Type == PartEvent.Type.UninstallFromCar)
-			)
-			{
-				throw new Exception($"Event {Type} can't be detected at '{eventTime}'. Unsupported!");
-			}
-
 			events[eventTime][Type].Add(action);
 
-			if (eventTime == PartEvent.Time.Post)
+			if (invokeActionIfConditionMet && eventTime == PartEvent.Time.Post)
 			{
 				switch (Type)
 				{

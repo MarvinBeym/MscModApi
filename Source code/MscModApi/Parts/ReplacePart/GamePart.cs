@@ -572,7 +572,7 @@ namespace MscModApi.Parts.ReplacePart
 		}
 
 		/// <inheritdoc />
-		public void AddEventListener(PartEvent.Time eventTime, PartEvent.Type Type, Action action)
+		public void AddEventListener(PartEvent.Time eventTime, PartEvent.Type Type, Action action, bool invokeActionIfConditionMet = true)
 		{
 			if (
 				eventTime == PartEvent.Time.Pre 
@@ -583,7 +583,7 @@ namespace MscModApi.Parts.ReplacePart
 
 			events[eventTime][Type].Add(action);
 
-			if (eventTime == PartEvent.Time.Post) {
+			if (invokeActionIfConditionMet && eventTime == PartEvent.Time.Post) {
 				switch (Type) {
 					//ToDo: check if invoking just the newly added action is enough of if all have to be invoked
 					case PartEvent.Type.Install:

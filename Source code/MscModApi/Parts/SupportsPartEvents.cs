@@ -6,7 +6,7 @@ namespace MscModApi.Parts
 {
 	public interface SupportsPartEvents
 	{
-		void AddEventListener(PartEvent.Time eventTime, PartEvent.Type Type, Action action);
+		void AddEventListener(PartEvent.Time eventTime, PartEvent.Type Type, Action action, bool invokeActionIfConditionMet = true);
 
 		List<Action> GetEvents(PartEvent.Time eventTime, PartEvent.Type Type);
 
