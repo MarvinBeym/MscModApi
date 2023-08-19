@@ -22,6 +22,12 @@ namespace MscModApi.Trigger
 		protected Part part;
 
 		/// <summary>
+		/// Stores a list of childs installed on this part before this part uninstalls
+		/// (otherwise if child uninstalls with parent, the childs events may not get called)
+		/// </summary>
+		protected List<BasicPart> childsInstalledBeforeUninstall = new List<BasicPart>();
+
+		/// <summary>
 		/// The parent gameObject of the part
 		/// </summary>
 		protected BasicPart parent;
@@ -155,10 +161,15 @@ namespace MscModApi.Trigger
 				foreach (BasicPart child in part.childs)
 				{
 					//Part was uninstalled from car so installed childs are as well.
-					if (child.installed && child.GetType().GetInterfaces().Contains(typeof(SupportsPartEvents)))
+					if (childsInstalledBeforeUninstall.Contains(child) || child.installed)
 					{
-						SupportsPartEvents partEventSupportingPart = (SupportsPartEvents)child;
-						partEventSupportingPart.GetEvents(PartEvent.Time.Post, PartEvent.Type.UninstallFromCar).InvokeAll();
+						if (child.GetType().GetInterfaces().Contains(typeof(SupportsPartEvents)))
+						{
+							SupportsPartEvents partEventSupportingPart = (SupportsPartEvents)child;
+							partEventSupportingPart.GetEvents(PartEvent.Time.Post, PartEvent.Type.UninstallFromCar).InvokeAll();
+						}
+
+						childsInstalledBeforeUninstall.Remove(child);
 					}
 				}
 			}
@@ -244,6 +255,10 @@ namespace MscModApi.Trigger
 
 			foreach (BasicPart child in part.childs)
 			{
+				if (child.installed)
+				{
+					childsInstalledBeforeUninstall.Add(child);
+				}
 				if (child.uninstallWhenParentUninstalls)
 				{
 					child.Uninstall();
@@ -262,7 +277,6 @@ namespace MscModApi.Trigger
 			}
 
 			part.SetScrewsActive(false);
-			//part.trigger.SetActive(true);
 		}
 
 		/// <summary>
@@ -313,7 +327,7 @@ namespace MscModApi.Trigger
 		/// Initializes the trigger logic
 		/// </summary>
 		/// <param name="part">The part</param>
-		/// <param name="parentGameObject">Parent GameObject</param>
+		/// <param name="parent">Parent object</param>
 		/// <param name="disableCollisionWhenInstalled">Should the collider be disabled when the part installs</param>
 		public void Init(Part part, BasicPart parent, bool disableCollisionWhenInstalled)
 		{
