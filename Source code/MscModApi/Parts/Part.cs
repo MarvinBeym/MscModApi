@@ -259,6 +259,7 @@ namespace MscModApi.Parts
 
 			if (parent != null) {
 				trigger = new TriggerWrapper(this, parent, disableCollisionWhenInstalled);
+				parent.AddChild(this);
 			}
 
 			if (partSave.installed) {

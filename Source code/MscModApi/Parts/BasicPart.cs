@@ -102,10 +102,9 @@ namespace MscModApi.Parts
 
 		/// <summary>
 		/// Add a part object as the child of this part
-		/// Should only be used by logic itself, never by mod makers!
 		/// </summary>
 		/// <param name="part"></param>
-		protected virtual void AddChild(BasicPart part)
+		public virtual void AddChild(BasicPart part)
 		{
 			_childs.Add(part);
 		}
