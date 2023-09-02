@@ -27,10 +27,9 @@ namespace MscModApi
 			"A general modding 'help' featuring things like installable/boltable parts, shop, part boxing, utility tools & more.";
 
 		public override bool UseAssetsFolder => true;
-		private static Settings showBoltSizeSetting = new Settings("showBoltSizeSetting", "Show screw size", false);
+		private static SettingsCheckBox showBoltSizeSetting;
 
-		private static Settings enableInstantInstall =
-			new Settings("enableInstantInstall", "Enable Instant Part install", false);
+		private static SettingsCheckBox enableInstantInstall;
 
 		private const string assetsFile = "msc-mod-api.unity3d";
 		private Tool tool;
@@ -56,7 +55,7 @@ namespace MscModApi
 			//Don't do anything
 		}
 
-		internal static bool ShowScrewSize => (bool)showBoltSizeSetting.Value;
+		internal static bool ShowScrewSize => (bool)showBoltSizeSetting.GetValue();
 
 		public override void ModSetup()
 		{
@@ -69,12 +68,11 @@ namespace MscModApi
 
 		public override void ModSettings()
 		{
-			Settings.AddCheckBox(this, showBoltSizeSetting);
-			Keybind.AddHeader(this, "Developer area - Screw placement mode");
+			showBoltSizeSetting = Settings.AddCheckBox(this, "showBoltSizeSetting", "Show screw size", false);
+			Keybind.AddHeader(this, "Developer Area");
 #if DEBUG
-			instantInstallKeybind =
-				Keybind.Add(this, "instant-install", "Instant install part looking at", KeyCode.UpArrow);
-			Settings.AddCheckBox(this, enableInstantInstall);
+			instantInstallKeybind = Keybind.Add(this, "instant-install", "Instant install part looking at", KeyCode.UpArrow);
+			enableInstantInstall = Settings.AddCheckBox(this, "enableInstantInstall", "Enable Instant Part install", false);
 #endif
 			ScrewPlacementAssist.ModSettings(this);
 		}
@@ -233,7 +231,7 @@ namespace MscModApi
 #if DEBUG
 		private void InstantInstallDebug()
 		{
-			if (!(bool)enableInstantInstall.Value) {
+			if (!enableInstantInstall.GetValue()) {
 				return;
 			}
 
