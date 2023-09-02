@@ -130,57 +130,5 @@ namespace MscModApi.Parts
 		/// </summary>
 		/// <param name="uninstall">Should an installed part be uninstalled prior to resetting</param>
 		public abstract void ResetToDefault(bool uninstall = false);
-
-		/// <summary>
-		/// Returns a list of all child parts of this part
-		/// </summary>
-		/// <returns></returns>
-		[Obsolete("use 'childs' property instead", true)]
-		public List<BasicPart> GetChilds()
-		{
-			return new List<BasicPart>(_childs);
-		}
-
-		[Obsolete("Use 'active' property instead", true)]
-		public void SetActive(bool active)
-		{
-			this.active = active;
-		}
-
-		[Obsolete("Use 'position' property instead", true)]
-		public void SetPosition(Vector3 position)
-		{
-			this.position = position;
-		}
-
-		[Obsolete("Use 'rotation' property instead", true)]
-		public void SetRotation(Quaternion rotation)
-		{
-			this.rotation = rotation.eulerAngles;
-		}
-
-		[Obsolete("Use 'defaultPosition' property instead", true)]
-		public void SetDefaultPosition(Vector3 defaultPosition)
-		{
-			this.defaultPosition = defaultPosition;
-		}
-
-		[Obsolete("Use 'defaultRotation'", true)]
-		public void SetDefaultRotation(Vector3 defaultRotation)
-		{
-			this.defaultRotation = defaultRotation;
-		}
-
-		[Obsolete("Use 'bought' property instead", true)]
-		public bool IsBought()
-		{
-			return bought;
-		}
-
-		[Obsolete("Use 'bought' property instead", true)]
-		public void SetBought(bool bought)
-		{
-			this.bought = bought;
-		}
 	}
 }

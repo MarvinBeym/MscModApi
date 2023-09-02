@@ -100,29 +100,5 @@ namespace MscModApi.Trigger
 					break;
 			}
 		}
-
-		[Obsolete("Use 'scale' property instead", true)]
-		public void SetScale(Vector3 scale)
-		{
-			this.scale = scale;
-		}
-
-		[Obsolete("Use 'position' property instead", true)]
-		public void SetPosition(Vector3 position)
-		{
-			this.position = position;
-		}
-
-		[Obsolete("Use 'rotation' property instead", true)]
-		public void SetRotation(Vector3 rotation)
-		{
-			this.rotation = rotation;
-		}
-
-		[Obsolete("Use 'visible' property instead", true)]
-		public void SetVisible(bool show)
-		{
-			visible = show;
-		}
 	}
 }

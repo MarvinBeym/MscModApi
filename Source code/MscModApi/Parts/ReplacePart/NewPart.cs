@@ -34,12 +34,6 @@ namespace MscModApi.Parts.ReplacePart
 
 		public override bool installed => part.installed;
 
-		[Obsolete("Use 'bolted' property instead")]
-		public bool IsFixed(bool ignoreUnsetScrews = true)
-		{
-			return part.IsFixed(ignoreUnsetScrews);
-		}
-
 		public bool canBeInstalledWithoutReplacing { get; protected set; }
 
 		public override bool bought
@@ -91,17 +85,5 @@ namespace MscModApi.Parts.ReplacePart
 
 		/// <inheritdoc />
 		public override bool installedOnCar => part.installedOnCar;
-
-		[Obsolete("Use 'installBlocked' property instead", true)]
-		public void BlockInstall(bool block)
-		{
-			installBlocked = block;
-		}
-
-		[Obsolete("Use 'canBeInstalledWithoutReplacing' property instead", true)]
-		public bool CanBeInstalledWithoutReplacing()
-		{
-			return canBeInstalledWithoutReplacing;
-		}
 	}
 }

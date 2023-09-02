@@ -87,9 +87,6 @@ namespace MscModApi.Parts.ReplacePart
 
 		public override bool bolted => boltedFsm.Value;
 
-		[Obsolete("Use 'bolted' property instead", true)]
-		public bool IsFixed() => bolted;
-
 		public override void Uninstall() => removalFsm.SendEvent("REMOVE");
 
 		internal void Setup(ReplacePart.ReplacementPart replacementPart)
@@ -143,30 +140,6 @@ namespace MscModApi.Parts.ReplacePart
 		public override void ResetToDefault(bool uninstall = false)
 		{
 			//Don't implement
-		}
-
-		[Obsolete("Use 'Install' method instead", true)]
-		internal void SetFakedInstallStatus(bool status)
-		{
-			Install(status);
-		}
-
-		[Obsolete("Use 'installBlocked' property instead", true)]
-		public bool IsInstallBlocked()
-		{
-			return installBlocked;
-		}
-
-		[Obsolete("Use 'installBlocked' property instead", true)]
-		public void BlockInstall(bool blocked)
-		{
-			installBlocked = blocked;
-		}
-
-		[Obsolete("Use 'installed' property instead", true)]
-		public bool IsInstalled()
-		{
-			return installed;
 		}
 	}
 }
