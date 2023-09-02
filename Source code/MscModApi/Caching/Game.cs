@@ -4,10 +4,16 @@ using HutongGames.PlayMaker;
 
 namespace MscModApi.Caching
 {
+	/// <summary>
+	/// Utility class for everything related to the game.
+	/// </summary>
 	public class Game
 	{
 		private static FsmFloat _money;
 
+		/// <summary>
+		/// Returns the current amount of money the player has.
+		/// </summary>
 		public static float money
 		{
 			get
@@ -24,6 +30,9 @@ namespace MscModApi.Caching
 			}
 		}
 
+		/// <summary>
+		/// Called when the MscModApi mod loads to cleanup static data
+		/// </summary>
 		public static void LoadCleanup()
 		{
 			_money = null;

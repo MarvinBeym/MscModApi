@@ -3,15 +3,18 @@ using HutongGames.PlayMaker;
 using MSCLoader;
 using System.Linq;
 using MSCLoader.Helper;
+using MscModApi.Caching;
 using MscModApi.Tools;
 using UnityEngine;
 
 namespace MscModApi.Parts.ReplacePart
 {
+	[Obsolete(
+		"Soon to be made obsolete, will be replaced with a new implementation using the new 'GamePart' wrapper class")]
 	public class OldPart : BasicPart
 	{
 		protected PlayMakerFSM fsm;
-		protected GameObject gameObject;
+		public override GameObject gameObject { get; protected set; }
 		protected GameObject trigger;
 		protected FsmBool installedFsm;
 		protected FsmBool boltedFsm;
@@ -53,7 +56,7 @@ namespace MscModApi.Parts.ReplacePart
 		/// <inheritdoc />
 		public override string name => gameObject.name;
 
-		public bool installBlocked
+		public override bool installBlocked
 		{
 			get => !assembleFsm.enabled;
 			set => assembleFsm.enabled = !value;
@@ -72,6 +75,8 @@ namespace MscModApi.Parts.ReplacePart
 			}
 		}
 
+		public override bool installedOnCar => gameObject.transform.root == CarH.satsuma;
+
 		public void Install(bool install)
 		{
 			if (!allowSettingFakedStatus) {
@@ -84,10 +89,7 @@ namespace MscModApi.Parts.ReplacePart
 
 		public override bool bolted => boltedFsm.Value;
 
-		[Obsolete("Use 'bolted' property instead", true)]
-		public bool IsFixed() => bolted;
-
-		public void Uninstall() => removalFsm.SendEvent("REMOVE");
+		public override void Uninstall() => removalFsm.SendEvent("REMOVE");
 
 		internal void Setup(ReplacePart.ReplacementPart replacementPart)
 		{
@@ -140,30 +142,6 @@ namespace MscModApi.Parts.ReplacePart
 		public override void ResetToDefault(bool uninstall = false)
 		{
 			//Don't implement
-		}
-
-		[Obsolete("Use 'Install' method instead", true)]
-		internal void SetFakedInstallStatus(bool status)
-		{
-			Install(status);
-		}
-
-		[Obsolete("Use 'installBlocked' property instead", true)]
-		public bool IsInstallBlocked()
-		{
-			return installBlocked;
-		}
-
-		[Obsolete("Use 'installBlocked' property instead", true)]
-		public void BlockInstall(bool blocked)
-		{
-			installBlocked = blocked;
-		}
-
-		[Obsolete("Use 'installed' property instead", true)]
-		public bool IsInstalled()
-		{
-			return installed;
 		}
 	}
 }

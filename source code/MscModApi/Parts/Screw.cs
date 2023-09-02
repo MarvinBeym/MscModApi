@@ -100,8 +100,8 @@ namespace MscModApi.Parts
 			gameObject.SetNameLayerTag($"{parentCollider.gameObject.name}_screw_{index}", "PART", "DontCollide");
 
 			gameObject.transform.SetParent(parentCollider.transform);
-			gameObject.transform.localPosition = position.CopyVector3();
-			gameObject.transform.localRotation = new Quaternion { eulerAngles = rotation.CopyVector3() };
+			gameObject.transform.localPosition = position;
+			gameObject.transform.localRotation = new Quaternion { eulerAngles = rotation };
 			gameObject.transform.localScale = new Vector3(scale, scale, scale);
 			gameObject.SetActive(true);
 
@@ -158,13 +158,31 @@ namespace MscModApi.Parts
 			}
 
 			if (changingToFixedState) {
-				part.GetEvents(EventTime.Pre, EventType.Bolted).InvokeAll();
+				part.GetEvents(PartEvent.Time.Pre, PartEvent.Type.Bolted).InvokeAll();
+				if (part.installedOnCar) {
+					part.GetEvents(PartEvent.Time.Pre, PartEvent.Type.BoltedOnCar).InvokeAll();
+
+					foreach (Part childPart in part.childs) {
+						if (childPart.bolted && childPart.installedOnCar) {
+							childPart.GetEvents(PartEvent.Time.Pre, PartEvent.Type.BoltedOnCar).InvokeAll();
+						}
+					}
+				}
 			}
 
 			tightness++;
 
 			if (changingToFixedState) {
-				part.GetEvents(EventTime.Post, EventType.Bolted).InvokeAll();
+				part.GetEvents(PartEvent.Time.Post, PartEvent.Type.Bolted).InvokeAll();
+				if (part.installedOnCar) {
+					part.GetEvents(PartEvent.Time.Post, PartEvent.Type.BoltedOnCar).InvokeAll();
+
+					foreach (Part childPart in part.childs) {
+						if (childPart.bolted && childPart.installedOnCar) {
+							childPart.GetEvents(PartEvent.Time.Post, PartEvent.Type.BoltedOnCar).InvokeAll();
+						}
+					}
+				}
 			}
 		}
 
@@ -182,13 +200,31 @@ namespace MscModApi.Parts
 			bool changingToUnfixed = part.bolted;
 
 			if (changingToUnfixed) {
-				part.GetEvents(EventTime.Pre, EventType.Unbolted).InvokeAll();
+				part.GetEvents(PartEvent.Time.Pre, PartEvent.Type.Unbolted).InvokeAll();
+				if (part.installedOnCar) {
+					part.GetEvents(PartEvent.Time.Pre, PartEvent.Type.UnboltedOnCar).InvokeAll();
+
+					foreach (Part childPart in part.childs) {
+						if (!childPart.bolted && childPart.installedOnCar) {
+							childPart.GetEvents(PartEvent.Time.Pre, PartEvent.Type.UnboltedOnCar).InvokeAll();
+						}
+					}
+				}
 			}
 
 			tightness--;
 
 			if (changingToUnfixed) {
-				part.GetEvents(EventTime.Post, EventType.Unbolted).InvokeAll();
+				part.GetEvents(PartEvent.Time.Post, PartEvent.Type.Unbolted).InvokeAll();
+				if (part.installedOnCar) {
+					part.GetEvents(PartEvent.Time.Post, PartEvent.Type.UnboltedOnCar).InvokeAll();
+
+					foreach (Part childPart in part.childs) {
+						if (!childPart.bolted && childPart.installedOnCar) {
+							childPart.GetEvents(PartEvent.Time.Post, PartEvent.Type.UnboltedOnCar).InvokeAll();
+						}
+					}
+				}
 			}
 		}
 

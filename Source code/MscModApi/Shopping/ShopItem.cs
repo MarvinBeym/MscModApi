@@ -38,15 +38,15 @@ namespace MscModApi.Shopping
 		public ShopItem(string name, float prize, Vector3 spawnLocation, PartBox partBox, string imageAssetName = "")
 		{
 			Setup(name, prize, spawnLocation, imageAssetName);
-			foreach (Part part in partBox.parts) {
+			foreach (Part part in partBox.childs) {
 				part.defaultPosition = spawnLocation;
 				part.active = part.bought;
 			}
 
-			buyable = !partBox.parts.Any(part => part.bought);
+			buyable = !partBox.childs.Any(part => part.bought);
 			onPurchaseAction = delegate
 			{
-				foreach (Part part in partBox.parts) {
+				foreach (Part part in partBox.childs) {
 					part.bought = true;
 					part.defaultPosition = spawnLocation;
 				}

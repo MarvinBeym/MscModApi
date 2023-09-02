@@ -7,8 +7,8 @@ using System.Collections.Generic;
 using MscModApi.Caching;
 using MscModApi.Commands;
 using MscModApi.PaintingSystem;
+using MscModApi.Parts.ReplacePart;
 using UnityEngine;
-using EventType = MscModApi.Parts.EventType;
 
 namespace MscModApi
 {
@@ -21,16 +21,15 @@ namespace MscModApi
 		public override string ID => "MscModApi";
 		public override string Name => "MscModApi";
 		public override string Author => "DonnerPlays";
-		public override string Version => "1.2";
+		public override string Version => "1.3";
 
 		public override string Description =>
-			"This allows developers to make their parts installable on the car. Also adds screws";
+			"A general modding 'help' featuring things like installable/boltable parts, shop, part boxing, utility tools & more.";
 
 		public override bool UseAssetsFolder => true;
-		private static Settings showBoltSizeSetting = new Settings("showBoltSizeSetting", "Show screw size", false);
+		private static SettingsCheckBox showBoltSizeSetting;
 
-		private static Settings enableInstantInstall =
-			new Settings("enableInstantInstall", "Enable Instant Part install", false);
+		private static SettingsCheckBox enableInstantInstall;
 
 		private const string assetsFile = "msc-mod-api.unity3d";
 		private Tool tool;
@@ -47,16 +46,7 @@ namespace MscModApi
 
 		private bool updateLocked = true;
 
-		/// <summary>Enables the screw placement for all parts.</summary>
-		/// <param name="mod">The mod.</param>
-		[Obsolete("Only kept for compatibility, use part.screwPlacementMode = true/false instead. Won't do anything!",
-			true)]
-		public static void EnableScrewPlacementForAllParts(Mod mod)
-		{
-			//Don't do anything
-		}
-
-		internal static bool ShowScrewSize => (bool)showBoltSizeSetting.Value;
+		internal static bool ShowScrewSize => (bool)showBoltSizeSetting.GetValue();
 
 		public override void ModSetup()
 		{
@@ -69,12 +59,11 @@ namespace MscModApi
 
 		public override void ModSettings()
 		{
-			Settings.AddCheckBox(this, showBoltSizeSetting);
-			Keybind.AddHeader(this, "Developer area - Screw placement mode");
+			showBoltSizeSetting = Settings.AddCheckBox(this, "showBoltSizeSetting", "Show screw size", false);
+			Keybind.AddHeader(this, "Developer Area");
 #if DEBUG
-			instantInstallKeybind =
-				Keybind.Add(this, "instant-install", "Instant install part looking at", KeyCode.UpArrow);
-			Settings.AddCheckBox(this, enableInstantInstall);
+			instantInstallKeybind = Keybind.Add(this, "instant-install", "Instant install part looking at", KeyCode.UpArrow);
+			enableInstantInstall = Settings.AddCheckBox(this, "enableInstantInstall", "Enable Instant Part install", false);
 #endif
 			ScrewPlacementAssist.ModSettings(this);
 		}
@@ -108,6 +97,7 @@ namespace MscModApi
 			ScrewPlacementAssist.LoadCleanup();
 			UserInteraction.LoadCleanup();
 			Tool.LoadCleanup();
+			SatsumaGamePart.LoadCleanup();
 
 			Logger.InitLogger(this);
 			LoadAssets();
@@ -146,11 +136,11 @@ namespace MscModApi
 					try {
 						part.CustomSaveSaving(mod, $"{id}_saveFile.json");
 					}
-					catch {
+					catch (Exception) {
 						// ignored
 					}
 
-					part.GetEvents(EventTime.Pre, EventType.Save).InvokeAll();
+					part.GetEvents(PartEvent.Time.Pre, PartEvent.Type.Save).InvokeAll();
 
 					var partSave = part.partSave;
 					partSave.position = part.gameObject.transform.position;
@@ -232,7 +222,7 @@ namespace MscModApi
 #if DEBUG
 		private void InstantInstallDebug()
 		{
-			if (!(bool)enableInstantInstall.Value) {
+			if (!enableInstantInstall.GetValue()) {
 				return;
 			}
 

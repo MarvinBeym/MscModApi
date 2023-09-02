@@ -5,12 +5,22 @@ using UnityEngine;
 
 namespace MscModApi.Caching
 {
+	/// <summary>
+	/// Cached GameObject.Find implementation for improved performance
+	/// </summary>
 	public static class Cache
 	{
-		public static Dictionary<string, GameObject> cachedGameObjects;
+		private static Dictionary<string, GameObject> cachedGameObjects;
 
 		private static GameObject[] globalCache;
 
+		/// <summary>
+		/// Works similar to GameObject.Find except that objects are cached once they are found, further "Cache.Find" calls will result in a quicker value return.
+		/// Also supports path search like 'Car/Engine/MyCoolPart/MyInnerPart/ThePart'
+		/// </summary>
+		/// <param name="name">The name or path of the gameobject.</param>
+		/// <param name="findEvenIfInactive">Uses an alternative way to find the object, if the part is not active when the .Find happens, without this, 'null' would be returned. Should rarely be disabled</param>
+		/// <returns></returns>
 		public static GameObject Find(string name, bool findEvenIfInactive = true)
 		{
 			try {
@@ -59,11 +69,6 @@ namespace MscModApi.Caching
 			return null;
 		}
 
-		public static void Clear()
-		{
-			cachedGameObjects = new Dictionary<string, GameObject>();
-		}
-
 		private static string GetObjectPath(GameObject gameObject)
 		{
 			Transform currentTransform = gameObject.transform;
@@ -77,6 +82,9 @@ namespace MscModApi.Caching
 			return path;
 		}
 
+		/// <summary>
+		/// Called when the MscModApi mod loads to cleanup static data
+		/// </summary>
 		public static void LoadCleanup()
 		{
 			cachedGameObjects = new Dictionary<string, GameObject>();

@@ -18,8 +18,8 @@ namespace MscModApi.Parts.ReplacePart
 		/// <summary>
 		/// Stores all events that a developer may have added to this GamePart object
 		/// </summary>
-		protected Dictionary<EventTime, Dictionary<EventType, List<Action>>> events =
-			new Dictionary<EventTime, Dictionary<EventType, List<Action>>>();
+		protected Dictionary<PartEvent.Time, Dictionary<PartEvent.Type, List<Action>>> events =
+			new Dictionary<PartEvent.Time, Dictionary<PartEvent.Type, List<Action>>>();
 
 		/// <summary>
 		/// Flag used to avoid calling the pre bolted event multiple times
@@ -72,8 +72,8 @@ namespace MscModApi.Parts.ReplacePart
 					$"Unable to find trigger GameObject on GameObject with name '{mainFsmGameObject.name}'");
 			}
 
-			partFsmGameObject = dataFsm.FsmVariables.FindFsmGameObject("ThisPart").Value;
-			if (!partFsmGameObject) {
+			gameObject = dataFsm.FsmVariables.FindFsmGameObject("ThisPart").Value;
+			if (!gameObject) {
 				throw new Exception(
 					$"Unable to find part GameObject on GameObject with name '{mainFsmGameObject.name}'");
 			}
@@ -84,8 +84,8 @@ namespace MscModApi.Parts.ReplacePart
 			purchasedState = dataFsm.FsmVariables.FindFsmBool("Purchased") ?? new FsmBool("Purchased");
 
 			assemblyFsm = triggerFsmGameObject.FindFsm("Assembly");
-			removalFsm = partFsmGameObject.FindFsm("Removal");
-			boltCheckFsm = partFsmGameObject.FindFsm("BoltCheck");
+			removalFsm = gameObject.FindFsm("Removal");
+			boltCheckFsm = gameObject.FindFsm("BoltCheck");
 
 			if (!assemblyFsm.Fsm.Initialized) {
 				assemblyFsm.InitializeFSM();
@@ -102,18 +102,29 @@ namespace MscModApi.Parts.ReplacePart
 			tightness = boltCheckFsm.FsmVariables.FindFsmFloat("Tightness");
 
 			AddActionAsFirst(assemblyFsm.FindState("Assemble"),
-				() => { GetEvents(EventTime.Pre, EventType.Install).InvokeAll(); });
+				() => { GetEvents(PartEvent.Time.Pre, PartEvent.Type.Install).InvokeAll(); });
 
-			AddActionAsLast(assemblyFsm.FindState("End"),
-				() => { GetEvents(EventTime.Post, EventType.Install).InvokeAll(); });
+			AddActionAsLast(assemblyFsm.FindState("End"), () =>
+			{
+				GetEvents(PartEvent.Time.Post, PartEvent.Type.Install).InvokeAll();
+				if (installedOnCar) {
+					GetEvents(PartEvent.Time.Post, PartEvent.Type.InstallOnCar).InvokeAll();
+				}
+			});
 
 			AddActionAsFirst(removalFsm.FindState("Remove part"),
-				() => { GetEvents(EventTime.Pre, EventType.Uninstall).InvokeAll(); });
-			AddActionAsLast(removalFsm.FindState("Remove part"),
-				() => { GetEvents(EventTime.Post, EventType.Uninstall).InvokeAll(); });
+				() => { GetEvents(PartEvent.Time.Pre, PartEvent.Type.Uninstall).InvokeAll(); });
+			AddActionAsLast(removalFsm.FindState("Remove part"), () =>
+			{
+				GetEvents(PartEvent.Time.Post, PartEvent.Type.Uninstall).InvokeAll();
+				if (!installedOnCar) {
+					//Check probably not needed, likely already not on car because part can't be connected to something else after being uninstalled
+					GetEvents(PartEvent.Time.Post, PartEvent.Type.UninstallFromCar).InvokeAll();
+				}
+			});
 
 			if (tightness == null) {
-				throw new Exception($"Unable to find tightness on bolt check fsm of part '{partFsmGameObject.name}'");
+				throw new Exception($"Unable to find tightness on bolt check fsm of part '{gameObject.name}'");
 			}
 
 			if (boltedState != null) {
@@ -130,14 +141,23 @@ namespace MscModApi.Parts.ReplacePart
 		}
 
 		/// <summary>
+		/// Usable when wanting to extend from GamePart and implement everything yourself.
+		/// An Example for the usability of this is the Class "SatsumaGamePart" which is a wrapper to make the Satsuma
+		/// (which has no part logic from the game) to allow using as a parent for "Part" objects
+		/// </summary>
+		protected GamePart()
+		{
+		}
+
+		/// <summary>
 		/// Setups the advanced bolted state detection requiring all bolts of the part to be tight before bolted events get called
 		/// </summary>
 		protected void SetupAdvancedBoltedStateDetection()
 		{
-			GameObject boltsGameObject = partFsmGameObject.FindChild("Bolts");
+			GameObject boltsGameObject = gameObject.FindChild("Bolts");
 			if (!boltsGameObject) {
 				ModConsole.Print(
-					$"GamePart: Unable to find 'Bolts' child of '{partFsmGameObject.name}'. Bolted event listening not possible");
+					$"GamePart: Unable to find 'Bolts' child of '{gameObject.name}'. Bolted event listening not possible");
 			}
 
 			for (int i = 0; i < boltsGameObject.transform.childCount; i++) {
@@ -169,11 +189,11 @@ namespace MscModApi.Parts.ReplacePart
 					boltFsm.InitializeFSM();
 				}
 
-				AddActionAsFirst(tightState, () => OnTight(EventTime.Pre));
-				AddActionAsLast(tightState, () => OnTight(EventTime.Post));
+				AddActionAsFirst(tightState, () => OnTight(PartEvent.Time.Pre));
+				AddActionAsLast(tightState, () => OnTight(PartEvent.Time.Post));
 
-				AddActionAsFirst(unscrewPreState, () => OnUnscrew(EventTime.Pre));
-				AddActionAsLast(unscrewPostState, () => OnUnscrew(EventTime.Post));
+				AddActionAsFirst(unscrewPreState, () => OnUnscrew(PartEvent.Time.Pre));
+				AddActionAsLast(unscrewPostState, () => OnUnscrew(PartEvent.Time.Post));
 				maxTightness += 8;
 			}
 		}
@@ -192,7 +212,10 @@ namespace MscModApi.Parts.ReplacePart
 					return;
 				}
 
-				GetEvents(EventTime.Pre, EventType.Uninstall).InvokeAll();
+				GetEvents(PartEvent.Time.Pre, PartEvent.Type.Unbolted).InvokeAll();
+				if (installedOnCar) {
+					GetEvents(PartEvent.Time.Pre, PartEvent.Type.UnboltedOnCar).InvokeAll();
+				}
 			});
 			AddActionAsLast(boltCheckFsm.FindState("Bolts OFF"), () =>
 			{
@@ -203,7 +226,10 @@ namespace MscModApi.Parts.ReplacePart
 					return;
 				}
 
-				GetEvents(EventTime.Post, EventType.Uninstall).InvokeAll();
+				GetEvents(PartEvent.Time.Post, PartEvent.Type.Unbolted).InvokeAll();
+				if (installedOnCar) {
+					GetEvents(PartEvent.Time.Post, PartEvent.Type.UnboltedOnCar).InvokeAll();
+				}
 			});
 
 
@@ -215,7 +241,10 @@ namespace MscModApi.Parts.ReplacePart
 					return;
 				}
 
-				GetEvents(EventTime.Pre, EventType.Install).InvokeAll();
+				GetEvents(PartEvent.Time.Pre, PartEvent.Type.Bolted).InvokeAll();
+				if (installedOnCar) {
+					GetEvents(PartEvent.Time.Pre, PartEvent.Type.BoltedOnCar).InvokeAll();
+				}
 			});
 			AddActionAsLast(boltCheckFsm.FindState("Bolts ON"), () =>
 			{
@@ -226,7 +255,10 @@ namespace MscModApi.Parts.ReplacePart
 					return;
 				}
 
-				GetEvents(EventTime.Post, EventType.Install).InvokeAll();
+				GetEvents(PartEvent.Time.Post, PartEvent.Type.Bolted).InvokeAll();
+				if (installedOnCar) {
+					GetEvents(PartEvent.Time.Post, PartEvent.Type.BoltedOnCar).InvokeAll();
+				}
 			});
 		}
 
@@ -235,21 +267,21 @@ namespace MscModApi.Parts.ReplacePart
 		/// </summary>
 		protected void InitEventStorage()
 		{
-			foreach (EventTime eventTime in Enum.GetValues(typeof(EventTime))) {
-				Dictionary<EventType, List<Action>> eventTypeDict = new Dictionary<EventType, List<Action>>();
+			foreach (PartEvent.Time eventTime in Enum.GetValues(typeof(PartEvent.Time))) {
+				Dictionary<PartEvent.Type, List<Action>> TypeDict = new Dictionary<PartEvent.Type, List<Action>>();
 
-				foreach (EventType eventType in Enum.GetValues(typeof(EventType))) {
-					eventTypeDict.Add(eventType, new List<Action>());
+				foreach (PartEvent.Type Type in Enum.GetValues(typeof(PartEvent.Type))) {
+					TypeDict.Add(Type, new List<Action>());
 				}
 
-				events.Add(eventTime, eventTypeDict);
+				events.Add(eventTime, TypeDict);
 			}
 		}
 
 		/// <summary>
 		/// Block installation of the part by disabling the trigger object
 		/// </summary>
-		public bool installBlocked
+		public override bool installBlocked
 		{
 			get => triggerFsmGameObject.activeSelf;
 			set => triggerFsmGameObject.SetActive(!value);
@@ -320,7 +352,7 @@ namespace MscModApi.Parts.ReplacePart
 		/// <summary>
 		/// The part fsm gameObject (The one you can pickup)
 		/// </summary>
-		public GameObject partFsmGameObject { get; protected set; }
+		public override GameObject gameObject { get; protected set; }
 
 		/// <summary>
 		/// The trigger fsm gameObject (deals with installing the part onto the car)
@@ -337,11 +369,11 @@ namespace MscModApi.Parts.ReplacePart
 		/// <inheritdoc />
 		public override Vector3 position
 		{
-			get => partFsmGameObject.transform.position;
+			get => gameObject.transform.position;
 			set
 			{
 				if (!installed) {
-					partFsmGameObject.transform.position = value;
+					gameObject.transform.position = value;
 				}
 			}
 		}
@@ -349,11 +381,11 @@ namespace MscModApi.Parts.ReplacePart
 		/// <inheritdoc />
 		public override Vector3 rotation
 		{
-			get => partFsmGameObject.transform.rotation.eulerAngles;
+			get => gameObject.transform.rotation.eulerAngles;
 			set
 			{
 				if (!installed) {
-					partFsmGameObject.transform.rotation = Quaternion.Euler(value);
+					gameObject.transform.rotation = Quaternion.Euler(value);
 				}
 			}
 		}
@@ -379,25 +411,28 @@ namespace MscModApi.Parts.ReplacePart
 		}
 
 		/// <inheritdoc />
+		public override bool installedOnCar => gameObject.transform.root == CarH.satsuma.transform;
+
+		/// <inheritdoc />
 		public override bool active
 		{
-			get => partFsmGameObject.activeSelf;
-			set => partFsmGameObject.SetActive(value);
+			get => gameObject.activeSelf;
+			set => gameObject.SetActive(value);
 		}
 
 		/// <inheritdoc />
-		public override string name => partFsmGameObject.name;
+		public override string name => gameObject.name;
 
 		/// <inheritdoc />
-		public override bool isLookingAt => partFsmGameObject.IsLookingAt();
+		public override bool isLookingAt => gameObject.IsLookingAt();
 
 		/// <inheritdoc />
-		public override bool isHolding => partFsmGameObject.IsHolding();
+		public override bool isHolding => gameObject.IsHolding();
 
 		/// <summary>
 		/// Sends the REMOVE event to the Part
 		/// </summary>
-		public void Uninstall()
+		public override void Uninstall()
 		{
 			removalFsm.SendEvent("REMOVE");
 		}
@@ -443,27 +478,35 @@ namespace MscModApi.Parts.ReplacePart
 		/// Gets called by the advanced bolted state detection when Unscrewing a bolt
 		/// </summary>
 		/// <param name="eventTime"></param>
-		protected void OnUnscrew(EventTime eventTime)
+		protected void OnUnscrew(PartEvent.Time eventTime)
 		{
 			alreadyCalledPreBolted = false;
 			alreadyCalledPostBolted = false;
 
 			switch (eventTime) {
-				case EventTime.Pre:
+				case PartEvent.Time.Pre:
 					if (alreadyCalledPreUnbolted) {
 						return;
 					}
 
 					alreadyCalledPreUnbolted = true;
-					GetEvents(EventTime.Pre, EventType.Unbolted).InvokeAll();
+					GetEvents(PartEvent.Time.Pre, PartEvent.Type.Unbolted).InvokeAll();
+					if (installedOnCar) {
+						GetEvents(PartEvent.Time.Pre, PartEvent.Type.UnboltedOnCar).InvokeAll();
+					}
+
 					break;
-				case EventTime.Post:
+				case PartEvent.Time.Post:
 					if (alreadyCalledPostUnbolted) {
 						return;
 					}
 
 					alreadyCalledPostUnbolted = true;
-					GetEvents(EventTime.Post, EventType.Unbolted).InvokeAll();
+					GetEvents(PartEvent.Time.Post, PartEvent.Type.Unbolted).InvokeAll();
+					if (installedOnCar) {
+						GetEvents(PartEvent.Time.Post, PartEvent.Type.UnboltedOnCar).InvokeAll();
+					}
+
 					break;
 			}
 		}
@@ -472,7 +515,7 @@ namespace MscModApi.Parts.ReplacePart
 		/// Gets called by the advanced bolted state detection when a bolt reaches the state "8" (tight)
 		/// </summary>
 		/// <param name="eventTime"></param>
-		protected void OnTight(EventTime eventTime)
+		protected void OnTight(PartEvent.Time eventTime)
 		{
 			if (tightness.Value < maxTightness) {
 				return; //Wait for all screws to be tight
@@ -483,21 +526,29 @@ namespace MscModApi.Parts.ReplacePart
 
 
 			switch (eventTime) {
-				case EventTime.Pre:
+				case PartEvent.Time.Pre:
 					if (alreadyCalledPreBolted) {
 						return;
 					}
 
 					alreadyCalledPreBolted = true;
-					GetEvents(EventTime.Pre, EventType.Bolted).InvokeAll();
+					GetEvents(PartEvent.Time.Pre, PartEvent.Type.Bolted).InvokeAll();
+					if (installedOnCar) {
+						GetEvents(PartEvent.Time.Pre, PartEvent.Type.BoltedOnCar).InvokeAll();
+					}
+
 					break;
-				case EventTime.Post:
+				case PartEvent.Time.Post:
 					if (alreadyCalledPostBolted) {
 						return;
 					}
 
 					alreadyCalledPostBolted = true;
-					GetEvents(EventTime.Post, EventType.Bolted).InvokeAll();
+					GetEvents(PartEvent.Time.Post, PartEvent.Type.Bolted).InvokeAll();
+					if (installedOnCar) {
+						GetEvents(PartEvent.Time.Post, PartEvent.Type.BoltedOnCar).InvokeAll();
+					}
+
 					break;
 			}
 		}
@@ -506,49 +557,116 @@ namespace MscModApi.Parts.ReplacePart
 		/// Not implemented for the 
 		/// </summary>
 		/// <param name="eventTime"></param>
-		/// <param name="eventType"></param>
+		/// <param name="Type"></param>
 		/// <returns></returns>
-		public List<Action> GetEvents(EventTime eventTime, EventType eventType)
+		public List<Action> GetEvents(PartEvent.Time eventTime, PartEvent.Type Type)
 		{
-			return events[eventTime][eventType];
+			return events[eventTime][Type];
 		}
 
 		/// <inheritdoc />
-		public void AddEventListener(EventTime eventTime, EventType eventType, Action action)
+		public void AddEventListener(PartEvent.Time eventTime, PartEvent.Type Type, Action action,
+			bool invokeActionIfConditionMet = true)
 		{
-			events[eventTime][eventType].Add(action);
+			if (
+				eventTime == PartEvent.Time.Pre
+				&& (Type == PartEvent.Type.InstallOnCar || Type == PartEvent.Type.UninstallFromCar)
+			) {
+				throw new Exception($"Event {Type} can't be detected at '{eventTime}'. Unsupported!");
+			}
 
-			if (eventTime == EventTime.Post) {
-				switch (eventType) {
+			events[eventTime][Type].Add(action);
+
+			if (invokeActionIfConditionMet && eventTime == PartEvent.Time.Post) {
+				switch (Type) {
 					//ToDo: check if invoking just the newly added action is enough of if all have to be invoked
-					case EventType.Install:
+					case PartEvent.Type.Install:
 						if (installed) {
 							action.Invoke();
 						}
 
 						break;
-					case EventType.Uninstall:
+					case PartEvent.Type.Uninstall:
 						if (!installed) {
 							action.Invoke();
 						}
 
 						break;
-					case EventType.Bolted:
+					case PartEvent.Type.Bolted:
 						if (bolted) {
 							//ToDo: bolted state should only be true if maxTightness is also reached
 							action.Invoke();
 						}
 
 						break;
-					case EventType.Unbolted:
+					case PartEvent.Type.Unbolted:
 						if (!bolted) {
 							//ToDo: bolted state should only be true if maxTightness is also reached
 							action.Invoke();
 						}
 
 						break;
+					case PartEvent.Type.InstallOnCar:
+						if (installedOnCar) {
+							action.Invoke();
+						}
+
+						break;
+					case PartEvent.Type.UninstallFromCar:
+						if (!installedOnCar) {
+							action.Invoke();
+						}
+
+						break;
+					case PartEvent.Type.BoltedOnCar:
+						if (bolted && installedOnCar) {
+							action.Invoke();
+						}
+
+						break;
+					case PartEvent.Type.UnboltedOnCar:
+						if (!bolted && installedOnCar) {
+							action.Invoke();
+						}
+
+						break;
 				}
 			}
+		}
+
+		/// <summary>
+		/// When this part installs, the "partsToBlock" parts will be blocked from being installed (installBlocked = true)
+		/// When this part uninstalls (opposite of "Type") the "partsToBlock" parts will be unblocked from being installed (installBlocked = false)
+		/// </summary>
+		/// <param name="Type">The event of this part after which installation of the "partsToBlock" will be blocked/unblocked</param>
+		/// <param name="partsToBlock">The parts to block when the "Type" is called on this part</param>
+		public void BlockOtherPartInstallOnEvent(PartEvent.Type Type, IEnumerable<BasicPart> partsToBlock)
+		{
+			AddEventListener(PartEvent.Time.Post, Type, () =>
+			{
+				foreach (BasicPart partToBlock in partsToBlock) {
+					partToBlock.installBlocked = true;
+				}
+			});
+			AddEventListener(PartEvent.Time.Post, PartEvent.GetOppositeEvent(Type), () =>
+			{
+				foreach (BasicPart partToBlock in partsToBlock) {
+					partToBlock.installBlocked = false;
+				}
+			});
+		}
+
+		/// <summary>
+		/// When this part installs, the "partToBlock" part will be blocked from being installed (installBlocked = true)
+		/// When this part uninstalls (opposite of "Type") the "partToBlock" part will be unblocked from being installed (installBlocked = false)
+		/// </summary>
+		/// <param name="Type">The event of this part after which installation of the "partToBlock" will be blocked/unblocked</param>
+		/// <param name="partToBlock">The part to block when the "Type" is called on this part</param>
+		public void BlockOtherPartInstallOnEvent(PartEvent.Type Type, BasicPart partToBlock)
+		{
+			AddEventListener(PartEvent.Time.Post, Type, () => { partToBlock.installBlocked = true; });
+			AddEventListener(PartEvent.Time.Post, PartEvent.GetOppositeEvent(Type),
+				() => { partToBlock.installBlocked = false; });
 		}
 	}
 }

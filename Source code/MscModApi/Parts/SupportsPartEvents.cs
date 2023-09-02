@@ -1,27 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using static MscModApi.Parts.PartEvent;
 
 namespace MscModApi.Parts
 {
-	public enum EventTime
-	{
-		Pre,
-		Post
-	}
-
-	public enum EventType
-	{
-		Save,
-		Install,
-		Uninstall,
-		Bolted,
-		Unbolted
-	}
-
 	public interface SupportsPartEvents
 	{
-		void AddEventListener(EventTime eventTime, EventType eventType, Action action);
+		void AddEventListener(PartEvent.Time eventTime, PartEvent.Type Type, Action action,
+			bool invokeActionIfConditionMet = true);
 
-		List<Action> GetEvents(EventTime eventTime, EventType eventType);
+		List<Action> GetEvents(PartEvent.Time eventTime, PartEvent.Type Type);
 	}
 }

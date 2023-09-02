@@ -19,6 +19,8 @@ namespace MscModApi.Parts.ReplacePart
 		internal List<Action> anyUnfixed = new List<Action>();
 	}
 
+	[Obsolete(
+		"Soon to be made obsolete, will be replaced with a new implementation using the new 'GamePart' wrapper class")]
 	/// <summary>The ReplacementPart class</summary>
 	public class ReplacementPart
 	{
@@ -123,13 +125,13 @@ namespace MscModApi.Parts.ReplacePart
 			}
 
 			foreach (var newPart in newParts) {
-				newPart.part.AddEventListener(EventTime.Post, EventType.Install,
+				newPart.part.AddEventListener(PartEvent.Time.Post, PartEvent.Type.Install,
 					delegate { NewPartInstalled(newPart); });
-				newPart.part.AddEventListener(EventTime.Post, EventType.Uninstall,
+				newPart.part.AddEventListener(PartEvent.Time.Post, PartEvent.Type.Uninstall,
 					delegate { NewPartUninstalled(newPart); });
 
-				newPart.part.AddEventListener(EventTime.Post, EventType.Bolted, NewPartFixed);
-				newPart.part.AddEventListener(EventTime.Post, EventType.Unbolted, NewPartUnfixed);
+				newPart.part.AddEventListener(PartEvent.Time.Post, PartEvent.Type.Bolted, NewPartFixed);
+				newPart.part.AddEventListener(PartEvent.Time.Post, PartEvent.Type.Unbolted, NewPartUnfixed);
 
 				if (newPart.installed) {
 					NewPartInstalled(newPart);

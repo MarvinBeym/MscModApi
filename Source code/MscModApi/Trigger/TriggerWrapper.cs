@@ -20,22 +20,12 @@ namespace MscModApi.Trigger
 		/// <param name="part">The part object the trigger will be added to</param>
 		/// <param name="parentGameObject">The gameObject the trigger will be added to as a child</param>
 		/// <param name="disableCollisionWhenInstalled">Disable the collision of the part when the part gets installed</param>
-		public TriggerWrapper(Part part, GameObject parentGameObject, bool disableCollisionWhenInstalled)
+		public TriggerWrapper(Part part, BasicPart parent,
+			DisableCollision disableCollisionWhenInstalled = DisableCollision.InstalledOnCar)
 		{
-			triggerGameObject = GameObject.CreatePrimitive(PrimitiveType.Cube);
-			triggerGameObject.transform.SetParent(parentGameObject.transform, false);
-			triggerGameObject.name = part.gameObject.name + "_trigger";
-			position = part.installPosition;
-			rotation = part.installRotation;
-			scale = defaultScale;
-
-			var collider = triggerGameObject.GetComponent<Collider>();
-			collider.isTrigger = true;
-
-			renderer = triggerGameObject.GetComponent<Renderer>();
-			visible = false;
+			Setup(part, parent.gameObject, disableCollisionWhenInstalled);
 			logic = triggerGameObject.AddComponent<Trigger>();
-			logic.Init(part, parentGameObject, disableCollisionWhenInstalled);
+			logic.Init(part, parent);
 		}
 
 		/// <summary>
@@ -84,28 +74,36 @@ namespace MscModApi.Trigger
 		/// </summary>
 		public void Uninstall() => logic.Uninstall();
 
-		[Obsolete("Use 'scale' property instead", true)]
-		public void SetScale(Vector3 scale)
+		protected void Setup(Part part, GameObject parent,
+			DisableCollision disableCollisionWhenInstalled = DisableCollision.InstalledOnCar)
 		{
-			this.scale = scale;
-		}
+			triggerGameObject = GameObject.CreatePrimitive(PrimitiveType.Cube);
+			triggerGameObject.transform.SetParent(parent.transform, false);
+			triggerGameObject.name = part.gameObject.name + "_trigger";
+			position = part.installPosition;
+			rotation = part.installRotation;
+			scale = defaultScale;
 
-		[Obsolete("Use 'position' property instead", true)]
-		public void SetPosition(Vector3 position)
-		{
-			this.position = position;
-		}
+			var collider = triggerGameObject.GetComponent<Collider>();
+			collider.isTrigger = true;
 
-		[Obsolete("Use 'rotation' property instead", true)]
-		public void SetRotation(Vector3 rotation)
-		{
-			this.rotation = rotation;
-		}
+			renderer = triggerGameObject.GetComponent<Renderer>();
+			visible = false;
 
-		[Obsolete("Use 'visible' property instead", true)]
-		public void SetVisible(bool show)
-		{
-			visible = show;
+			switch (disableCollisionWhenInstalled) {
+				case DisableCollision.InstalledOnCar:
+					part.AddEventListener(PartEvent.Time.Post, PartEvent.Type.InstallOnCar,
+						() => part.collider.isTrigger = true);
+					part.AddEventListener(PartEvent.Time.Post, PartEvent.Type.UninstallFromCar,
+						() => part.collider.isTrigger = false);
+					break;
+				case DisableCollision.InstalledOnParent:
+					part.AddEventListener(PartEvent.Time.Post, PartEvent.Type.Install,
+						() => part.collider.isTrigger = true);
+					part.AddEventListener(PartEvent.Time.Post, PartEvent.Type.Uninstall,
+						() => part.collider.isTrigger = false);
+					break;
+			}
 		}
 	}
 }

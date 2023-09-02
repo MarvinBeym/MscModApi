@@ -28,7 +28,8 @@ namespace MscModApi.Parts
 		/// <param name="disableCollisionWhenInstalled">Disables the collider of the part when installed to the parent (reduces lag, avoids problematic collisions)</param>
 		public Box(string boxName, string partId, string partName, GameObject partGameObject, int numberOfParts,
 			Part parent, Vector3[] installLocations, Vector3[] installRotations, Vector3 defaultPosition,
-			bool uninstallWhenParentUninstalls = true, bool disableCollisionWhenInstalled = true)
+			bool uninstallWhenParentUninstalls = false,
+			DisableCollision disableCollisionWhenInstalled = DisableCollision.InstalledOnCar)
 
 		{
 			Setup(
@@ -66,7 +67,8 @@ namespace MscModApi.Parts
 		public Box(string boxName, string partId, string partName, GameObject customBoxModel, GameObject partGameObject,
 			int numberOfParts,
 			Part parent, Vector3[] installLocations, Vector3[] installRotations, Vector3 defaultPosition,
-			bool uninstallWhenParentUninstalls = true, bool disableCollisionWhenInstalled = true)
+			bool uninstallWhenParentUninstalls = false,
+			DisableCollision disableCollisionWhenInstalled = DisableCollision.InstalledOnCar)
 		{
 			Setup(
 				boxName,
@@ -103,10 +105,11 @@ namespace MscModApi.Parts
 			GameObject partGameObject, int numberOfParts,
 			Part parent,
 			Vector3[] installLocations, Vector3[] installRotations, Vector3 defaultPosition,
-			bool uninstallWhenParentUninstalls, bool disableCollisionWhenInstalled)
+			bool uninstallWhenParentUninstalls,
+			DisableCollision disableCollisionWhenInstalled = DisableCollision.InstalledOnCar)
 		{
 			boxModel.SetNameLayerTag(boxName + "(Clone)");
-			this.boxModel = boxModel;
+			gameObject = boxModel;
 
 			PartBaseInfo partBaseInfo = parent.partBaseInfo;
 
@@ -123,11 +126,11 @@ namespace MscModApi.Parts
 					part.active = false;
 				}
 
-				AddPart(part);
+				AddChild(part);
 			}
 
 			active = false;
-			logic = this.boxModel.AddComponent<BoxLogic>();
+			logic = gameObject.AddComponent<BoxLogic>();
 			logic.Init(this);
 		}
 
@@ -139,7 +142,7 @@ namespace MscModApi.Parts
 		/// <param name="overrideSize"></param>
 		protected void AddScrews(Screw[] screws, float overrideScale = 0f, float overrideSize = 0f)
 		{
-			foreach (Part part in parts) {
+			foreach (Part part in childs) {
 				part.AddScrews(screws.CloneToNew(), overrideScale, overrideSize);
 			}
 		}

@@ -1,36 +1,132 @@
-﻿using MSCLoader;
-using MscModApi.Tools;
-using MscModApi.Trigger;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using HutongGames.PlayMaker;
+using MSCLoader;
+using MscModApi.Caching;
+using MscModApi.Parts.ReplacePart;
+using MscModApi.Tools;
+using MscModApi.Trigger;
 using UnityEngine;
+using static MscModApi.Parts.PartEvent;
 
 namespace MscModApi.Parts
 {
-	public class Part : BasicPart, SupportsPartEvents
+	/// <summary>
+	/// When should the collider of a part be disabled
+	/// </summary>
+	public enum DisableCollision
+	{
+		/// <summary>
+		/// Disables the part collider when the part is installed on the parent (installed = true)
+		/// </summary>
+		InstalledOnParent,
+
+		/// <summary>
+		/// Disables the part collider when the part is installed to the car (installedOnCar = true)
+		/// </summary>
+		InstalledOnCar,
+
+		/// <summary>
+		/// Never disables the part collider, part can collide with everything.
+		/// CAUTION!! potential conflicts with other GameObjects as well as extreme performance impact are possible
+		/// </summary>
+		Never
+	}
+
+	public class Part : BasicPart, SupportsPartEvents, SupportsPartBehaviourEvents
 	{
 		protected static GameObject clampModel;
-
 		protected int clampsAdded;
+		internal PartSave partSave;
+		protected Dictionary<Screw, int> preScrewPlacementModeEnableTightnessMap = new Dictionary<Screw, int>();
+		private bool _screwPlacementMode;
+		protected bool injectedScrewPlacementDisablePreUninstall;
 
-		public List<Part> childParts { get; protected set; } = new List<Part>();
+		/// <summary>
+		/// Stores all events that a developer may have added to this part object
+		/// </summary>
+		protected Dictionary<PartEvent.Time, Dictionary<PartEvent.Type, List<Action>>> events =
+			new Dictionary<PartEvent.Time, Dictionary<PartEvent.Type, List<Action>>>();
+
+		/// <inheritdoc />
+		protected Part()
+		{
+		}
+
+		public Part(string id, string name, GameObject part, Part parent, Vector3 installPosition,
+			Vector3 installRotation,
+			PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls = false,
+			DisableCollision disableCollisionWhenInstalled = DisableCollision.InstalledOnCar) : this(id, name, part,
+			(BasicPart)parent, installPosition, installRotation, partBaseInfo, uninstallWhenParentUninstalls,
+			disableCollisionWhenInstalled)
+		{
+		}
+
+		public Part(string id, string name, GameObject part, GamePart parent, Vector3 installPosition,
+			Vector3 installRotation,
+			PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls = false,
+			DisableCollision disableCollisionWhenInstalled = DisableCollision.InstalledOnCar) : this(id, name, part,
+			(BasicPart)parent, installPosition, installRotation, partBaseInfo, uninstallWhenParentUninstalls,
+			disableCollisionWhenInstalled)
+		{
+		}
+
+		protected Part(string id, string name, GameObject part, BasicPart parent, Vector3 installPosition,
+			Vector3 installRotation,
+			PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls = false,
+			DisableCollision disableCollisionWhenInstalled = DisableCollision.InstalledOnCar)
+		{
+			gameObjectUsedForInstantiation = part;
+
+			Setup(id, name, parent, installPosition, installRotation, partBaseInfo,
+				uninstallWhenParentUninstalls, disableCollisionWhenInstalled, null);
+		}
+
+		public Part(string id, string name, PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls = false,
+			DisableCollision disableCollisionWhenInstalled = DisableCollision.InstalledOnCar, string prefabName = null)
+		{
+			Setup(id, name, null, Vector3.zero, Vector3.zero, partBaseInfo,
+				uninstallWhenParentUninstalls, disableCollisionWhenInstalled, prefabName);
+		}
+
+		public Part(string id, string name, Part parent, Vector3 installPosition, Vector3 installRotation,
+			PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls = false,
+			DisableCollision disableCollisionWhenInstalled = DisableCollision.InstalledOnCar,
+			string prefabName = null) : this(id, name, (BasicPart)parent, installPosition, installRotation,
+			partBaseInfo, uninstallWhenParentUninstalls, disableCollisionWhenInstalled, prefabName)
+		{
+		}
+
+		public Part(string id, string name, GamePart parent, Vector3 installPosition, Vector3 installRotation,
+			PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls = false,
+			DisableCollision disableCollisionWhenInstalled = DisableCollision.InstalledOnCar,
+			string prefabName = null) : this(id, name, (BasicPart)parent, installPosition, installRotation,
+			partBaseInfo, uninstallWhenParentUninstalls, disableCollisionWhenInstalled, prefabName)
+		{
+		}
+
+		protected Part(string id, string name, BasicPart parent, Vector3 installPosition, Vector3 installRotation,
+			PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls = false,
+			DisableCollision disableCollisionWhenInstalled = DisableCollision.InstalledOnCar, string prefabName = null)
+		{
+			Setup(id, name, parent, installPosition, installRotation, partBaseInfo,
+				uninstallWhenParentUninstalls, disableCollisionWhenInstalled, prefabName);
+		}
 
 		public string id { get; protected set; }
 
 		public PartBaseInfo partBaseInfo { get; protected set; }
 
-		public GameObject gameObject { get; protected set; }
-		internal PartSave partSave;
+		public override GameObject gameObject { get; protected set; }
 
 		public Vector3 installPosition { get; protected set; }
+
 		public Vector3 installRotation { get; protected set; }
+
+		public BasicPart parent { get; protected set; }
 
 		public bool uninstallWhenParentUninstalls { get; protected set; }
 
-		public GameObject parentGameObject { get; protected set; }
-		public Part parentPart { get; protected set; }
 		protected List<Screw> savedScrews;
 
 		public Collider collider { get; protected set; }
@@ -40,19 +136,14 @@ namespace MscModApi.Parts
 		public Transform transform => gameObject.transform;
 
 		public GameObject gameObjectUsedForInstantiation { get; protected set; }
-		public bool usingPartParent => parentPart != null;
 
-		protected Dictionary<Screw, int> preScrewPlacementModeEnableTightnessMap = new Dictionary<Screw, int>();
+		public bool hasParent => parent != null;
 
-		private bool _screwPlacementMode;
-		protected bool injectedScrewPlacementDisablePreUninstall = false;
-		private FsmBool parentGameObjectBolted = new FsmBool("Bolted");
+		public override bool installBlocked { get; set; }
 
-		/// <summary>
-		/// Stores all events that a developer may have added to this part object
-		/// </summary>
-		protected Dictionary<EventTime, Dictionary<EventType, List<Action>>> events =
-			new Dictionary<EventTime, Dictionary<EventType, List<Action>>>();
+		public List<Screw> screws => partSave.screws;
+
+		public override bool installed => partSave.installed;
 
 		public bool screwPlacementMode
 		{
@@ -65,7 +156,8 @@ namespace MscModApi.Parts
 
 				if (!injectedScrewPlacementDisablePreUninstall) {
 					injectedScrewPlacementDisablePreUninstall = true;
-					AddEventListener(EventTime.Pre, EventType.Uninstall, () => { this.screwPlacementMode = false; });
+					AddEventListener(PartEvent.Time.Pre, PartEvent.Type.Uninstall,
+						() => { screwPlacementMode = false; });
 				}
 
 				foreach (Screw screw in screws) {
@@ -98,195 +190,16 @@ namespace MscModApi.Parts
 			}
 		}
 
-		public bool hasParent => trigger != null;
-
-		public bool installBlocked { get; set; }
-
-		public List<Screw> screws => partSave.screws;
-
-		public override bool installed => partSave.installed;
-
-		/// <inheritdoc />
-		protected Part()
-		{
-		}
-
-		public Part(string id, string name, GameObject part, Part parentPart, Vector3 installPosition,
-			Vector3 installRotation,
-			PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls = true,
-			bool disableCollisionWhenInstalled = true)
-		{
-			gameObjectUsedForInstantiation = part;
-
-			this.parentPart = parentPart;
-
-			Setup(id, name, parentPart.gameObject, installPosition, installRotation, partBaseInfo,
-				uninstallWhenParentUninstalls, disableCollisionWhenInstalled, null);
-			parentPart.childParts.Add(this);
-		}
-
-		public Part(string id, string name, GameObject parent, Vector3 installPosition, Vector3 installRotation,
-			PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls = true,
-			bool disableCollisionWhenInstalled = true, string prefabName = null)
-		{
-			Setup(id, name, parent, installPosition, installRotation, partBaseInfo,
-				uninstallWhenParentUninstalls, disableCollisionWhenInstalled, prefabName);
-		}
-
-		public Part(string id, string name, PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls = true,
-			bool disableCollisionWhenInstalled = true, string prefabName = null)
-		{
-			Setup(id, name, null, Vector3.zero, Vector3.zero, partBaseInfo,
-				uninstallWhenParentUninstalls, disableCollisionWhenInstalled, prefabName);
-		}
-
-		public Part(string id, string name, Part parentPart, Vector3 installPosition, Vector3 installRotation,
-			PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls = true,
-			bool disableCollisionWhenInstalled = true, string prefabName = null)
-		{
-			this.parentPart = parentPart;
-			Setup(id, name, parentPart.gameObject, installPosition, installRotation, partBaseInfo,
-				uninstallWhenParentUninstalls, disableCollisionWhenInstalled, prefabName);
-			parentPart.childParts.Add(this);
-		}
-
-		protected void Setup(string id, string name, GameObject parentGameObject, Vector3 installPosition,
-			Vector3 installRotation, PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls,
-			bool disableCollisionWhenInstalled, string prefabName)
-		{
-			InitEventStorage();
-			this.id = id;
-			this.partBaseInfo = partBaseInfo;
-			this.installPosition = installPosition;
-			this.uninstallWhenParentUninstalls = uninstallWhenParentUninstalls;
-			this.installRotation = installRotation;
-			this.parentGameObject = parentGameObject;
-
-			if (!usingPartParent) {
-				try {
-					PlayMakerFSM parentRemovalFsm = parentGameObject.FindFsm("Removal");
-
-					/*
-					 * 					if (!removalFsm.Fsm.Initialized)
-					{
-						removalFsm.InitializeFSM();
-					}
-					 */
-					if (!parentRemovalFsm.Fsm.Initialized) {
-						parentRemovalFsm.InitializeFSM();
-					}
-
-					GameObject fsmPartGameObject = parentRemovalFsm.FsmVariables.FindFsmGameObject("db_ThisPart").Value;
-					PlayMakerFSM fsmPartDataFsm = fsmPartGameObject.FindFsm("Data");
-					parentGameObjectBolted = fsmPartDataFsm.FsmVariables.FindFsmBool("Bolted");
-				}
-				catch (Exception) {
-					// ignored
-				}
-			}
-
-			if (gameObjectUsedForInstantiation != null) {
-				gameObject = GameObject.Instantiate(gameObjectUsedForInstantiation);
-				gameObject.SetNameLayerTag(name + "(Clone)", "PART", "Parts");
-			}
-			else {
-				gameObject = Helper.LoadPartAndSetName(partBaseInfo.assetBundle, prefabName ?? id, name);
-			}
-
-			if (!partBaseInfo.partsSave.TryGetValue(id, out partSave)) {
-				partSave = new PartSave();
-			}
-
-			try {
-				CustomSaveLoading(partBaseInfo.mod, $"{id}_saveFile.json");
-			}
-			catch {
-				// ignored
-			}
-
-			savedScrews = new List<Screw>(partSave.screws);
-			partSave.screws.Clear();
-
-			collider = gameObject.GetComponent<Collider>();
-
-			if (parentGameObject != null) {
-				trigger = new TriggerWrapper(this, parentGameObject, disableCollisionWhenInstalled);
-			}
-
-			if (partSave.installed) {
-				Install();
-			}
-
-			LoadPartPositionAndRotation(gameObject, partSave);
-
-			if (!MscModApi.modSaveFileMapping.ContainsKey(partBaseInfo.mod.ID)) {
-				MscModApi.modSaveFileMapping.Add(partBaseInfo.mod.ID, partBaseInfo.saveFilePath);
-			}
-
-			if (MscModApi.modsParts.TryGetValue(partBaseInfo.mod.ID, out var modParts)) {
-				modParts.Add(id, this);
-			}
-			else {
-				MscModApi.modsParts.Add(partBaseInfo.mod.ID, new Dictionary<string, Part>
-				{
-					{ id, this }
-				});
-			}
-
-			partBaseInfo.AddToPartsList(this);
-		}
-
-		protected void InitEventStorage()
-		{
-			foreach (EventTime eventTime in Enum.GetValues(typeof(EventTime))) {
-				Dictionary<EventType, List<Action>> eventTypeDict = new Dictionary<EventType, List<Action>>();
-
-				foreach (EventType eventType in Enum.GetValues(typeof(EventType))) {
-					eventTypeDict.Add(eventType, new List<Action>());
-				}
-
-				events.Add(eventTime, eventTypeDict);
-			}
-		}
-
 		/// <inheritdoc />
 		public override string name => gameObject.name;
 
 		/// <inheritdoc />
 		public override bool isLookingAt => gameObject.IsLookingAt();
 
-
 		/// <inheritdoc />
 		public override bool isHolding => gameObject.IsHolding();
 
 		public bool installPossible => !installBlocked && bought && trigger != null;
-
-
-		public bool parentInstalled
-		{
-			get
-			{
-				if (usingPartParent) {
-					return parentPart.installed;
-				}
-				else {
-					return parentGameObject.transform.parent != null;
-				}
-			}
-		}
-
-		public bool parentBolted
-		{
-			get
-			{
-				if (usingPartParent) {
-					return parentPart.bolted;
-				}
-				else {
-					return parentGameObjectBolted.Value;
-				}
-			}
-		}
 
 		/// <inheritdoc />
 		public override bool bought
@@ -326,17 +239,95 @@ namespace MscModApi.Parts
 			set => gameObject.SetActive(value);
 		}
 
+		public override bool bolted
+		{
+			get { return screws.Count > 0 && screws.All(screw => screw.tightness == Screw.maxTightness) && installed; }
+		}
+
+		public override bool installedOnCar => installed && gameObject.transform.root == CarH.satsuma.transform;
+
+		protected void Setup(string id, string name, BasicPart parent, Vector3 installPosition,
+			Vector3 installRotation, PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls,
+			DisableCollision disableCollisionWhenInstalled, string prefabName)
+		{
+			InitEventStorage();
+			this.id = id;
+			this.partBaseInfo = partBaseInfo;
+			this.installPosition = installPosition;
+			this.uninstallWhenParentUninstalls = uninstallWhenParentUninstalls;
+			this.installRotation = installRotation;
+			this.parent = parent;
+
+			if (gameObjectUsedForInstantiation != null) {
+				gameObject = GameObject.Instantiate(gameObjectUsedForInstantiation);
+				gameObject.SetNameLayerTag(name + "(Clone)");
+			}
+			else {
+				gameObject = Helper.LoadPartAndSetName(partBaseInfo.assetBundle, prefabName ?? id, name);
+			}
+
+			if (!partBaseInfo.partsSave.TryGetValue(id, out partSave)) {
+				partSave = new PartSave();
+			}
+
+			try {
+				CustomSaveLoading(partBaseInfo.mod, $"{id}_saveFile.json");
+			}
+			catch (Exception) {
+				// ignored
+			}
+
+			savedScrews = new List<Screw>(partSave.screws);
+			partSave.screws.Clear();
+
+			collider = gameObject.GetComponent<Collider>();
+
+			if (parent != null) {
+				trigger = new TriggerWrapper(this, parent, disableCollisionWhenInstalled);
+				parent.AddChild(this);
+			}
+
+			if (partSave.installed) {
+				Install();
+			}
+
+			LoadPartPositionAndRotation(gameObject, partSave);
+
+			if (!MscModApi.modSaveFileMapping.ContainsKey(partBaseInfo.mod.ID)) {
+				MscModApi.modSaveFileMapping.Add(partBaseInfo.mod.ID, partBaseInfo.saveFilePath);
+			}
+
+			if (MscModApi.modsParts.TryGetValue(partBaseInfo.mod.ID, out var modParts)) {
+				modParts.Add(id, this);
+			}
+			else {
+				MscModApi.modsParts.Add(partBaseInfo.mod.ID, new Dictionary<string, Part>
+				{
+					{ id, this }
+				});
+			}
+
+			partBaseInfo.AddToPartsList(this);
+		}
+
+		protected void InitEventStorage()
+		{
+			foreach (PartEvent.Time eventTime in Enum.GetValues(typeof(PartEvent.Time))) {
+				Dictionary<PartEvent.Type, List<Action>> TypeDict = new Dictionary<PartEvent.Type, List<Action>>();
+
+				foreach (PartEvent.Type Type in Enum.GetValues(typeof(PartEvent.Type))) {
+					TypeDict.Add(Type, new List<Action>());
+				}
+
+				events.Add(eventTime, TypeDict);
+			}
+		}
+
 		internal void ResetScrews()
 		{
 			foreach (var screw in partSave.screws) {
 				screw.OutBy(screw.tightness);
 			}
-		}
-
-		[Obsolete("Use 'screws' property instead", true)]
-		public List<Screw> GetScrews()
-		{
-			return screws;
 		}
 
 		internal void SetScrewsActive(bool active)
@@ -349,50 +340,9 @@ namespace MscModApi.Parts
 			trigger?.Install();
 		}
 
-		[Obsolete("Use 'installed' property instead", true)]
-		public bool IsInstalled()
-		{
-			return installed;
-		}
-
-		[Obsolete("Use 'bolted' property instead", true)]
-		public bool IsFixed(bool ignoreUnsetScrews = true)
-		{
-			return bolted;
-		}
-
-		public override bool bolted
-		{
-			get { return screws.Count > 0 && screws.All(screw => screw.tightness == Screw.maxTightness) && installed; }
-		}
-
-		public void Uninstall()
+		public override void Uninstall()
 		{
 			trigger?.Uninstall();
-		}
-
-		public void AddClampModel(Vector3 position, Vector3 rotation, Vector3 scale)
-		{
-			var clamp = GameObject.Instantiate(clampModel);
-			clamp.name = $"{gameObject.name}_clamp_{clampsAdded}";
-			clampsAdded++;
-			clamp.transform.SetParent(gameObject.transform);
-			clamp.transform.localPosition = position;
-			clamp.transform.localScale = scale;
-			clamp.transform.localRotation = new Quaternion { eulerAngles = rotation };
-		}
-
-
-		[Obsolete("Use 'parentInstalled' property instead", true)]
-		internal bool ParentInstalled()
-		{
-			return parentInstalled;
-		}
-
-		[Obsolete("Use 'parentBolted' property instead", true)]
-		public bool ParentFixed()
-		{
-			return parentBolted;
 		}
 
 		private void LoadPartPositionAndRotation(GameObject gameObject, PartSave partSave)
@@ -441,122 +391,145 @@ namespace MscModApi.Parts
 			}
 		}
 
-		[Obsolete("Use cleaner 'AddEventListener' method instead", true)]
-		public void AddPreSaveAction(Action action)
-		{
-			AddEventListener(EventTime.Pre, EventType.Save, action);
-		}
-
-		[Obsolete("Use cleaner 'AddEventListener' method instead", true)]
-		public void AddPreInstallAction(Action action)
-		{
-			AddEventListener(EventTime.Pre, EventType.Install, action);
-		}
-
-		[Obsolete("Use cleaner 'AddEventListener' method instead", true)]
-		public void AddPostInstallAction(Action action)
-		{
-			AddEventListener(EventTime.Post, EventType.Install, action);
-		}
-
-		[Obsolete("Use cleaner 'AddEventListener' method instead", true)]
-		public void AddPreUninstallAction(Action action)
-		{
-			AddEventListener(EventTime.Pre, EventType.Uninstall, action);
-		}
-
-		[Obsolete("Use cleaner 'AddEventListener' method instead", true)]
-		public void AddPostUninstallAction(Action action)
-		{
-			AddEventListener(EventTime.Post, EventType.Uninstall, action);
-		}
-
-		[Obsolete("Use cleaner 'AddEventListener' method instead", true)]
-		public void AddPostFixedAction(Action action)
-		{
-			AddEventListener(EventTime.Post, EventType.Bolted, action);
-		}
-
-		[Obsolete("Use cleaner 'AddEventListener' method instead", true)]
-		public void AddPreFixedAction(Action action)
-		{
-			AddEventListener(EventTime.Pre, EventType.Bolted, action);
-		}
-
-		[Obsolete("Use cleaner 'AddEventListener' method instead", true)]
-		public void AddPreUnfixedActions(Action action)
-		{
-			AddEventListener(EventTime.Pre, EventType.Unbolted, action);
-		}
-
-		[Obsolete("Use cleaner 'AddEventListener' method instead", true)]
-		public void AddPostUnfixedActions(Action action)
-		{
-			AddEventListener(EventTime.Post, EventType.Unbolted, action);
-		}
-
-		[Obsolete("Use AddWhenInstalledBehaviour instead. Will be removed in a later version", true)]
-		public T AddWhenInstalledMono<T>() where T : MonoBehaviour
-		{
-			return AddWhenInstalledBehaviour<T>();
-		}
-
-		[Obsolete("Use AddWhenUninstalledBehaviour instead. Will be removed in a later version", true)]
-		public T AddWhenUninstalledMono<T>() where T : MonoBehaviour
-		{
-			return AddWhenUninstalledBehaviour<T>();
-		}
-
-		public T AddWhenInstalledBehaviour<T>() where T : Behaviour
+		/// <inheritdoc />
+		public T AddEventBehaviour<T>(PartEvent.Type Type) where T : Behaviour
 		{
 			var behaviour = AddComponent<T>();
-			behaviour.enabled = installed;
+			switch (Type) {
+				case PartEvent.Type.Install:
+					behaviour.enabled = installed;
+					AddEventListener(PartEvent.Time.Post, Type, () => behaviour.enabled = true);
+					AddEventListener(PartEvent.Time.Post, PartEvent.Type.Uninstall, () => behaviour.enabled = false);
+					break;
+				case PartEvent.Type.Uninstall:
+					behaviour.enabled = !installed;
+					AddEventListener(PartEvent.Time.Post, Type, () => behaviour.enabled = true);
+					AddEventListener(PartEvent.Time.Post, PartEvent.Type.Install, () => behaviour.enabled = false);
+					break;
+				case PartEvent.Type.InstallOnCar:
+					behaviour.enabled = installedOnCar;
+					AddEventListener(PartEvent.Time.Post, Type, () => behaviour.enabled = true);
+					AddEventListener(PartEvent.Time.Post, PartEvent.Type.UninstallFromCar,
+						() => behaviour.enabled = false);
+					break;
+				case PartEvent.Type.UninstallFromCar:
+					behaviour.enabled = !installedOnCar;
+					AddEventListener(PartEvent.Time.Post, Type, () => behaviour.enabled = true);
+					AddEventListener(PartEvent.Time.Post, PartEvent.Type.InstallOnCar, () => behaviour.enabled = false);
+					break;
+				case PartEvent.Type.Bolted:
+					behaviour.enabled = bolted;
+					AddEventListener(PartEvent.Time.Post, Type, () => behaviour.enabled = true);
+					AddEventListener(PartEvent.Time.Post, PartEvent.Type.Unbolted, () => behaviour.enabled = false);
+					break;
+				case PartEvent.Type.Unbolted:
+					behaviour.enabled = !bolted;
+					AddEventListener(PartEvent.Time.Post, Type, () => behaviour.enabled = true);
+					AddEventListener(PartEvent.Time.Post, PartEvent.Type.Bolted, () => behaviour.enabled = false);
+					break;
+				case PartEvent.Type.BoltedOnCar:
+					behaviour.enabled = bolted && installedOnCar;
+					AddEventListener(PartEvent.Time.Post, Type, () => behaviour.enabled = true);
+					AddEventListener(PartEvent.Time.Post, PartEvent.Type.UnboltedOnCar,
+						() => behaviour.enabled = false);
+					break;
+				case PartEvent.Type.UnboltedOnCar:
+					behaviour.enabled = !bolted && installedOnCar;
+					AddEventListener(PartEvent.Time.Post, Type, () => behaviour.enabled = true);
+					AddEventListener(PartEvent.Time.Post, PartEvent.Type.BoltedOnCar, () => behaviour.enabled = false);
+					break;
+			}
 
-
-			AddEventListener(EventTime.Post, EventType.Install, delegate { behaviour.enabled = true; });
-
-			AddEventListener(EventTime.Post, EventType.Uninstall, delegate { behaviour.enabled = false; });
 			return behaviour;
 		}
 
-		public T AddWhenUninstalledBehaviour<T>() where T : Behaviour
+		/// <summary>
+		/// When this part installs, the "partsToBlock" parts will be blocked from being installed (installBlocked = true)
+		/// When this part uninstalls (opposite of "Type") the "partsToBlock" parts will be unblocked from being installed (installBlocked = false)
+		/// </summary>
+		/// <param name="Type">The event of this part after which installation of the "partsToBlock" will be blocked/unblocked</param>
+		/// <param name="partsToBlock">The parts to block when the "Type" is called on this part</param>
+		public void BlockOtherPartInstallOnEvent(PartEvent.Type Type, IEnumerable<BasicPart> partsToBlock)
 		{
-			var behaviour = AddComponent<T>();
-			behaviour.enabled = !installed;
-
-			AddEventListener(EventTime.Post, EventType.Install, delegate { behaviour.enabled = false; });
-
-			AddEventListener(EventTime.Post, EventType.Uninstall, delegate { behaviour.enabled = true; });
-			return behaviour;
+			AddEventListener(PartEvent.Time.Post, Type, () =>
+			{
+				foreach (BasicPart partToBlock in partsToBlock) {
+					partToBlock.installBlocked = true;
+				}
+			});
+			AddEventListener(PartEvent.Time.Post, GetOppositeEvent(Type), () =>
+			{
+				foreach (BasicPart partToBlock in partsToBlock) {
+					partToBlock.installBlocked = false;
+				}
+			});
 		}
 
-		public void AddEventListener(EventTime eventTime, EventType eventType, Action action)
+		/// <summary>
+		/// When this part installs, the "partToBlock" part will be blocked from being installed (installBlocked = true)
+		/// When this part uninstalls (opposite of "Type") the "partToBlock" part will be unblocked from being installed (installBlocked = false)
+		/// </summary>
+		/// <param name="Type">The event of this part after which installation of the "partToBlock" will be blocked/unblocked</param>
+		/// <param name="partToBlock">The part to block when the "Type" is called on this part</param>
+		public void BlockOtherPartInstallOnEvent(PartEvent.Type Type, BasicPart partToBlock)
 		{
-			events[eventTime][eventType].Add(action);
+			AddEventListener(PartEvent.Time.Post, Type, () => { partToBlock.installBlocked = true; });
+			AddEventListener(PartEvent.Time.Post, GetOppositeEvent(Type),
+				() => { partToBlock.installBlocked = false; });
+		}
 
-			if (eventTime == EventTime.Post) {
-				switch (eventType) {
+		public void AddEventListener(PartEvent.Time eventTime, PartEvent.Type Type, Action action,
+			bool invokeActionIfConditionMet = true)
+		{
+			events[eventTime][Type].Add(action);
+
+			if (invokeActionIfConditionMet && eventTime == PartEvent.Time.Post) {
+				switch (Type) {
 					//ToDo: check if invoking just the newly added action is enough of if all have to be invoked
-					case EventType.Install:
+					case PartEvent.Type.Install:
 						if (installed) {
 							action.Invoke();
 						}
 
 						break;
-					case EventType.Uninstall:
+					case PartEvent.Type.Uninstall:
 						if (!installed) {
 							action.Invoke();
 						}
 
 						break;
-					case EventType.Bolted:
+					case PartEvent.Type.Bolted:
 						if (bolted) {
 							action.Invoke();
 						}
 
 						break;
-					case EventType.Unbolted:
+					case PartEvent.Type.Unbolted:
 						if (!bolted) {
+							action.Invoke();
+						}
+
+						break;
+					case PartEvent.Type.InstallOnCar:
+						if (installedOnCar) {
+							action.Invoke();
+						}
+
+						break;
+					case PartEvent.Type.UninstallFromCar:
+						if (!installedOnCar) {
+							action.Invoke();
+						}
+
+						break;
+					case PartEvent.Type.BoltedOnCar:
+						if (bolted && installedOnCar) {
+							action.Invoke();
+						}
+
+						break;
+					case PartEvent.Type.UnboltedOnCar:
+						if (!bolted && installedOnCar) {
 							action.Invoke();
 						}
 
@@ -565,9 +538,9 @@ namespace MscModApi.Parts
 			}
 		}
 
-		public List<Action> GetEvents(EventTime eventTime, EventType eventType)
+		public List<Action> GetEvents(PartEvent.Time eventTime, PartEvent.Type Type)
 		{
-			return events[eventTime][eventType];
+			return events[eventTime][Type];
 		}
 
 		public T AddComponent<T>() where T : Component => gameObject.AddComponent(typeof(T)) as T;
@@ -585,34 +558,15 @@ namespace MscModApi.Parts
 			rotation = defaultRotation;
 		}
 
-		[Obsolete("Use 'installBlocked' property instead", true)]
-		public void BlockInstall(bool block)
+		public void AddClampModel(Vector3 position, Vector3 rotation, Vector3 scale)
 		{
-			installBlocked = block;
-		}
-
-		[Obsolete("Use 'installBlocked' property instead", true)]
-		public bool IsInstallBlocked()
-		{
-			return installBlocked;
-		}
-
-		[Obsolete("Use 'hasParent' property instead", true)]
-		public bool HasParent()
-		{
-			return hasParent;
-		}
-
-		[Obsolete("Use 'screwPlacementMode' property instead", true)]
-		public void EnableScrewPlacementMode()
-		{
-			screwPlacementMode = true;
-		}
-
-		[Obsolete("Use 'screwPlacementMode' property instead", true)]
-		internal bool IsInScrewPlacementMode()
-		{
-			return screwPlacementMode;
+			var clamp = GameObject.Instantiate(clampModel);
+			clamp.name = $"{gameObject.name}_clamp_{clampsAdded}";
+			clampsAdded++;
+			clamp.transform.SetParent(gameObject.transform);
+			clamp.transform.localPosition = position;
+			clamp.transform.localScale = scale;
+			clamp.transform.localRotation = new Quaternion { eulerAngles = rotation };
 		}
 
 		public virtual void CustomSaveLoading(Mod mod, string saveFileName)
