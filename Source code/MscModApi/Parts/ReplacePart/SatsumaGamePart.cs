@@ -15,7 +15,6 @@ namespace MscModApi.Parts.ReplacePart
 		/// Instance of this class
 		/// </summary>
 		protected static SatsumaGamePart instance;
-
 		private SatsumaGamePart()
 		{
 			tightness = new FsmFloat
@@ -60,7 +59,8 @@ namespace MscModApi.Parts.ReplacePart
 		/// <returns></returns>
 		public static SatsumaGamePart GetInstance()
 		{
-			if (instance != null) {
+			if (instance != null)
+			{
 				return instance;
 			}
 
@@ -76,11 +76,13 @@ namespace MscModApi.Parts.ReplacePart
 			instance = null;
 		}
 
+		/// <inheritdoc />
 		public override void Uninstall()
 		{
 			//Not possible on car
 		}
 
+		/// <inheritdoc />
 		public override void ResetToDefault(bool uninstall = false)
 		{
 			//Not possible on car

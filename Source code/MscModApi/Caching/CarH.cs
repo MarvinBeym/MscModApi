@@ -4,6 +4,9 @@ using UnityEngine;
 
 namespace MscModApi.Caching
 {
+	/// <summary>
+	/// Utility class for everything related to the car, all cached for high performance.
+	/// </summary>
 	public class CarH
 	{
 		private static GameObject _satsuma;
@@ -14,9 +17,18 @@ namespace MscModApi.Caching
 		private static GameObject _electricity;
 		private static FsmString _playerCurrentVehicle;
 
+		/// <summary>
+		/// Returns if the car is currently running (rpm above 20).
+		/// </summary>
 		public static bool running => drivetrain.rpm > 20;
+		/// <summary>
+		/// Returns if the player is currently sitting in the car (drive mode).
+		/// </summary>
 		public static bool playerInCar => playerCurrentVehicle == "Satsuma";
 
+		/// <summary>
+		/// Returns the current vehicle the player is in (drive mode).
+		/// </summary>
 		public static string playerCurrentVehicle
 		{
 			get
@@ -28,6 +40,9 @@ namespace MscModApi.Caching
 			}
 		}
 
+		/// <summary>
+		/// Returns the cars electricity object.
+		/// </summary>
 		public static GameObject electricity
 		{
 			get
@@ -39,6 +54,9 @@ namespace MscModApi.Caching
 			}
 		}
 
+		/// <summary>
+		/// Returns if the cars power is currently on.
+		/// </summary>
 		public static bool hasPower
 		{
 			get
@@ -50,6 +68,9 @@ namespace MscModApi.Caching
 			}
 		}
 
+		/// <summary>
+		/// Returns the UnityCar CarController object of the satsuma.
+		/// </summary>
 		public static CarController carController
 		{
 			get
@@ -61,6 +82,9 @@ namespace MscModApi.Caching
 			}
 		}
 
+		/// <summary>
+		/// Returns the UnityCar AxisCarController object of the satsuma.
+		/// </summary>
 		public static AxisCarController axisCarController
 		{
 			get
@@ -72,6 +96,9 @@ namespace MscModApi.Caching
 			}
 		}
 
+		/// <summary>
+		/// Returns the UnityCar Drivetrain object of the satsuma.
+		/// </summary>
 		public static Drivetrain drivetrain
 		{
 			get
@@ -83,6 +110,9 @@ namespace MscModApi.Caching
 			}
 		}
 
+		/// <summary>
+		/// Returns the satsuma GameObject object.
+		/// </summary>
 		public static GameObject satsuma
 		{
 			get
@@ -94,6 +124,9 @@ namespace MscModApi.Caching
 			}
 		}
 
+		/// <summary>
+		/// Called when the MscModApi mod loads to cleanup static data
+		/// </summary>
 		public static void LoadCleanup()
 		{
 			_satsuma = null;
