@@ -159,14 +159,11 @@ namespace MscModApi.Parts
 
 			if (changingToFixedState) {
 				part.GetEvents(PartEvent.Time.Pre, PartEvent.Type.Bolted).InvokeAll();
-				if (part.installedOnCar)
-				{
+				if (part.installedOnCar) {
 					part.GetEvents(PartEvent.Time.Pre, PartEvent.Type.BoltedOnCar).InvokeAll();
 
-					foreach (Part childPart in part.childs)
-					{
-						if (childPart.bolted && childPart.installedOnCar)
-						{
+					foreach (Part childPart in part.childs) {
+						if (childPart.bolted && childPart.installedOnCar) {
 							childPart.GetEvents(PartEvent.Time.Pre, PartEvent.Type.BoltedOnCar).InvokeAll();
 						}
 					}
@@ -177,14 +174,11 @@ namespace MscModApi.Parts
 
 			if (changingToFixedState) {
 				part.GetEvents(PartEvent.Time.Post, PartEvent.Type.Bolted).InvokeAll();
-				if (part.installedOnCar)
-				{
+				if (part.installedOnCar) {
 					part.GetEvents(PartEvent.Time.Post, PartEvent.Type.BoltedOnCar).InvokeAll();
 
-					foreach (Part childPart in part.childs)
-					{
-						if (childPart.bolted && childPart.installedOnCar)
-						{
+					foreach (Part childPart in part.childs) {
+						if (childPart.bolted && childPart.installedOnCar) {
 							childPart.GetEvents(PartEvent.Time.Post, PartEvent.Type.BoltedOnCar).InvokeAll();
 						}
 					}
@@ -207,14 +201,11 @@ namespace MscModApi.Parts
 
 			if (changingToUnfixed) {
 				part.GetEvents(PartEvent.Time.Pre, PartEvent.Type.Unbolted).InvokeAll();
-				if (part.installedOnCar)
-				{
+				if (part.installedOnCar) {
 					part.GetEvents(PartEvent.Time.Pre, PartEvent.Type.UnboltedOnCar).InvokeAll();
 
-					foreach (Part childPart in part.childs)
-					{
-						if (!childPart.bolted && childPart.installedOnCar)
-						{
+					foreach (Part childPart in part.childs) {
+						if (!childPart.bolted && childPart.installedOnCar) {
 							childPart.GetEvents(PartEvent.Time.Pre, PartEvent.Type.UnboltedOnCar).InvokeAll();
 						}
 					}
@@ -225,14 +216,11 @@ namespace MscModApi.Parts
 
 			if (changingToUnfixed) {
 				part.GetEvents(PartEvent.Time.Post, PartEvent.Type.Unbolted).InvokeAll();
-				if (part.installedOnCar)
-				{
+				if (part.installedOnCar) {
 					part.GetEvents(PartEvent.Time.Post, PartEvent.Type.UnboltedOnCar).InvokeAll();
 
-					foreach (Part childPart in part.childs)
-					{
-						if (!childPart.bolted && childPart.installedOnCar)
-						{
+					foreach (Part childPart in part.childs) {
+						if (!childPart.bolted && childPart.installedOnCar) {
 							childPart.GetEvents(PartEvent.Time.Post, PartEvent.Type.UnboltedOnCar).InvokeAll();
 						}
 					}

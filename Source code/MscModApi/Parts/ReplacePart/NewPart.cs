@@ -7,7 +7,8 @@ using UnityEngine;
 
 namespace MscModApi.Parts.ReplacePart
 {
-	[Obsolete("Soon to be made obsolete, will be replaced with a new implementation using the new 'GamePart' wrapper class")]
+	[Obsolete(
+		"Soon to be made obsolete, will be replaced with a new implementation using the new 'GamePart' wrapper class")]
 	public class NewPart : BasicPart
 	{
 		public Part part;

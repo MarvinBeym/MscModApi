@@ -9,7 +9,7 @@ namespace MscModApi.Parts
 	/// The absolute base class for objects acting like a part (Part, Box, Kit)
 	/// </summary>
 	public abstract class BasicPart
-	{		
+	{
 		/// <summary>
 		/// Internal list of part objects that are a child of this part
 		/// </summary>
@@ -114,8 +114,7 @@ namespace MscModApi.Parts
 		/// <param name="parts"></param>
 		protected virtual void AddChilds(IEnumerable<BasicPart> parts)
 		{
-			foreach (BasicPart part in parts)
-			{
+			foreach (BasicPart part in parts) {
 				AddChild(part);
 			}
 		}

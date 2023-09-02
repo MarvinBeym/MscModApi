@@ -39,8 +39,7 @@ namespace MscModApi.Parts
 			get => childs.All(childPart => childPart.installBlocked);
 			set
 			{
-				foreach (Part childPart in childs)
-				{
+				foreach (Part childPart in childs) {
 					childPart.installBlocked = value;
 				}
 			}
@@ -117,8 +116,7 @@ namespace MscModApi.Parts
 
 		internal void IncrementUnpackedCount()
 		{
-			if (!hasPartsToUnpack)
-			{
+			if (!hasPartsToUnpack) {
 				return;
 			}
 

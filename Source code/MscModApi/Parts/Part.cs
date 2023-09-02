@@ -20,10 +20,12 @@ namespace MscModApi.Parts
 		/// Disables the part collider when the part is installed on the parent (installed = true)
 		/// </summary>
 		InstalledOnParent,
+
 		/// <summary>
 		/// Disables the part collider when the part is installed to the car (installedOnCar = true)
 		/// </summary>
 		InstalledOnCar,
+
 		/// <summary>
 		/// Never disables the part collider, part can collide with everything.
 		/// CAUTION!! potential conflicts with other GameObjects as well as extreme performance impact are possible
@@ -54,14 +56,18 @@ namespace MscModApi.Parts
 		public Part(string id, string name, GameObject part, Part parent, Vector3 installPosition,
 			Vector3 installRotation,
 			PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls = false,
-			DisableCollision disableCollisionWhenInstalled = DisableCollision.InstalledOnCar) : this(id, name, part, (BasicPart) parent, installPosition, installRotation, partBaseInfo, uninstallWhenParentUninstalls, disableCollisionWhenInstalled)
+			DisableCollision disableCollisionWhenInstalled = DisableCollision.InstalledOnCar) : this(id, name, part,
+			(BasicPart)parent, installPosition, installRotation, partBaseInfo, uninstallWhenParentUninstalls,
+			disableCollisionWhenInstalled)
 		{
 		}
 
 		public Part(string id, string name, GameObject part, GamePart parent, Vector3 installPosition,
 			Vector3 installRotation,
 			PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls = false,
-			DisableCollision disableCollisionWhenInstalled = DisableCollision.InstalledOnCar) : this(id, name, part, (BasicPart)parent, installPosition, installRotation, partBaseInfo, uninstallWhenParentUninstalls, disableCollisionWhenInstalled)
+			DisableCollision disableCollisionWhenInstalled = DisableCollision.InstalledOnCar) : this(id, name, part,
+			(BasicPart)parent, installPosition, installRotation, partBaseInfo, uninstallWhenParentUninstalls,
+			disableCollisionWhenInstalled)
 		{
 		}
 
@@ -85,13 +91,17 @@ namespace MscModApi.Parts
 
 		public Part(string id, string name, Part parent, Vector3 installPosition, Vector3 installRotation,
 			PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls = false,
-			DisableCollision disableCollisionWhenInstalled = DisableCollision.InstalledOnCar, string prefabName = null) : this(id, name, (BasicPart) parent, installPosition, installRotation, partBaseInfo, uninstallWhenParentUninstalls, disableCollisionWhenInstalled, prefabName)
+			DisableCollision disableCollisionWhenInstalled = DisableCollision.InstalledOnCar,
+			string prefabName = null) : this(id, name, (BasicPart)parent, installPosition, installRotation,
+			partBaseInfo, uninstallWhenParentUninstalls, disableCollisionWhenInstalled, prefabName)
 		{
 		}
 
 		public Part(string id, string name, GamePart parent, Vector3 installPosition, Vector3 installRotation,
 			PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls = false,
-			DisableCollision disableCollisionWhenInstalled = DisableCollision.InstalledOnCar, string prefabName = null) : this(id, name, (BasicPart) parent, installPosition, installRotation, partBaseInfo, uninstallWhenParentUninstalls, disableCollisionWhenInstalled, prefabName)
+			DisableCollision disableCollisionWhenInstalled = DisableCollision.InstalledOnCar,
+			string prefabName = null) : this(id, name, (BasicPart)parent, installPosition, installRotation,
+			partBaseInfo, uninstallWhenParentUninstalls, disableCollisionWhenInstalled, prefabName)
 		{
 		}
 
@@ -110,7 +120,7 @@ namespace MscModApi.Parts
 		public override GameObject gameObject { get; protected set; }
 
 		public Vector3 installPosition { get; protected set; }
-		
+
 		public Vector3 installRotation { get; protected set; }
 
 		public BasicPart parent { get; protected set; }
@@ -126,7 +136,7 @@ namespace MscModApi.Parts
 		public Transform transform => gameObject.transform;
 
 		public GameObject gameObjectUsedForInstantiation { get; protected set; }
-		
+
 		public bool hasParent => parent != null;
 
 		public override bool installBlocked { get; set; }
@@ -140,23 +150,19 @@ namespace MscModApi.Parts
 			get => _screwPlacementMode;
 			set
 			{
-				if (!installed)
-				{
+				if (!installed) {
 					return;
 				}
 
-				if (!injectedScrewPlacementDisablePreUninstall)
-				{
+				if (!injectedScrewPlacementDisablePreUninstall) {
 					injectedScrewPlacementDisablePreUninstall = true;
-					AddEventListener(PartEvent.Time.Pre, PartEvent.Type.Uninstall, () => { screwPlacementMode = false; });
+					AddEventListener(PartEvent.Time.Pre, PartEvent.Type.Uninstall,
+						() => { screwPlacementMode = false; });
 				}
 
-				foreach (Screw screw in screws)
-				{
-					if (!value)
-					{
-						if (!preScrewPlacementModeEnableTightnessMap.TryGetValue(screw, out int preEnableTightness))
-						{
+				foreach (Screw screw in screws) {
+					if (!value) {
+						if (!preScrewPlacementModeEnableTightnessMap.TryGetValue(screw, out int preEnableTightness)) {
 							continue;
 						}
 
@@ -167,8 +173,7 @@ namespace MscModApi.Parts
 						continue;
 					}
 
-					if (preScrewPlacementModeEnableTightnessMap.ContainsKey(screw))
-					{
+					if (preScrewPlacementModeEnableTightnessMap.ContainsKey(screw)) {
 						continue;
 					}
 
@@ -177,8 +182,7 @@ namespace MscModApi.Parts
 					screw.tightness = 0;
 				}
 
-				if (!value && ScrewPlacementAssist.selectedPart == this)
-				{
+				if (!value && ScrewPlacementAssist.selectedPart == this) {
 					ScrewPlacementAssist.HidePartInteraction();
 				}
 
@@ -210,8 +214,7 @@ namespace MscModApi.Parts
 			get => gameObject.transform.position;
 			set
 			{
-				if (!installed)
-				{
+				if (!installed) {
 					gameObject.transform.position = value;
 				}
 			}
@@ -223,8 +226,7 @@ namespace MscModApi.Parts
 			get => gameObject.transform.rotation.eulerAngles;
 			set
 			{
-				if (!installed)
-				{
+				if (!installed) {
 					gameObject.transform.rotation = Quaternion.Euler(value);
 				}
 			}
@@ -271,8 +273,7 @@ namespace MscModApi.Parts
 			try {
 				CustomSaveLoading(partBaseInfo.mod, $"{id}_saveFile.json");
 			}
-			catch (Exception)
-			{
+			catch (Exception) {
 				// ignored
 			}
 
@@ -377,15 +378,12 @@ namespace MscModApi.Parts
 
 		public void AddScrews(Screw[] screws, float overrideScale = 0f, float overrideSize = 0f)
 		{
-			foreach (var screw in screws)
-			{
-				if (overrideScale != 0f)
-				{
+			foreach (var screw in screws) {
+				if (overrideScale != 0f) {
 					screw.scale = overrideScale;
 				}
 
-				if (overrideSize != 0f)
-				{
+				if (overrideSize != 0f) {
 					screw.size = overrideSize;
 				}
 
@@ -397,8 +395,7 @@ namespace MscModApi.Parts
 		public T AddEventBehaviour<T>(PartEvent.Type Type) where T : Behaviour
 		{
 			var behaviour = AddComponent<T>();
-			switch (Type)
-			{
+			switch (Type) {
 				case PartEvent.Type.Install:
 					behaviour.enabled = installed;
 					AddEventListener(PartEvent.Time.Post, Type, () => behaviour.enabled = true);
@@ -412,7 +409,8 @@ namespace MscModApi.Parts
 				case PartEvent.Type.InstallOnCar:
 					behaviour.enabled = installedOnCar;
 					AddEventListener(PartEvent.Time.Post, Type, () => behaviour.enabled = true);
-					AddEventListener(PartEvent.Time.Post, PartEvent.Type.UninstallFromCar, () => behaviour.enabled = false);
+					AddEventListener(PartEvent.Time.Post, PartEvent.Type.UninstallFromCar,
+						() => behaviour.enabled = false);
 					break;
 				case PartEvent.Type.UninstallFromCar:
 					behaviour.enabled = !installedOnCar;
@@ -432,7 +430,8 @@ namespace MscModApi.Parts
 				case PartEvent.Type.BoltedOnCar:
 					behaviour.enabled = bolted && installedOnCar;
 					AddEventListener(PartEvent.Time.Post, Type, () => behaviour.enabled = true);
-					AddEventListener(PartEvent.Time.Post, PartEvent.Type.UnboltedOnCar, () => behaviour.enabled = false);
+					AddEventListener(PartEvent.Time.Post, PartEvent.Type.UnboltedOnCar,
+						() => behaviour.enabled = false);
 					break;
 				case PartEvent.Type.UnboltedOnCar:
 					behaviour.enabled = !bolted && installedOnCar;
@@ -454,15 +453,13 @@ namespace MscModApi.Parts
 		{
 			AddEventListener(PartEvent.Time.Post, Type, () =>
 			{
-				foreach (BasicPart partToBlock in partsToBlock)
-				{
+				foreach (BasicPart partToBlock in partsToBlock) {
 					partToBlock.installBlocked = true;
 				}
 			});
 			AddEventListener(PartEvent.Time.Post, GetOppositeEvent(Type), () =>
 			{
-				foreach (BasicPart partToBlock in partsToBlock)
-				{
+				foreach (BasicPart partToBlock in partsToBlock) {
 					partToBlock.installBlocked = false;
 				}
 			});
@@ -476,69 +473,66 @@ namespace MscModApi.Parts
 		/// <param name="partToBlock">The part to block when the "Type" is called on this part</param>
 		public void BlockOtherPartInstallOnEvent(PartEvent.Type Type, BasicPart partToBlock)
 		{
-			AddEventListener(PartEvent.Time.Post, Type, () => { partToBlock.installBlocked = true;});
-			AddEventListener(PartEvent.Time.Post, GetOppositeEvent(Type), () => { partToBlock.installBlocked = false; });
+			AddEventListener(PartEvent.Time.Post, Type, () => { partToBlock.installBlocked = true; });
+			AddEventListener(PartEvent.Time.Post, GetOppositeEvent(Type),
+				() => { partToBlock.installBlocked = false; });
 		}
 
-		public void AddEventListener(PartEvent.Time eventTime, PartEvent.Type Type, Action action, bool invokeActionIfConditionMet = true)
+		public void AddEventListener(PartEvent.Time eventTime, PartEvent.Type Type, Action action,
+			bool invokeActionIfConditionMet = true)
 		{
 			events[eventTime][Type].Add(action);
 
-			if (invokeActionIfConditionMet && eventTime == PartEvent.Time.Post)
-			{
-				switch (Type)
-				{
+			if (invokeActionIfConditionMet && eventTime == PartEvent.Time.Post) {
+				switch (Type) {
 					//ToDo: check if invoking just the newly added action is enough of if all have to be invoked
 					case PartEvent.Type.Install:
-						if (installed)
-						{
+						if (installed) {
 							action.Invoke();
 						}
 
 						break;
 					case PartEvent.Type.Uninstall:
-						if (!installed)
-						{
+						if (!installed) {
 							action.Invoke();
 						}
 
 						break;
 					case PartEvent.Type.Bolted:
-						if (bolted)
-						{
+						if (bolted) {
 							action.Invoke();
 						}
 
 						break;
 					case PartEvent.Type.Unbolted:
-						if (!bolted)
-						{
+						if (!bolted) {
 							action.Invoke();
 						}
+
 						break;
 					case PartEvent.Type.InstallOnCar:
-						if (installedOnCar)
-						{
+						if (installedOnCar) {
 							action.Invoke();
 						}
+
 						break;
 					case PartEvent.Type.UninstallFromCar:
-						if (!installedOnCar)
-						{
+						if (!installedOnCar) {
 							action.Invoke();
 						}
+
 						break;
 					case PartEvent.Type.BoltedOnCar:
-						if (bolted && installedOnCar)
-						{
+						if (bolted && installedOnCar) {
 							action.Invoke();
 						}
+
 						break;
 					case PartEvent.Type.UnboltedOnCar:
-						if (!bolted && installedOnCar)
-						{
+						if (!bolted && installedOnCar) {
 							action.Invoke();
 						}
+
 						break;
 				}
 			}
@@ -556,8 +550,7 @@ namespace MscModApi.Parts
 		/// <inheritdoc />
 		public override void ResetToDefault(bool uninstall = false)
 		{
-			if (uninstall && installed)
-			{
+			if (uninstall && installed) {
 				Uninstall();
 			}
 
@@ -575,7 +568,7 @@ namespace MscModApi.Parts
 			clamp.transform.localScale = scale;
 			clamp.transform.localRotation = new Quaternion { eulerAngles = rotation };
 		}
-		
+
 		public virtual void CustomSaveLoading(Mod mod, string saveFileName)
 		{
 			throw new Exception("Only subclasses should not throw an error");

@@ -19,7 +19,8 @@ namespace MscModApi.Parts.ReplacePart
 		internal List<Action> anyUnfixed = new List<Action>();
 	}
 
-	[Obsolete("Soon to be made obsolete, will be replaced with a new implementation using the new 'GamePart' wrapper class")]
+	[Obsolete(
+		"Soon to be made obsolete, will be replaced with a new implementation using the new 'GamePart' wrapper class")]
 	/// <summary>The ReplacementPart class</summary>
 	public class ReplacementPart
 	{

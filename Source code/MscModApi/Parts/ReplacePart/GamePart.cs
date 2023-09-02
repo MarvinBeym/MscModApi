@@ -105,25 +105,23 @@ namespace MscModApi.Parts.ReplacePart
 				() => { GetEvents(PartEvent.Time.Pre, PartEvent.Type.Install).InvokeAll(); });
 
 			AddActionAsLast(assemblyFsm.FindState("End"), () =>
-				{
-					GetEvents(PartEvent.Time.Post, PartEvent.Type.Install).InvokeAll();
-					if (installedOnCar)
-					{
-						GetEvents(PartEvent.Time.Post, PartEvent.Type.InstallOnCar).InvokeAll();
-					}
-				});
+			{
+				GetEvents(PartEvent.Time.Post, PartEvent.Type.Install).InvokeAll();
+				if (installedOnCar) {
+					GetEvents(PartEvent.Time.Post, PartEvent.Type.InstallOnCar).InvokeAll();
+				}
+			});
 
 			AddActionAsFirst(removalFsm.FindState("Remove part"),
 				() => { GetEvents(PartEvent.Time.Pre, PartEvent.Type.Uninstall).InvokeAll(); });
 			AddActionAsLast(removalFsm.FindState("Remove part"), () =>
-				{
-					GetEvents(PartEvent.Time.Post, PartEvent.Type.Uninstall).InvokeAll();
-					if (!installedOnCar)
-					{
-						//Check probably not needed, likely already not on car because part can't be connected to something else after being uninstalled
-						GetEvents(PartEvent.Time.Post, PartEvent.Type.UninstallFromCar).InvokeAll();
-					}
-				});
+			{
+				GetEvents(PartEvent.Time.Post, PartEvent.Type.Uninstall).InvokeAll();
+				if (!installedOnCar) {
+					//Check probably not needed, likely already not on car because part can't be connected to something else after being uninstalled
+					GetEvents(PartEvent.Time.Post, PartEvent.Type.UninstallFromCar).InvokeAll();
+				}
+			});
 
 			if (tightness == null) {
 				throw new Exception($"Unable to find tightness on bolt check fsm of part '{gameObject.name}'");
@@ -149,7 +147,6 @@ namespace MscModApi.Parts.ReplacePart
 		/// </summary>
 		protected GamePart()
 		{
-
 		}
 
 		/// <summary>
@@ -216,8 +213,7 @@ namespace MscModApi.Parts.ReplacePart
 				}
 
 				GetEvents(PartEvent.Time.Pre, PartEvent.Type.Unbolted).InvokeAll();
-				if (installedOnCar)
-				{
+				if (installedOnCar) {
 					GetEvents(PartEvent.Time.Pre, PartEvent.Type.UnboltedOnCar).InvokeAll();
 				}
 			});
@@ -231,8 +227,7 @@ namespace MscModApi.Parts.ReplacePart
 				}
 
 				GetEvents(PartEvent.Time.Post, PartEvent.Type.Unbolted).InvokeAll();
-				if (installedOnCar)
-				{
+				if (installedOnCar) {
 					GetEvents(PartEvent.Time.Post, PartEvent.Type.UnboltedOnCar).InvokeAll();
 				}
 			});
@@ -247,8 +242,7 @@ namespace MscModApi.Parts.ReplacePart
 				}
 
 				GetEvents(PartEvent.Time.Pre, PartEvent.Type.Bolted).InvokeAll();
-				if (installedOnCar)
-				{
+				if (installedOnCar) {
 					GetEvents(PartEvent.Time.Pre, PartEvent.Type.BoltedOnCar).InvokeAll();
 				}
 			});
@@ -262,8 +256,7 @@ namespace MscModApi.Parts.ReplacePart
 				}
 
 				GetEvents(PartEvent.Time.Post, PartEvent.Type.Bolted).InvokeAll();
-				if (installedOnCar)
-				{
+				if (installedOnCar) {
 					GetEvents(PartEvent.Time.Post, PartEvent.Type.BoltedOnCar).InvokeAll();
 				}
 			});
@@ -498,10 +491,10 @@ namespace MscModApi.Parts.ReplacePart
 
 					alreadyCalledPreUnbolted = true;
 					GetEvents(PartEvent.Time.Pre, PartEvent.Type.Unbolted).InvokeAll();
-					if (installedOnCar)
-					{
+					if (installedOnCar) {
 						GetEvents(PartEvent.Time.Pre, PartEvent.Type.UnboltedOnCar).InvokeAll();
 					}
+
 					break;
 				case PartEvent.Time.Post:
 					if (alreadyCalledPostUnbolted) {
@@ -510,10 +503,10 @@ namespace MscModApi.Parts.ReplacePart
 
 					alreadyCalledPostUnbolted = true;
 					GetEvents(PartEvent.Time.Post, PartEvent.Type.Unbolted).InvokeAll();
-					if (installedOnCar)
-					{
+					if (installedOnCar) {
 						GetEvents(PartEvent.Time.Post, PartEvent.Type.UnboltedOnCar).InvokeAll();
 					}
+
 					break;
 			}
 		}
@@ -540,10 +533,10 @@ namespace MscModApi.Parts.ReplacePart
 
 					alreadyCalledPreBolted = true;
 					GetEvents(PartEvent.Time.Pre, PartEvent.Type.Bolted).InvokeAll();
-					if (installedOnCar)
-					{
+					if (installedOnCar) {
 						GetEvents(PartEvent.Time.Pre, PartEvent.Type.BoltedOnCar).InvokeAll();
 					}
+
 					break;
 				case PartEvent.Time.Post:
 					if (alreadyCalledPostBolted) {
@@ -552,10 +545,10 @@ namespace MscModApi.Parts.ReplacePart
 
 					alreadyCalledPostBolted = true;
 					GetEvents(PartEvent.Time.Post, PartEvent.Type.Bolted).InvokeAll();
-					if (installedOnCar)
-					{
+					if (installedOnCar) {
 						GetEvents(PartEvent.Time.Post, PartEvent.Type.BoltedOnCar).InvokeAll();
 					}
+
 					break;
 			}
 		}
@@ -572,10 +565,11 @@ namespace MscModApi.Parts.ReplacePart
 		}
 
 		/// <inheritdoc />
-		public void AddEventListener(PartEvent.Time eventTime, PartEvent.Type Type, Action action, bool invokeActionIfConditionMet = true)
+		public void AddEventListener(PartEvent.Time eventTime, PartEvent.Type Type, Action action,
+			bool invokeActionIfConditionMet = true)
 		{
 			if (
-				eventTime == PartEvent.Time.Pre 
+				eventTime == PartEvent.Time.Pre
 				&& (Type == PartEvent.Type.InstallOnCar || Type == PartEvent.Type.UninstallFromCar)
 			) {
 				throw new Exception($"Event {Type} can't be detected at '{eventTime}'. Unsupported!");
@@ -610,30 +604,31 @@ namespace MscModApi.Parts.ReplacePart
 							//ToDo: bolted state should only be true if maxTightness is also reached
 							action.Invoke();
 						}
+
 						break;
 					case PartEvent.Type.InstallOnCar:
-						if (installedOnCar)
-						{
+						if (installedOnCar) {
 							action.Invoke();
 						}
+
 						break;
 					case PartEvent.Type.UninstallFromCar:
-						if (!installedOnCar)
-						{
+						if (!installedOnCar) {
 							action.Invoke();
 						}
+
 						break;
 					case PartEvent.Type.BoltedOnCar:
-						if (bolted && installedOnCar)
-						{
+						if (bolted && installedOnCar) {
 							action.Invoke();
 						}
+
 						break;
 					case PartEvent.Type.UnboltedOnCar:
-						if (!bolted && installedOnCar)
-						{
+						if (!bolted && installedOnCar) {
 							action.Invoke();
 						}
+
 						break;
 				}
 			}
@@ -649,15 +644,13 @@ namespace MscModApi.Parts.ReplacePart
 		{
 			AddEventListener(PartEvent.Time.Post, Type, () =>
 			{
-				foreach (BasicPart partToBlock in partsToBlock)
-				{
+				foreach (BasicPart partToBlock in partsToBlock) {
 					partToBlock.installBlocked = true;
 				}
 			});
 			AddEventListener(PartEvent.Time.Post, PartEvent.GetOppositeEvent(Type), () =>
 			{
-				foreach (BasicPart partToBlock in partsToBlock)
-				{
+				foreach (BasicPart partToBlock in partsToBlock) {
 					partToBlock.installBlocked = false;
 				}
 			});
@@ -672,7 +665,8 @@ namespace MscModApi.Parts.ReplacePart
 		public void BlockOtherPartInstallOnEvent(PartEvent.Type Type, BasicPart partToBlock)
 		{
 			AddEventListener(PartEvent.Time.Post, Type, () => { partToBlock.installBlocked = true; });
-			AddEventListener(PartEvent.Time.Post, PartEvent.GetOppositeEvent(Type), () => { partToBlock.installBlocked = false; });
+			AddEventListener(PartEvent.Time.Post, PartEvent.GetOppositeEvent(Type),
+				() => { partToBlock.installBlocked = false; });
 		}
 	}
 }

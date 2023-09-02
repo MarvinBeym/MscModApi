@@ -13,7 +13,7 @@ namespace MscModApi.Parts
 		void Update()
 		{
 			if (box.hasPartsToUnpack && box.isLookingAt) {
-				Part nextPart = (Part) box.childs[box.partsUnpackedCount];
+				Part nextPart = (Part)box.childs[box.partsUnpackedCount];
 				UserInteraction.GuiInteraction($"Press [{cInput.GetText("Use")}] to Unpack {nextPart.cleanName}");
 				if (UserInteraction.UseButtonDown) {
 					nextPart.position = gameObject.transform.position + gameObject.transform.up * 0.3f;
