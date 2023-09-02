@@ -24,7 +24,7 @@ namespace MscModApi
 		public override string Version => "1.3";
 
 		public override string Description =>
-			"This allows developers to make their parts installable on the car. Also adds screws";
+			"A general modding 'help' featuring things like installable/boltable parts, shop, part boxing, utility tools & more.";
 
 		public override bool UseAssetsFolder => true;
 		private static Settings showBoltSizeSetting = new Settings("showBoltSizeSetting", "Show screw size", false);
