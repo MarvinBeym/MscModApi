@@ -7,7 +7,7 @@ namespace MscModApi.Caching
 {
 	public static class Cache
 	{
-		public static Dictionary<string, GameObject> cachedGameObjects;
+		private static Dictionary<string, GameObject> cachedGameObjects;
 
 		private static GameObject[] globalCache;
 
