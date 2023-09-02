@@ -3,18 +3,22 @@ using HutongGames.PlayMaker;
 using MSCLoader;
 using System.Linq;
 using MSCLoader.Helper;
+using MscModApi.Caching;
 using MscModApi.Tools;
 using UnityEngine;
 
 namespace MscModApi.Parts.ReplacePart
 {
+	[Obsolete(
+		"Soon to be made obsolete, will be replaced with a new implementation using the new 'GamePart' wrapper class")]
 	public class OldPart : BasicPart
 	{
 		protected PlayMakerFSM fsm;
-		protected GameObject gameObject;
+		public override GameObject gameObject { get; protected set; }
 		protected GameObject trigger;
 		protected FsmBool installedFsm;
-		protected FsmBool bolted;
+		protected FsmBool boltedFsm;
+		protected FsmBool purchased;
 		protected PlayMakerFSM assembleFsm;
 		protected PlayMakerFSM removalFsm;
 		protected GameObject oldFsmGameObject;
@@ -29,18 +33,16 @@ namespace MscModApi.Parts.ReplacePart
 			gameObject = fsm.FsmVariables.FindFsmGameObject("ThisPart").Value;
 			trigger = fsm.FsmVariables.FindFsmGameObject("Trigger").Value;
 			installedFsm = fsm.FsmVariables.FindFsmBool("Installed");
-			bolted = fsm.FsmVariables.FindFsmBool("Bolted");
-
+			boltedFsm = fsm.FsmVariables.FindFsmBool("Bolted");
+			purchased = fsm.FsmVariables.FindFsmBool("Purchased");
 			assembleFsm = GetFsmByName(trigger, "Assembly");
 			removalFsm = GetFsmByName(gameObject, "Removal");
 
-			if (!assembleFsm.Fsm.Initialized)
-			{
+			if (!assembleFsm.Fsm.Initialized) {
 				assembleFsm.InitializeFSM();
 			}
 
-			if (!removalFsm.Fsm.Initialized)
-			{
+			if (!removalFsm.Fsm.Initialized) {
 				removalFsm.InitializeFSM();
 			}
 		}
@@ -54,39 +56,40 @@ namespace MscModApi.Parts.ReplacePart
 		/// <inheritdoc />
 		public override string name => gameObject.name;
 
-		public bool installBlocked
+		public override bool installBlocked
 		{
 			get => !assembleFsm.enabled;
 			set => assembleFsm.enabled = !value;
 		}
 
-		public bool installed
+		public override bool installed
 		{
 			get
 			{
-				if (justUninstalled)
-				{
+				if (justUninstalled) {
 					justUninstalled = false;
 					return false;
 				}
 
 				return installedFsm.Value;
 			}
-			set
-			{
-				if (!allowSettingFakedStatus)
-				{
-					return;
-				}
-
-				installedFsm.Value = value;
-				bolted.Value = value;
-			}
 		}
 
-		public bool IsFixed() => installed && bolted.Value;
+		public override bool installedOnCar => gameObject.transform.root == CarH.satsuma;
 
-		public void Uninstall() => removalFsm.SendEvent("REMOVE");
+		public void Install(bool install)
+		{
+			if (!allowSettingFakedStatus) {
+				return;
+			}
+
+			installedFsm.Value = install;
+			boltedFsm.Value = install;
+		}
+
+		public override bool bolted => boltedFsm.Value;
+
+		public override void Uninstall() => removalFsm.SendEvent("REMOVE");
 
 		internal void Setup(ReplacePart.ReplacementPart replacementPart)
 		{
@@ -109,7 +112,7 @@ namespace MscModApi.Parts.ReplacePart
 
 		public override bool bought
 		{
-			get => true;
+			get => purchased != null && purchased.Value;
 			set => throw new NotImplementedException();
 		}
 
@@ -139,30 +142,6 @@ namespace MscModApi.Parts.ReplacePart
 		public override void ResetToDefault(bool uninstall = false)
 		{
 			//Don't implement
-		}
-
-		[Obsolete("Use 'installed' property instead", true)]
-		internal void SetFakedInstallStatus(bool status)
-		{
-			installed = status;
-		}
-
-		[Obsolete("Use 'installBlocked' property instead", true)]
-		public bool IsInstallBlocked()
-		{
-			return installBlocked;
-		}
-
-		[Obsolete("Use 'installBlocked' property instead", true)]
-		public void BlockInstall(bool blocked)
-		{
-			installBlocked = blocked;
-		}
-
-		[Obsolete("Use 'installed' property instead", true)]
-		public bool IsInstalled()
-		{
-			return installed;
 		}
 	}
 }

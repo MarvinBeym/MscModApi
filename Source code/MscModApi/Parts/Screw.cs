@@ -34,8 +34,7 @@ namespace MscModApi.Parts
 		internal GameObject gameObject;
 		private MeshRenderer renderer;
 
-		[JsonProperty]
-		internal int tightness;
+		[JsonProperty] internal int tightness;
 
 		internal bool showSize;
 		private Collider collider;
@@ -46,7 +45,7 @@ namespace MscModApi.Parts
 		internal static GameObject screwModel;
 		internal static GameObject normalModel;
 		internal static GameObject longModel;
-		private static readonly int Color1 = Shader.PropertyToID("_Color");
+		private static int color1;
 		internal static AudioClip soundClip;
 
 		public Screw(Vector3 position, Vector3 rotation, Type type = Type.Normal, float scale = 1, float size = 10,
@@ -101,8 +100,8 @@ namespace MscModApi.Parts
 			gameObject.SetNameLayerTag($"{parentCollider.gameObject.name}_screw_{index}", "PART", "DontCollide");
 
 			gameObject.transform.SetParent(parentCollider.transform);
-			gameObject.transform.localPosition = position.CopyVector3();
-			gameObject.transform.localRotation = new Quaternion { eulerAngles = rotation.CopyVector3() };
+			gameObject.transform.localPosition = position;
+			gameObject.transform.localRotation = new Quaternion { eulerAngles = rotation };
 			gameObject.transform.localScale = new Vector3(scale, scale, scale);
 			gameObject.SetActive(true);
 
@@ -147,18 +146,43 @@ namespace MscModApi.Parts
 			gameObject.transform.Rotate(0, 0, rotationStep);
 			gameObject.transform.Translate(0f, 0f, -transformStep);
 
-			bool changingToFixedState = tightness + 1 == maxTightness;
-			
-			if (changingToFixedState)
-			{
-				part.GetEvents(Part.EventTime.Pre, Part.EventType.Fixed).InvokeAll();
+			bool changingToFixedState = false;
+			if (tightness + 1 == maxTightness) {
+				int screwCount = part.screws.Count;
+				int totalTightness = 0;
+				part.screws.ForEach((Screw screw) => { totalTightness += screw.tightness; });
+
+				if (totalTightness + 1 == screwCount * maxTightness) {
+					changingToFixedState = true;
+				}
+			}
+
+			if (changingToFixedState) {
+				part.GetEvents(PartEvent.Time.Pre, PartEvent.Type.Bolted).InvokeAll();
+				if (part.installedOnCar) {
+					part.GetEvents(PartEvent.Time.Pre, PartEvent.Type.BoltedOnCar).InvokeAll();
+
+					foreach (Part childPart in part.childs) {
+						if (childPart.bolted && childPart.installedOnCar) {
+							childPart.GetEvents(PartEvent.Time.Pre, PartEvent.Type.BoltedOnCar).InvokeAll();
+						}
+					}
+				}
 			}
 
 			tightness++;
-			
-			if (changingToFixedState)
-			{
-				part.GetEvents(Part.EventTime.Post, Part.EventType.Fixed).InvokeAll();
+
+			if (changingToFixedState) {
+				part.GetEvents(PartEvent.Time.Post, PartEvent.Type.Bolted).InvokeAll();
+				if (part.installedOnCar) {
+					part.GetEvents(PartEvent.Time.Post, PartEvent.Type.BoltedOnCar).InvokeAll();
+
+					foreach (Part childPart in part.childs) {
+						if (childPart.bolted && childPart.installedOnCar) {
+							childPart.GetEvents(PartEvent.Time.Post, PartEvent.Type.BoltedOnCar).InvokeAll();
+						}
+					}
+				}
 			}
 		}
 
@@ -173,18 +197,34 @@ namespace MscModApi.Parts
 			gameObject.transform.Rotate(0, 0, -rotationStep);
 			gameObject.transform.Translate(0f, 0f, transformStep);
 
-			bool changingToUnfixed = part.isFixed;
-			
-			if (changingToUnfixed)
-			{
-				part.GetEvents(Part.EventTime.Pre, Part.EventType.Unfixed).InvokeAll();
+			bool changingToUnfixed = part.bolted;
+
+			if (changingToUnfixed) {
+				part.GetEvents(PartEvent.Time.Pre, PartEvent.Type.Unbolted).InvokeAll();
+				if (part.installedOnCar) {
+					part.GetEvents(PartEvent.Time.Pre, PartEvent.Type.UnboltedOnCar).InvokeAll();
+
+					foreach (Part childPart in part.childs) {
+						if (!childPart.bolted && childPart.installedOnCar) {
+							childPart.GetEvents(PartEvent.Time.Pre, PartEvent.Type.UnboltedOnCar).InvokeAll();
+						}
+					}
+				}
 			}
 
 			tightness--;
 
-			if (changingToUnfixed)
-			{
-				part.GetEvents(Part.EventTime.Post, Part.EventType.Unfixed).InvokeAll();
+			if (changingToUnfixed) {
+				part.GetEvents(PartEvent.Time.Post, PartEvent.Type.Unbolted).InvokeAll();
+				if (part.installedOnCar) {
+					part.GetEvents(PartEvent.Time.Post, PartEvent.Type.UnboltedOnCar).InvokeAll();
+
+					foreach (Part childPart in part.childs) {
+						if (!childPart.bolted && childPart.installedOnCar) {
+							childPart.GetEvents(PartEvent.Time.Post, PartEvent.Type.UnboltedOnCar).InvokeAll();
+						}
+					}
+				}
 			}
 		}
 
@@ -214,8 +254,9 @@ namespace MscModApi.Parts
 		{
 			if (highlight) {
 				renderer.material.shader = textShader;
-				renderer.material.SetColor(Color1, Color.green);
-			} else {
+				renderer.material.SetColor(color1, Color.green);
+			}
+			else {
 				renderer.material = material;
 			}
 		}
@@ -228,6 +269,18 @@ namespace MscModApi.Parts
 			screwModel = assetBundle.LoadAsset<GameObject>("screw.prefab");
 			normalModel = assetBundle.LoadAsset<GameObject>("screw_normal.prefab");
 			longModel = assetBundle.LoadAsset<GameObject>("screw_long.prefab");
+		}
+
+		public static void LoadCleanup()
+		{
+			material = null;
+			textShader = null;
+			nutModel = null;
+			screwModel = null;
+			normalModel = null;
+			longModel = null;
+			color1 = Shader.PropertyToID("_Color");
+			soundClip = null;
 		}
 	}
 }

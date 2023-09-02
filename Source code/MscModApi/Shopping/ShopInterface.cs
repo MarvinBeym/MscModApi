@@ -72,21 +72,17 @@ namespace MscModApi.Shopping
 			gameObject.SetActive(true);
 
 			EmptyShoppingCart();
-			
-			foreach (ModItem modItem in shopItems[shopLocation])
-			{
+
+			foreach (ModItem modItem in shopItems[shopLocation]) {
 				modItem.Show(true);
 			}
 
-			foreach (var shopLocationModItems in shopItems)
-			{
+			foreach (var shopLocationModItems in shopItems) {
 				if (shopLocationModItems.Key == shopLocation) continue;
-				foreach (ModItem modItem in shopLocationModItems.Value)
-				{
+				foreach (ModItem modItem in shopLocationModItems.Value) {
 					modItem.Show(false);
 				}
 			}
-
 		}
 
 		internal bool IsOpen()
@@ -119,18 +115,15 @@ namespace MscModApi.Shopping
 			modItemToOpen.Open();
 
 
-			foreach (ModItem modItem in shopItems[shopLocation].Where(modItem => modItem != modItemToOpen))
-			{
+			foreach (ModItem modItem in shopItems[shopLocation].Where(modItem => modItem != modItemToOpen)) {
 				modItem.Close();
 			}
 		}
 
 		internal void OnAddToCart(ShopItem shopItem)
 		{
-			if (shoppingCart.Contains(shopItem))
-			{
-				if (shopItem.IsMultiPurchase())
-				{
+			if (shoppingCart.Contains(shopItem)) {
+				if (shopItem.IsMultiPurchase()) {
 					shopItem.IncreaseCount();
 					totalCost += shopItem.baseItemPrize;
 					totalCostComp.text = totalCost.ToString();
@@ -150,14 +143,12 @@ namespace MscModApi.Shopping
 
 		internal void SetBuyPossible(bool possible)
 		{
-			if (possible)
-			{
+			if (possible) {
 				totalCostComp.color = textColor;
 				btnBuyTextComp.color = textColor;
 				btnBuyComp.enabled = true;
 			}
-			else
-			{
+			else {
 				totalCostComp.color = Color.red;
 				btnBuyTextComp.color = Color.red;
 				btnBuyComp.enabled = false;
@@ -168,8 +159,7 @@ namespace MscModApi.Shopping
 		{
 			totalCost = 0;
 			totalCostComp.text = totalCost.ToString();
-			foreach (ShopItem item in shoppingCart)
-			{
+			foreach (ShopItem item in shoppingCart) {
 				GameObject.Destroy(item.cartItemGameObject);
 			}
 
@@ -180,50 +170,44 @@ namespace MscModApi.Shopping
 		{
 			totalCost -= shopItem.baseItemPrize;
 			totalCostComp.text = totalCost.ToString();
-			if (!shopItem.IsMultiPurchase())
-			{
+			if (!shopItem.IsMultiPurchase()) {
 				GameObject.Destroy(shopItem.cartItemGameObject);
 				shoppingCart.Remove(shopItem);
 			}
-			else
-			{
-				if (shopItem.itemCount <= 1)
-				{
+			else {
+				if (shopItem.itemCount <= 1) {
 					GameObject.Destroy(shopItem.cartItemGameObject);
 					shoppingCart.Remove(shopItem);
 				}
-				else
-				{
+				else {
 					shopItem.DecreaseCount();
 				}
 			}
 		}
+
 		internal void OnCheckout()
 		{
 			Game.money -= totalCost;
 			totalCost = 0;
 			totalCostComp.text = totalCost.ToString();
 			foreach (var shopItem in shoppingCart) {
-				if (shopItem.IsMultiPurchase())
-				{
-					for (var i = 0; i < shopItem.itemCount; i++)
-					{
+				if (shopItem.IsMultiPurchase()) {
+					for (var i = 0; i < shopItem.itemCount; i++) {
 						shopItem.onPurchaseAction.Invoke();
 					}
 				}
-				else
-				{
+				else {
 					shopItem.onPurchaseAction.Invoke();
 					GameObject.Destroy(shopItem.partItemGameObject);
 				}
+
 				GameObject.Destroy(shopItem.cartItemGameObject);
 			}
+
 			shoppingCart.Clear();
 
-			foreach (var shopLocationItem in shopItems)
-			{
-				foreach (ModItem modItem in shopLocationItem.Value)
-				{
+			foreach (var shopLocationItem in shopItems) {
+				foreach (ModItem modItem in shopLocationItem.Value) {
 					modItem.UpdatePartCount();
 				}
 			}

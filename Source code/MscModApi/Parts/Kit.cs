@@ -31,21 +31,19 @@ namespace MscModApi.Parts
 		private void Setup(string name, GameObject boxModel, Part[] parts)
 		{
 			boxModel.SetNameLayerTag(name + "(Clone)");
-			this.boxModel = boxModel;
+			gameObject = boxModel;
 
-			AddParts(parts);
+			AddChilds(parts);
 
-			if (!bought)
-			{
-				foreach (Part part in this.parts)
-				{
+			if (!bought) {
+				foreach (Part part in childs) {
 					part.Uninstall();
 					part.active = false;
 				}
 			}
 
 			active = false;
-			logic = this.boxModel.AddComponent<BoxLogic>();
+			logic = gameObject.AddComponent<BoxLogic>();
 			logic.Init(this);
 		}
 

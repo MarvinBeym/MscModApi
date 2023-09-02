@@ -19,7 +19,6 @@ namespace MscModApi.Tools
 			this.fileName = fileName;
 
 			this.filePath = Helper.CombinePaths(ModLoader.GetModSettingsFolder(mod), FileName);
-
 		}
 
 		public Mod Mod => mod;

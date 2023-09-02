@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using UnityEngine;
 
 namespace MscModApi.Parts
@@ -8,6 +10,23 @@ namespace MscModApi.Parts
 	/// </summary>
 	public abstract class BasicPart
 	{
+		/// <summary>
+		/// Internal list of part objects that are a child of this part
+		/// </summary>
+		protected readonly List<BasicPart> _childs = new List<BasicPart>();
+
+		/// <summary>
+		/// A readonly list of BasicPart childs of this part
+		/// </summary>
+		public readonly ReadOnlyCollection<BasicPart> childs;
+
+		protected BasicPart()
+		{
+			this.childs = _childs.AsReadOnly();
+		}
+
+		public abstract GameObject gameObject { get; protected set; }
+
 		/// <summary>
 		/// The default position, used for example when resetting.
 		/// </summary>
@@ -53,58 +72,62 @@ namespace MscModApi.Parts
 		/// Returns if the player is currently looking at this part
 		/// </summary>
 		public abstract bool isLookingAt { get; }
-		
+
 		/// <summary>
 		/// Returns if the player is currently holding this part
 		/// </summary>
 		public abstract bool isHolding { get; }
 
 		/// <summary>
+		/// Returns if the part is currently installed to it's parent
+		/// </summary>
+		public abstract bool installed { get; }
+
+		/// <summary>
+		/// Returns if the part is currently bolted to it's parent
+		/// </summary>
+		public abstract bool bolted { get; }
+
+		/// <summary>
+		/// Returns if the part is currently installed on the car
+		/// </summary>
+		public abstract bool installedOnCar { get; }
+
+		/// <summary>
+		/// Blocks the part from being installed on the parent
+		/// </summary>
+		public abstract bool installBlocked { get; set; }
+
+		/// <summary>
+		/// Add a part object as the child of this part
+		/// </summary>
+		/// <param name="part"></param>
+		public virtual void AddChild(BasicPart part)
+		{
+			_childs.Add(part);
+		}
+
+
+		/// <summary>
+		/// Adds multiple parts as a child
+		/// </summary>
+		/// <param name="parts"></param>
+		protected virtual void AddChilds(IEnumerable<BasicPart> parts)
+		{
+			foreach (BasicPart part in parts) {
+				AddChild(part);
+			}
+		}
+
+		/// <summary>
+		/// Uninstalls the part
+		/// </summary>
+		public abstract void Uninstall();
+
+		/// <summary>
 		/// Resets the part to its defaultPosition & defaultRotation
 		/// </summary>
 		/// <param name="uninstall">Should an installed part be uninstalled prior to resetting</param>
 		public abstract void ResetToDefault(bool uninstall = false);
-
-		[Obsolete("Use 'active' property instead", true)]
-		public void SetActive(bool active)
-		{
-			this.active = active;
-		}
-
-		[Obsolete("Use 'position' property instead", true)]
-		public void SetPosition(Vector3 position)
-		{
-			this.position = position;
-		}
-
-		[Obsolete("Use 'rotation' property instead", true)]
-		public void SetRotation(Quaternion rotation)
-		{
-			this.rotation = rotation.eulerAngles;
-		}
-
-		[Obsolete("Use 'defaultPosition' property instead", true)]
-		public void SetDefaultPosition(Vector3 defaultPosition)
-		{
-			this.defaultPosition = defaultPosition;
-		}
-
-		[Obsolete("Use 'defaultRotation'", true)]
-		public void SetDefaultRotation(Vector3 defaultRotation)
-		{
-			this.defaultRotation = defaultRotation;
-		}
-
-		[Obsolete("Use 'bought' property instead", true)]
-		public bool IsBought()
-		{
-			return bought;
-		}
-
-		[Obsolete("Use 'bought' property instead", true)]
-		public void SetBought(bool bought)
-		{
-			this.bought = bought;
-		}
 	}
 }

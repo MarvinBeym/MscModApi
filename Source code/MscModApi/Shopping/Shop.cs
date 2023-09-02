@@ -12,7 +12,8 @@ namespace MscModApi.Shopping
 	{
 		private static ShopInterface shopInterface;
 
-		internal static Dictionary<ShopLocation, List<ModItem>> shopItems = new Dictionary<ShopLocation, List<ModItem>>();
+		internal static Dictionary<ShopLocation, List<ModItem>> shopItems;
+		private static Dictionary<ShopLocation, GameObject> shopCatalogs;
 
 		public enum ShopLocation
 		{
@@ -34,7 +35,6 @@ namespace MscModApi.Shopping
 				public static Vector3 Backroom { get; } = new Vector3(1558.975f, 5.2f, 741.894f);
 				public static Vector3 Counter { get; } = new Vector3(1555.082f, 6f, 737.622f);
 				public static Vector3 Outside { get; } = new Vector3(1552.154f, 5f, 732.755f);
-
 			}
 		}
 
@@ -47,23 +47,19 @@ namespace MscModApi.Shopping
 			internal static GameObject shopCatalog;
 		}
 
-		private static Dictionary<ShopLocation, GameObject> shopCatalogs = new Dictionary<ShopLocation, GameObject>();
-
 		internal static void Init()
 		{
 			shopCatalogs = new Dictionary<ShopLocation, GameObject>();
 			shopInterface = new ShopInterface();
 
-			foreach (var shopLocation in (ShopLocation[]) Enum.GetValues(typeof(ShopLocation)))
-			{
+			foreach (var shopLocation in (ShopLocation[])Enum.GetValues(typeof(ShopLocation))) {
 				shopItems[shopLocation] = new List<ModItem>();
 				GameObject shopCatalogParent = null;
 				Vector3 position = new Vector3(0, 0, 0);
 				Vector3 rotation = new Vector3(0, 0, 0);
 				Vector3 scale = new Vector3(1, 1, 1);
 
-				switch (shopLocation)
-				{
+				switch (shopLocation) {
 					case ShopLocation.Teimo:
 						shopCatalogParent = Cache.Find("STORE");
 						position = new Vector3(-2.96f, 1.31f, -0.34f);
@@ -85,14 +81,12 @@ namespace MscModApi.Shopping
 				shopCatalog.transform.localScale = scale;
 				shopCatalog.name = $"{shopLocation} Shop Catalog(Clone)";
 				shopCatalogs.Add(shopLocation, shopCatalog);
-
 			}
 		}
 
 		public static void Add(ShopBaseInfo baseInfo, ShopLocation shopLocation, ShopItem[] shopItems)
 		{
-			foreach (var shopItem in shopItems)
-			{
+			foreach (var shopItem in shopItems) {
 				Add(baseInfo, shopLocation, shopItem);
 			}
 		}
@@ -100,10 +94,10 @@ namespace MscModApi.Shopping
 		public static void Add(ShopBaseInfo baseInfo, ShopLocation shopLocation, ShopItem shopItem)
 		{
 			shopItem.SetBaseInfo(baseInfo);
-			ModItem modItem = shopItems[shopLocation].FirstOrDefault(modItemCached => modItemCached.mod == baseInfo.mod);
+			ModItem modItem = shopItems[shopLocation]
+				.FirstOrDefault(modItemCached => modItemCached.mod == baseInfo.mod);
 
-			if (modItem == null)
-			{
+			if (modItem == null) {
 				modItem = new ModItem(shopLocation, shopInterface, baseInfo.mod);
 				shopItems[shopLocation].Add(modItem);
 			}
@@ -116,15 +110,12 @@ namespace MscModApi.Shopping
 		internal static void Handle()
 		{
 			if (shopInterface == null || shopInterface.IsOpen()) return;
-			foreach (var keyValuePair in shopCatalogs)
-			{
+			foreach (var keyValuePair in shopCatalogs) {
 				var shopLocation = keyValuePair.Key;
 				var shopCatalog = keyValuePair.Value;
-				if (shopCatalog.IsLookingAt())
-				{
+				if (shopCatalog.IsLookingAt()) {
 					UserInteraction.GuiInteraction($"Open catalog");
-					if (UserInteraction.LeftMouseDown)
-					{
+					if (UserInteraction.LeftMouseDown) {
 						shopInterface.Open(shopLocation);
 					}
 				}
@@ -138,6 +129,13 @@ namespace MscModApi.Shopping
 			Prefabs.partPanel = assetBundle.LoadAsset<GameObject>("part_panel.prefab");
 			Prefabs.modPanel = assetBundle.LoadAsset<GameObject>("mod_panel.prefab");
 			Prefabs.cartItem = assetBundle.LoadAsset<GameObject>("cart_item.prefab");
+		}
+
+		public static void LoadCleanup()
+		{
+			shopInterface = null;
+			shopItems = new Dictionary<ShopLocation, List<ModItem>>();
+			shopCatalogs = new Dictionary<ShopLocation, GameObject>();
 		}
 	}
 }
