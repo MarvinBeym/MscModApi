@@ -47,7 +47,7 @@ namespace MscModApi.Shopping
 		{
 			int count = 0;
 			foreach (ShopItem item in items) {
-				count += item.IsBuyable() ? 1 : 0;
+				count += item.buyable ? 1 : 0;
 			}
 
 			return count;
@@ -72,7 +72,7 @@ namespace MscModApi.Shopping
 		public void Open()
 		{
 			foreach (ShopItem item in GetItems()) {
-				item.Show(item.IsBuyable());
+				item.Show(item.buyable);
 			}
 		}
 
