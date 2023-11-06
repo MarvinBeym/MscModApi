@@ -21,7 +21,7 @@ namespace MscModApi
 		public override string ID => "MscModApi";
 		public override string Name => "MscModApi";
 		public override string Author => "DonnerPlays";
-		public override string Version => "1.3";
+		public override string Version => "1.3.1";
 
 		public override string Description =>
 			"A general modding 'help' featuring things like installable/boltable parts, shop, part boxing, utility tools & more.";
