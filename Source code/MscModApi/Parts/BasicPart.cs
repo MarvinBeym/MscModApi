@@ -31,7 +31,7 @@ namespace MscModApi.Parts
 		/// The default position, used for example when resetting.
 		/// </summary>
 		public Vector3 defaultPosition { get; set; } = Vector3.zero;
-
+		
 		/// <summary>
 		/// The default rotation, used for example when resetting.
 		/// </summary>

@@ -124,7 +124,7 @@
   <PropertyGroup>
     <PostBuildEvent>if "$(ConfigurationName)" == "Debug" (
 copy "$(TargetPath)" "D:\Spiele\Steam\steamapps\common\My Summer Car\Mods" /y
-copy "$(TargetDir)$(TargetName).pdb" "S:\Spiele\Steam\steamapps\common\My Summer Car\Mods" /y
+copy "$(TargetDir)$(TargetName).pdb" "D:\Spiele\Steam\steamapps\common\My Summer Car\Mods" /y
 cd "D:\Spiele\Steam\steamapps\common\My Summer Car\Mods"
 call "D:\Spiele\Steam\steamapps\common\My Summer Car\Mods\debug.bat"
 ) ELSE (

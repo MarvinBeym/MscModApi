@@ -123,7 +123,7 @@ namespace MscModApi.Shopping
 		internal void OnAddToCart(ShopItem shopItem)
 		{
 			if (shoppingCart.Contains(shopItem)) {
-				if (shopItem.IsMultiPurchase()) {
+				if (shopItem.multiPurchase) {
 					shopItem.IncreaseCount();
 					totalCost += shopItem.baseItemPrize;
 					totalCostComp.text = totalCost.ToString();
@@ -170,7 +170,7 @@ namespace MscModApi.Shopping
 		{
 			totalCost -= shopItem.baseItemPrize;
 			totalCostComp.text = totalCost.ToString();
-			if (!shopItem.IsMultiPurchase()) {
+			if (!shopItem.multiPurchase) {
 				GameObject.Destroy(shopItem.cartItemGameObject);
 				shoppingCart.Remove(shopItem);
 			}
@@ -191,7 +191,7 @@ namespace MscModApi.Shopping
 			totalCost = 0;
 			totalCostComp.text = totalCost.ToString();
 			foreach (var shopItem in shoppingCart) {
-				if (shopItem.IsMultiPurchase()) {
+				if (shopItem.multiPurchase) {
 					for (var i = 0; i < shopItem.itemCount; i++) {
 						shopItem.onPurchaseAction.Invoke();
 					}
