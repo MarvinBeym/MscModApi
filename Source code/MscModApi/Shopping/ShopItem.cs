@@ -9,28 +9,64 @@ namespace MscModApi.Shopping
 {
 	public class ShopItem
 	{
-		private string name;
-		private float prize;
+		public BasicPart part
+		{
+			get;
+			protected set;
+		}
+
+		public string name
+		{
+			get;
+			protected set;
+		}
+
+		public float prize
+		{
+			get;
+			protected set;
+		}
 		private Vector3 spawnLocation;
-		private string imageAssetName;
+		protected string imageAssetName;
 		private ShopInterface shopInterface;
 		internal GameObject partItemGameObject;
 		internal Action onPurchaseAction;
 		private ShopBaseInfo baseInfo;
 
-		private bool multiPurchase = false;
+		/// <summary>
+		/// If the item in the shop can be bought multiple times (won't be removed from the shop on purchase)
+		/// </summary>
+		public bool multiPurchase
+		{
+			get;
+			protected set;
+		}
 		private Text itemCountComp;
 		private Text itemPrizeComp;
 
 		internal int itemCount = 1;
 		internal float baseItemPrize = 0;
 		internal GameObject cartItemGameObject;
-		private bool buyable = true;
+
+		/// <summary>
+		/// Is the item currently buyable
+		/// </summary>
+		public bool buyable
+		{
+			get
+			{
+				if (multiPurchase)
+				{
+					return true;
+				}
+
+				return !part.bought;
+			}
+		}
 
 		public ShopItem(string name, float prize, Vector3 spawnLocation, Action onPurchaseAction,
 			string imageAssetName = "", bool multiPurchase = true)
 		{
-			SetMultiPurchase(multiPurchase);
 			Setup(name, prize, spawnLocation, imageAssetName);
 			this.onPurchaseAction = onPurchaseAction;
 		}
@@ -38,27 +74,29 @@ namespace MscModApi.Shopping
 		public ShopItem(string name, float prize, Vector3 spawnLocation, PartBox partBox, string imageAssetName = "")
 		{
 			Setup(name, prize, spawnLocation, imageAssetName);
-			foreach (Part part in partBox.childs) {
-				part.defaultPosition = spawnLocation;
-				part.active = part.bought;
-			}
-
-			buyable = !partBox.childs.Any(part => part.bought);
-			onPurchaseAction = delegate
-			{
-				foreach (Part part in partBox.childs) {
-					part.bought = true;
-					part.defaultPosition = spawnLocation;
+			foreach (Part partBoxChild in partBox.childs) {
+				if (partBoxChild.partSave.bought == PartSave.BoughtState.NotConfigured)
+				{
+					partBoxChild.partSave.bought = PartSave.BoughtState.No;
 				}
 
-				if (!multiPurchase) {
-					buyable = false;
+				partBoxChild.defaultPosition = spawnLocation;
+				partBoxChild.active = partBoxChild.bought;
+			}
+
+			onPurchaseAction = delegate
+			{
+				foreach (Part partBoxChild in partBox.childs) {
+					partBoxChild.bought = true;
+					partBoxChild.defaultPosition = spawnLocation;
 				}
 
 				partBox.active = true;
 				partBox.position = spawnLocation;
 				partBox.rotation = new Vector3(0, 0, 0);
 			};
+
+			part = partBox;
 		}
 
 
@@ -66,21 +104,18 @@ namespace MscModApi.Shopping
 		{
 			Setup(name, prize, spawnLocation, imageAssetName);
 
-			if (part.partSave.bought == PartSave.BoughtState.NotConfigured) {
+			if (part.partSave.bought == PartSave.BoughtState.NotConfigured)
+			{
 				part.partSave.bought = PartSave.BoughtState.No;
 			}
 
 			part.defaultPosition = spawnLocation;
 			part.active = part.bought;
-			buyable = !part.bought;
+			this.part = part;
 
 			onPurchaseAction = delegate { OnPartPurchase(part); };
 		}
 
-		internal bool IsBuyable()
-		{
-			return buyable;
-		}
 
 		private void Setup(string name, float prize, Vector3 spawnLocation, string imageAssetName)
 		{
@@ -120,10 +155,6 @@ namespace MscModApi.Shopping
 			part.bought = true;
 			part.active = true;
 			part.ResetToDefault();
-
-			if (!IsMultiPurchase()) {
-				buyable = false;
-			}
 		}
 
 		internal void AddToCart()
@@ -168,16 +199,6 @@ namespace MscModApi.Shopping
 		internal void SetBaseInfo(ShopBaseInfo baseInfo)
 		{
 			this.baseInfo = baseInfo;
-		}
-
-		public void SetMultiPurchase(bool multiPurchase)
-		{
-			this.multiPurchase = multiPurchase;
-		}
-
-		public bool IsMultiPurchase()
-		{
-			return multiPurchase;
 		}
 
 		public void Show(bool show)
