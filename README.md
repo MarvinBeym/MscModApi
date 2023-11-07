@@ -1,20 +1,19 @@
 # MscModApi
 
-| Component     | Latest tested version                                                | Link                                                              |
-|---------------|----------------------------------------------------------------------|-------------------------------------------------------------------|
-| ModLoader     | ![](https://img.shields.io/badge/v1.2-blue.svg)                      | [GitHub](https://github.com/piotrulos/MSCModLoader)               |
-| My Summer car | ![](https://img.shields.io/badge/experimental_12.10.2021-orange.svg) | [Steam](https://store.steampowered.com/app/516750/My_Summer_Car/) |
-
----
+A help for mod makers
 
 ## Table of contents
 
-- [MscModApi](#mscmodapi)
-    * [Features](#features)
-    * [Installation](#installation)
-        * [User](#user)
-        * [Developer/Mod maker](#developermod-maker)
-    * [Usage](#usage)
+<!-- TOC -->
+* [MscModApi](#mscmodapi)
+  * [Table of contents](#table-of-contents)
+  * [Requirements](#requirements)
+  * [Installation](#installation)
+    * [Users](#users)
+    * [Mod Authors](#mod-authors)
+  * [Features](#features)
+    * [Important info about ***Features***](#important-info-about-features)
+<!-- TOC -->
 
 ---
 
