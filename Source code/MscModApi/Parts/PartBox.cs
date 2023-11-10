@@ -13,11 +13,21 @@ namespace MscModApi.Parts
 	public abstract class PartBox : BasicPart
 	{
 		/// <summary>
+		/// Internal list of all partBoxes created
+		/// </summary>
+		protected static List<PartBox> partBoxes = new List<PartBox>();
+
+		/// <summary>
 		/// Returns internal unpacked counter (starting at 0)
 		/// </summary>
 		public int partsUnpackedCount { get; protected set; } = 0;
 
 		public override GameObject gameObject { get; protected set; }
+
+		protected PartBox()
+		{
+			partBoxes.Add(this);
+		}
 
 		/// <summary>
 		/// Returns the name of the box model
@@ -39,7 +49,7 @@ namespace MscModApi.Parts
 			get => childs.All(childPart => childPart.installBlocked);
 			set
 			{
-				foreach (Part childPart in childs) {
+				foreach (var childPart in childs) {
 					childPart.installBlocked = value;
 				}
 			}
@@ -81,7 +91,7 @@ namespace MscModApi.Parts
 			get { return childs.Any(part => part.bought); }
 			set
 			{
-				foreach (Part part in childs) {
+				foreach (var part in childs) {
 					part.bought = value;
 				}
 			}
@@ -155,7 +165,7 @@ namespace MscModApi.Parts
 				rotation = defaultRotation;
 			}
 
-			foreach (Part part in childs) {
+			foreach (var part in childs) {
 				if (uninstall && part.installed) {
 					part.Uninstall();
 				}
@@ -169,6 +179,19 @@ namespace MscModApi.Parts
 		public override void Uninstall()
 		{
 			//Not Implemented for PartBox
+		}
+
+		public static void Save()
+		{
+			foreach (var partBox in partBoxes)
+			{
+				partBox.CheckUnpackedOnSave();
+			}
+		}
+
+		public static void LoadCleanup()
+		{
+			partBoxes = new List<PartBox>();
 		}
 	}
 }
