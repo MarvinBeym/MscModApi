@@ -134,11 +134,8 @@ namespace MscModApi.Trigger
 					//May happen if a different component is adding a RigidBody itself (Like a HingeJoint)
 					rigidBody = existingRigidBody;
 				}
-				else {
-					rigidBody = part.gameObject.AddComponent<Rigidbody>();
-				}
+				rigidBody = part.ResetRigidBody();
 
-				rigidBody.mass = 3;
 				part.gameObject.transform.parent = null;
 				part.gameObject.transform.Translate(Vector3.up * 0.025f);
 				yield return null;
@@ -306,10 +303,8 @@ namespace MscModApi.Trigger
 		{
 			this.part = part;
 			this.parent = parent;
-			rigidBody = part.gameObject.GetComponent<Rigidbody>();
-			if (!rigidBody) {
-				rigidBody = part.gameObject.AddComponent<Rigidbody>();
-			}
+
+			rigidBody = part.ResetRigidBody();
 		}
 	}
 }
