@@ -166,12 +166,7 @@ namespace MscModApi.Parts
 			}
 
 			foreach (var part in childs) {
-				if (uninstall && part.installed) {
-					part.Uninstall();
-				}
-
-				part.position = defaultPosition;
-				part.rotation = defaultRotation;
+				part.ResetToDefault(uninstall);
 			}
 		}
 
