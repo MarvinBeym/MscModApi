@@ -21,7 +21,7 @@ namespace MscModApi
 		public override string ID => "MscModApi";
 		public override string Name => "MscModApi";
 		public override string Author => "DonnerPlays";
-		public override string Version => "1.3.1";
+		public override string Version => "1.3.2";
 
 		public override string Description =>
 			"A general modding 'help' featuring things like installable/boltable parts, shop, part boxing, utility tools & more.";
@@ -36,7 +36,6 @@ namespace MscModApi
 
 		internal static Dictionary<string, string> modSaveFileMapping;
 		internal static Dictionary<string, Dictionary<string, Part>> modsParts;
-		internal static List<PartBox> partBoxes;
 		internal static Dictionary<string, Screw> screws;
 		private Screw previousScrew;
 
@@ -87,17 +86,6 @@ namespace MscModApi
 
 			//Do cleanup of static fields to avoid problems with reloading (going/getting to menu and then going back into game)
 			LoadCleanup();
-			Cache.LoadCleanup();
-			CarH.LoadCleanup();
-			Game.LoadCleanup();
-			PaintingSystem.PaintingSystem.LoadCleanup();
-			Screw.LoadCleanup();
-			Shop.LoadCleanup();
-			Logger.LoadCleanup();
-			ScrewPlacementAssist.LoadCleanup();
-			UserInteraction.LoadCleanup();
-			Tool.LoadCleanup();
-			SatsumaGamePart.LoadCleanup();
 
 			Logger.InitLogger(this);
 			LoadAssets();
@@ -114,10 +102,7 @@ namespace MscModApi
 
 		private void Save()
 		{
-			foreach (PartBox partBox in partBoxes) {
-				partBox.CheckUnpackedOnSave();
-			}
-
+			PartBox.Save();
 			PaintingSystem.PaintingSystem.Save();
 
 			foreach (var modParts in modsParts) {
@@ -136,7 +121,7 @@ namespace MscModApi
 					try {
 						part.CustomSaveSaving(mod, $"{id}_saveFile.json");
 					}
-					catch (Exception) {
+					catch (Exception eee) {
 						// ignored
 					}
 
@@ -325,7 +310,18 @@ namespace MscModApi
 
 		public static void LoadCleanup()
 		{
-			partBoxes = new List<PartBox>();
+			Cache.LoadCleanup();
+			CarH.LoadCleanup();
+			Game.LoadCleanup();
+			PaintingSystem.PaintingSystem.LoadCleanup();
+			Screw.LoadCleanup();
+			Shop.LoadCleanup();
+			Logger.LoadCleanup();
+			ScrewPlacementAssist.LoadCleanup();
+			UserInteraction.LoadCleanup();
+			Tool.LoadCleanup();
+			SatsumaGamePart.LoadCleanup();
+			PartBox.LoadCleanup();
 			modSaveFileMapping = new Dictionary<string, string>();
 			modsParts = new Dictionary<string, Dictionary<string, Part>>();
 			screws = new Dictionary<string, Screw>();

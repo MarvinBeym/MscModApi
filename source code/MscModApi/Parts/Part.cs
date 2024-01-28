@@ -127,6 +127,23 @@ namespace MscModApi.Parts
 
 		public bool uninstallWhenParentUninstalls { get; protected set; }
 
+		/// <summary>
+		/// The mass (weight) of the part, applied to the rigidBody component
+		/// </summary>
+		public virtual int mass => 10;
+		/// <summary>
+		/// The drag of the part, applied to the rigidBody component
+		/// </summary>
+		public virtual float drag => 0.1f;
+		/// <summary>
+		/// The angular drag of the part, applied to the rigidBody component
+		/// </summary>
+		public virtual float angularDrag => 0.1f;
+		/// <summary>
+		///The collision detection mode of the part, continuous recommended to avoid part falling through floor.
+		/// </summary>
+		public virtual CollisionDetectionMode collisionDetectionMode => CollisionDetectionMode.Continuous;
+		
 		protected List<Screw> savedScrews;
 
 		public Collider collider { get; protected set; }
@@ -281,6 +298,8 @@ namespace MscModApi.Parts
 			partSave.screws.Clear();
 
 			collider = gameObject.GetComponent<Collider>();
+
+			ResetRigidBody();
 
 			if (parent != null) {
 				trigger = new TriggerWrapper(this, parent, disableCollisionWhenInstalled);
@@ -577,6 +596,24 @@ namespace MscModApi.Parts
 		public virtual void CustomSaveSaving(Mod mod, string saveFileName)
 		{
 			throw new Exception("Only subclasses should not throw an error");
+		}
+
+		/// <summary>
+		/// Called to reset the rigidBody of the part (adds it when it's missing and reapplies mass, drag, detection, ...)
+		/// </summary>
+		public Rigidbody ResetRigidBody()
+		{
+			Rigidbody rigidBody = gameObject.GetComponent<Rigidbody>();
+			if (!rigidBody)
+			{
+				rigidBody = gameObject.AddComponent<Rigidbody>();
+			}
+
+			rigidBody.mass = mass;
+			rigidBody.drag = drag;
+			rigidBody.angularDrag = angularDrag;
+			rigidBody.collisionDetectionMode = collisionDetectionMode;
+			return rigidBody;
 		}
 	}
 }

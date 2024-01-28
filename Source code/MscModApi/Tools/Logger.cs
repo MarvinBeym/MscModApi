@@ -58,7 +58,7 @@ namespace MscModApi.Tools
 		public static void New(string message, Exception ex)
 		{
 			Assembly callingAssembly = Assembly.GetCallingAssembly();
-			WriteLogEntry(callingAssembly.GetName().Name, message, "", null);
+			WriteLogEntry(callingAssembly.GetName().Name, message, "", ex);
 		}
 
 		public static void New(string message, string additionalInfo, Exception ex)

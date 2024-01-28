@@ -367,3 +367,4 @@ FodyWeavers.xsd
 /project files/Unity Asset Bundle/Library
 /project files/Current version
 /project files/Older versions
+/project files/*.zip
