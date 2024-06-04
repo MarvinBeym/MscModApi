@@ -48,6 +48,9 @@ namespace MscModApi.Shopping
 		internal float baseItemPrize = 0;
 		internal GameObject cartItemGameObject;
 
+		protected bool isCustomOnBought = false;
+		protected bool customOnPurchaseBought = false;
+
 		/// <summary>
 		/// Is the item currently buyable
 		/// </summary>
@@ -60,6 +63,16 @@ namespace MscModApi.Shopping
 					return true;
 				}
 
+				if (isCustomOnBought && !multiPurchase)
+				{
+					return !customOnPurchaseBought;
+				}
+
+				if (part == null && !isCustomOnBought)
+				{
+					return false;
+				}
+
 				return !part.bought;
 			}
 		}
@@ -68,8 +81,13 @@ namespace MscModApi.Shopping
 			string imageAssetName = "", bool multiPurchase = true)
 		{
 			Setup(name, prize, spawnLocation, imageAssetName);
-			this.onPurchaseAction = onPurchaseAction;
 			this.multiPurchase = multiPurchase;
+			isCustomOnBought = true;
+			this.onPurchaseAction = delegate
+			{
+				customOnPurchaseBought = true;
+				onPurchaseAction.Invoke();
+			};
 		}
 
 		public ShopItem(string name, float prize, Vector3 spawnLocation, PartBox partBox, string imageAssetName = "")
