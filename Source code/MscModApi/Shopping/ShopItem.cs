@@ -69,6 +69,7 @@ namespace MscModApi.Shopping
 		{
 			Setup(name, prize, spawnLocation, imageAssetName);
 			this.onPurchaseAction = onPurchaseAction;
+			this.multiPurchase = multiPurchase;
 		}
 
 		public ShopItem(string name, float prize, Vector3 spawnLocation, PartBox partBox, string imageAssetName = "")
