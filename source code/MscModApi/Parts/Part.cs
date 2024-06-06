@@ -258,7 +258,14 @@ namespace MscModApi.Parts
 
 		public override bool bolted
 		{
-			get { return screws.Count > 0 && screws.All(screw => screw.tightness == Screw.maxTightness) && installed; }
+			get
+			{
+				if (screws.Count == 0)
+				{
+					return true;
+				}
+				return screws.All(screw => screw.tightness == Screw.maxTightness) && installed;
+			}
 		}
 
 		public override bool installedOnCar => installed && gameObject.transform.root == CarH.satsuma.transform;
