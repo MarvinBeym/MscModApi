@@ -299,7 +299,7 @@ namespace MscModApi.Parts.ReplacePart
 		/// (only set when using advanced bolted state detection)
 		/// 
 		/// </summary>
-		protected float maxTightness { get; set; }
+		public float maxTightness { get; protected set; }
 
 		/// <summary>
 		/// The main Fsm GameObject
