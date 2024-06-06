@@ -71,6 +71,7 @@ namespace MscModApi.Parts.ReplacePart
 				throw new Exception(
 					$"Unable to find trigger GameObject on GameObject with name '{mainFsmGameObject.name}'");
 			}
+			triggerFsmGameObjectCollider = triggerFsmGameObject.GetComponent<Collider>();
 
 			gameObject = dataFsm.FsmVariables.FindFsmGameObject("ThisPart").Value;
 			if (!gameObject) {
@@ -283,8 +284,8 @@ namespace MscModApi.Parts.ReplacePart
 		/// </summary>
 		public override bool installBlocked
 		{
-			get => triggerFsmGameObject.activeSelf;
-			set => triggerFsmGameObject.SetActive(!value);
+			get => triggerFsmGameObjectCollider.enabled;
+			set => triggerFsmGameObjectCollider.enabled = !value;
 		}
 
 		/// <summary>
@@ -358,6 +359,7 @@ namespace MscModApi.Parts.ReplacePart
 		/// The trigger fsm gameObject (deals with installing the part onto the car)
 		/// </summary>
 		public GameObject triggerFsmGameObject { get; protected set; }
+		protected Collider triggerFsmGameObjectCollider { get; set; }
 
 		/// <inheritdoc />
 		public override bool bought
