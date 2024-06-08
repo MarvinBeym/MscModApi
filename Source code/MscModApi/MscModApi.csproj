@@ -85,12 +85,16 @@
     <Compile Include="Parts\ReplacePart\NewPart.cs" />
     <Compile Include="Parts\ReplacePart\OldPart.cs" />
     <Compile Include="Parts\PartEventListener.cs" />
+    <Compile Include="Parts\ReplacePart\ReplacedPartEventListener.cs" />
+    <Compile Include="Parts\ReplacePart\ReplacedGamePartsEvent.cs" />
+    <Compile Include="Parts\ReplacePart\ReplacedGameParts.cs" />
     <Compile Include="Parts\ReplacePart\ReplacementPart.cs" />
     <Compile Include="Parts\Box.cs" />
     <Compile Include="Parts\BoxLogic.cs" />
     <Compile Include="Parts\Kit.cs" />
     <Compile Include="Parts\ReplacePart\SatsumaGamePart.cs" />
     <Compile Include="Parts\SupportsPartBehaviourEvents.cs" />
+    <Compile Include="Parts\ReplacePart\SupportsReplacedGamePartsEvent.cs" />
     <Compile Include="Parts\SupportsPartEvents.cs" />
     <Compile Include="Shopping\ModItem.cs" />
     <Compile Include="Parts\PartBox.cs" />
