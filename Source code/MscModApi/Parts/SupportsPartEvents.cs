@@ -17,17 +17,15 @@ namespace MscModApi.Parts
 		/// <param name="action">The action to execute when the event occurs</param>
 		/// <param name="invokeActionIfConditionMet">When the condition for the Event type is already met when the event is added. The newly added event is immediately triggered</param>
 		/// <returns>Returns the action added (eg for later removal)</returns>
-		Action AddEventListener(PartEvent.Time eventTime, PartEvent.Type Type, Action action,
+		PartEventListener AddEventListener(PartEvent.Time eventTime, PartEvent.Type Type, Action action,
 			bool invokeActionIfConditionMet = true);
 
 		/// <summary>
 		/// Remove an action from the event system
 		/// </summary>
-		/// <param name="eventTime">>When the event would occur</param>
-		/// <param name="Type">The type of event the action was added to</param>
-		/// <param name="action">The action to remove</param>
+		/// <param name="partEventListener">The reference of the part event listener</param>
 		/// <returns>Returns true if event was found and removed. Otherwise false</returns>
-		bool RemoveEventListener(PartEvent.Time eventTime, PartEvent.Type Type, Action action);
+		bool RemoveEventListener(PartEventListener partEventListener);
 
 		/// <summary>
 		/// Returns all actions added to a part

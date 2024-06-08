@@ -505,7 +505,7 @@ namespace MscModApi.Parts
 		}
 
 		/// <inheritdoc />
-		public Action AddEventListener(PartEvent.Time eventTime, PartEvent.Type Type, Action action,
+		public PartEventListener AddEventListener(PartEvent.Time eventTime, PartEvent.Type Type, Action action,
 			bool invokeActionIfConditionMet = true)
 		{
 			events[eventTime][Type].Add(action);
@@ -564,14 +564,14 @@ namespace MscModApi.Parts
 				}
 			}
 
-			return action;
+			return new PartEventListener(eventTime, Type, action);
 		}
 
 		/// <inheritdoc />
-		public bool RemoveEventListener(PartEvent.Time eventTime, PartEvent.Type Type, Action action)
+		public bool RemoveEventListener(PartEventListener partEventListener)
 		{
-			var actions = GetEvents(eventTime, Type);
-			return actions.Contains(action) && actions.Remove(action);
+			var actions = GetEvents(partEventListener.eventTime, partEventListener.type);
+			return actions.Contains(partEventListener.action) && actions.Remove(partEventListener.action);
 		}
 
 		public List<Action> GetEvents(PartEvent.Time eventTime, PartEvent.Type Type)
