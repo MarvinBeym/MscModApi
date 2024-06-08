@@ -504,7 +504,8 @@ namespace MscModApi.Parts
 				() => { partToBlock.installBlocked = false; });
 		}
 
-		public void AddEventListener(PartEvent.Time eventTime, PartEvent.Type Type, Action action,
+		/// <inheritdoc />
+		public Action AddEventListener(PartEvent.Time eventTime, PartEvent.Type Type, Action action,
 			bool invokeActionIfConditionMet = true)
 		{
 			events[eventTime][Type].Add(action);
@@ -562,6 +563,15 @@ namespace MscModApi.Parts
 						break;
 				}
 			}
+
+			return action;
+		}
+
+		/// <inheritdoc />
+		public bool RemoveEventListener(PartEvent.Time eventTime, PartEvent.Type Type, Action action)
+		{
+			var actions = GetEvents(eventTime, Type);
+			return actions.Contains(action) && actions.Remove(action);
 		}
 
 		public List<Action> GetEvents(PartEvent.Time eventTime, PartEvent.Type Type)

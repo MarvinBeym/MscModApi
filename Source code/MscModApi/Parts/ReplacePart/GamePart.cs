@@ -567,7 +567,7 @@ namespace MscModApi.Parts.ReplacePart
 		}
 
 		/// <inheritdoc />
-		public void AddEventListener(PartEvent.Time eventTime, PartEvent.Type Type, Action action,
+		public Action AddEventListener(PartEvent.Time eventTime, PartEvent.Type Type, Action action,
 			bool invokeActionIfConditionMet = true)
 		{
 			if (
@@ -634,6 +634,15 @@ namespace MscModApi.Parts.ReplacePart
 						break;
 				}
 			}
+
+			return action;
+		}
+
+		/// <inheritdoc />
+		public bool RemoveEventListener(PartEvent.Time eventTime, PartEvent.Type Type, Action action)
+		{
+			var actions = GetEvents(eventTime, Type);
+			return actions.Contains(action) && actions.Remove(action);
 		}
 
 		/// <summary>

@@ -11,3 +11,6 @@ dotnet_diagnostic.IDE1006.severity = none
 
 # CS0618: Typ oder Element ist veraltet
 dotnet_diagnostic.CS0618.severity = error
+
+# Default severity for analyzer diagnostics with category 'Style'
+dotnet_analyzer_diagnostic.category-Style.severity = none
