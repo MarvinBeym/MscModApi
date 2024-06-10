@@ -61,7 +61,7 @@ namespace MscModApi.Trigger
 		protected IEnumerator HandleUninstall()
 		{
 			while (part.installed) {
-				if (!part.bolted && part.gameObject.IsLookingAt() && UserInteraction.EmptyHand() &&
+				if ((!part.bolted || !part.hasBolts) && part.gameObject.IsLookingAt() && UserInteraction.EmptyHand() &&
 				    !Tool.HasToolInHand()) {
 					if (part.screwPlacementMode) {
 						ScrewPlacementAssist.HandlePartInteraction(part);

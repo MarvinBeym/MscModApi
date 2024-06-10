@@ -109,6 +109,11 @@ namespace MscModApi.Parts
 		/// </summary>
 		public override bool bolted => childs.All(part => part.bolted);
 
+		/// <summary>
+		/// Returns if any parts contained in this box have bolts
+		/// (Only made available through inheritance, rare use cases)
+		/// </summary>
+		public override bool hasBolts => childs.Any(part => part.hasBolts);
 
 		/// <summary>
 		/// Returns if all parts contained in this box are installed on the car

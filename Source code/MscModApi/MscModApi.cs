@@ -239,8 +239,8 @@ namespace MscModApi
 			}
 
 
-			if (!part.bolted || part.screws.Count == 0) {
-				if (part.installed && part.screws.Count > 0) {
+			if (!part.bolted || !part.hasBolts) {
+				if (part.installed && part.hasBolts) {
 					UserInteraction.GuiInteraction("Tighten all screws");
 					if (instantInstallKeybind.GetKeybindDown()) {
 						part.partSave.screws.ForEach(delegate(Screw screw)
@@ -249,7 +249,7 @@ namespace MscModApi
 						});
 					}
 				}
-				else {
+				else if (!part.installed) {
 					UserInteraction.GuiInteraction("Fully install part");
 					if (instantInstallKeybind.GetKeybindDown()) {
 						part.Install();

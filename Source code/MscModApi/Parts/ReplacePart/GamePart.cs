@@ -413,6 +413,9 @@ namespace MscModApi.Parts.ReplacePart
 		}
 
 		/// <inheritdoc />
+		public override bool hasBolts => dataFsm.FsmVariables.FindFsmBool("Bolted") != null;
+
+		/// <inheritdoc />
 		public override bool installedOnCar => gameObject.transform.root == CarH.satsuma.transform;
 
 		/// <inheritdoc />
