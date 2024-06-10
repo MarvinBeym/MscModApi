@@ -63,13 +63,15 @@ namespace MscModApi.Parts.ReplacePart
 
 			foreach (var newPart in this.newParts)
 			{
-				AddNewPart(newPart, false);
+				SetupNewPart(newPart);
 			}
 
 			foreach (var requiredNonReplacingPart in this.requiredNonReplacingParts)
 			{
-				AddNewPart(requiredNonReplacingPart, true);
+				SetupRequiredNonReplacingPart(requiredNonReplacingPart);
 			}
+
+			SetReplacedState(replaced);
 		}
 
 		/// <summary>
@@ -102,6 +104,8 @@ namespace MscModApi.Parts.ReplacePart
 				newParts.Add(newPart);
 			}
 
+			SetReplacedState(replaced);
+
 			return true;
 		}
 
@@ -117,23 +121,22 @@ namespace MscModApi.Parts.ReplacePart
 		{
 			if (requiredNonReplacing)
 			{
-				if (requiredNonReplacingParts.Contains(newPart))
+				if (!requiredNonReplacingParts.Contains(newPart))
 				{
 					return false;
 				}
 
 				
-				requiredNonReplacingParts.Add(newPart);
+				requiredNonReplacingParts.Remove(newPart);
 			}
 			else
 			{
-				if (newParts.Contains(newPart))
+				if (!newParts.Contains(newPart))
 				{
 					return false;
 				}
 
-				SetupNewPart(newPart);
-				newParts.Add(newPart);
+				newParts.Remove(newPart);
 			}
 
 			ClearEventListenersFromPart(newPart);
@@ -160,12 +163,13 @@ namespace MscModApi.Parts.ReplacePart
 
 			partEventListener = originalPart.AddEventListener(PartEvent.Time.Post, PartEvent.Type.Uninstall, delegate
 			{
-				if (originalParts.All(part => !part.installed))
+				if (originalParts.AllHaveState(PartEvent.Type.Install))
 				{
-					foreach (var newPart in newParts)
-					{
-						newPart.installBlocked = false;
-					}
+					return;
+				}
+				foreach (var newPart in newParts)
+				{
+					newPart.installBlocked = false;
 				}
 			});
 			StoreEventListenerReference(originalPart, partEventListener);
@@ -194,35 +198,34 @@ namespace MscModApi.Parts.ReplacePart
 			partEventListener = newPart.AddEventListener(PartEvent.Time.Post, PartEvent.Type.Uninstall, delegate
 				{
 					GetEvents(ReplacedGamePartsEvent.Type.AnyNewUninstalled).InvokeAll();
-					if (newParts.All(part => !part.installed))
+					if (newParts.AllHaveState(PartEvent.Type.Install))
 					{
-						foreach (var originalPart in originalParts)
-						{
-							originalPart.installBlocked = false;
-						}
+						return;
+					}
+					foreach (var originalPart in originalParts)
+					{
+						originalPart.installBlocked = false;
 					}
 				});
 			StoreEventListenerReference(newPart, partEventListener);
 
 
 			partEventListener = newPart.AddEventListener(PartEvent.Time.Post, PartEvent.Type.Bolted, delegate
+			{
+				if (!replaced)
 				{
-					if (
-						newParts.All(part => part.bolted)
-						&& requiredNonReplacingParts.All(part => part.bolted)
-					)
-					{
-						GetEvents(ReplacedGamePartsEvent.Type.AllNewBolted).InvokeAll();
-						SetReplacedState(true);
-					}
-				});
+					return;
+				}
+				GetEvents(ReplacedGamePartsEvent.Type.AllNewBolted).InvokeAll();
+				SetReplacedState(true);
+			});
 			StoreEventListenerReference(newPart, partEventListener);
 
 
 			partEventListener = newPart.AddEventListener(PartEvent.Time.Post, PartEvent.Type.Unbolted, delegate
 				{
 					GetEvents(ReplacedGamePartsEvent.Type.AnyNewUnbolted).InvokeAll();
-					if (originalParts.All(part => !part.installedOnCar))
+					if (!originalParts.AllHaveState(PartEvent.Type.InstallOnCar))
 					{
 						//Forcing because already checked
 						SetReplacedState(false, true);
@@ -249,7 +252,7 @@ namespace MscModApi.Parts.ReplacePart
 			var partEventListener = requiredNonReplacingPart.AddEventListener(PartEvent.Time.Post, PartEvent.Type.Unbolted, delegate
 			{
 				GetEvents(ReplacedGamePartsEvent.Type.AnyNewUnbolted).InvokeAll();
-				if (originalParts.All(part => !part.installedOnCar))
+				if (!originalParts.AllHaveState(PartEvent.Type.InstallOnCar))
 				{
 					//Forcing because already checked
 					SetReplacedState(false, true);
@@ -266,14 +269,9 @@ namespace MscModApi.Parts.ReplacePart
 
 			partEventListener = requiredNonReplacingPart.AddEventListener(PartEvent.Time.Post, PartEvent.Type.Bolted, delegate
 			{
-				if (
-					newParts.All(part => part.bolted)
-					&& requiredNonReplacingParts.All(part => part.bolted)
-				)
-				{
-					GetEvents(ReplacedGamePartsEvent.Type.AllNewBolted).InvokeAll();
-					SetReplacedState(true);
-				}
+				if (!replaced) {return;}
+				GetEvents(ReplacedGamePartsEvent.Type.AllNewBolted).InvokeAll();
+				SetReplacedState(true);
 			});
 			StoreEventListenerReference(requiredNonReplacingPart, partEventListener);
 		}
@@ -286,9 +284,9 @@ namespace MscModApi.Parts.ReplacePart
 		{
 			get
 			{
-				return originalParts.All(part => !part.installed) 
-				       && newParts.All(part => part.installed) 
-				       && requiredNonReplacingParts.All(part => part.installed);
+				return originalParts.All(part => !part.installedOnCar) 
+				       && newParts.All(part => part.bolted && part.installedOnCar) 
+				       && requiredNonReplacingParts.All(part => part.bolted && part.installedOnCar);
 			}
 		}
 
