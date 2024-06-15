@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using HutongGames.PlayMaker;
 using MSCLoader;
 using MscModApi.Caching;
 using MscModApi.Parts.ReplacePart;
@@ -146,6 +147,11 @@ namespace MscModApi.Parts
 		
 		protected List<Screw> savedScrews;
 
+		/// <summary>
+		/// Class for accessing with the PlayMakerFSM component added to every part
+		/// </summary>
+		public  FsmPartData fsmPartData;
+
 		public Collider collider { get; protected set; }
 
 		public TriggerWrapper trigger { get; protected set; }
@@ -156,7 +162,16 @@ namespace MscModApi.Parts
 
 		public bool hasParent => parent != null;
 
-		public override bool installBlocked { get; set; }
+		private bool _installBlocked = false;
+		public override bool installBlocked
+		{
+			get => _installBlocked;
+			set
+			{
+				_installBlocked = value;
+				fsmPartData.installBlocked = value;
+			}
+		}
 
 		public List<Screw> screws => partSave.screws;
 
@@ -222,7 +237,11 @@ namespace MscModApi.Parts
 		public override bool bought
 		{
 			get => partSave.bought == PartSave.BoughtState.Yes || partSave.bought == PartSave.BoughtState.NotConfigured;
-			set => partSave.bought = value ? PartSave.BoughtState.Yes : PartSave.BoughtState.No;
+			set
+			{
+				partSave.bought = value ? PartSave.BoughtState.Yes : PartSave.BoughtState.No;
+				fsmPartData.bought = value;
+			}
 		}
 
 		/// <inheritdoc />
@@ -333,6 +352,7 @@ namespace MscModApi.Parts
 			}
 
 			partBaseInfo.AddToPartsList(this);
+			fsmPartData = new FsmPartData(this);
 		}
 
 		protected void InitEventStorage()
@@ -383,6 +403,7 @@ namespace MscModApi.Parts
 			screw.SetPart(this);
 			screw.parentCollider = gameObject.GetComponent<Collider>();
 			partSave.screws.Add(screw);
+			fsmPartData.hasBolts.Value = true;
 
 			var index = partSave.screws.IndexOf(screw);
 
