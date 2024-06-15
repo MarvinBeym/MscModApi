@@ -105,23 +105,28 @@ namespace MscModApi
 			PartBox.Save();
 			PaintingSystem.PaintingSystem.Save();
 
-			foreach (var modParts in modsParts) {
+			foreach (var modParts in modsParts)
+			{
 				var mod = ModLoader.GetMod(modParts.Key);
 
-				if (!modSaveFileMapping.TryGetValue(mod.ID, out var saveFileName)) {
+				if (!modSaveFileMapping.TryGetValue(mod.ID, out var saveFileName))
+				{
 					//save file for mod can't be found, skip the whole mod.
 					continue;
 				}
 
 				var modPartSaves = new Dictionary<string, PartSave>();
 
-				foreach (var partData in modParts.Value) {
+				foreach (var partData in modParts.Value)
+				{
 					var id = partData.Key;
 					var part = partData.Value;
-					try {
+					try
+					{
 						part.CustomSaveSaving(mod, $"{id}_saveFile.json");
 					}
-					catch (Exception eee) {
+					catch (Exception eee)
+					{
 						// ignored
 					}
 
@@ -140,7 +145,8 @@ namespace MscModApi
 
 		private new void Update()
 		{
-			if (updateLocked) {
+			if (updateLocked)
+			{
 				return;
 			}
 
@@ -150,8 +156,10 @@ namespace MscModApi
 #endif
 
 			var toolInHand = tool.GetToolInHand();
-			if (toolInHand == Tool.ToolType.None) {
-				if (previousScrew != null) {
+			if (toolInHand == Tool.ToolType.None)
+			{
+				if (previousScrew != null)
+				{
 					previousScrew.Highlight(false);
 					previousScrew = null;
 				}
@@ -163,11 +171,13 @@ namespace MscModApi
 
 			if (screw == null) return;
 
-			if (screw.part.screwPlacementMode) {
+			if (screw.part.screwPlacementMode)
+			{
 				return;
 			}
 
-			if (ShowScrewSize && screw.showSize) {
+			if (ShowScrewSize && screw.showSize)
+			{
 				UserInteraction.GuiInteraction($"Screw size: {screw.size.ToString("#.#").Replace(".00", "")}mm");
 			}
 
@@ -177,8 +187,10 @@ namespace MscModApi
 
 			if (!tool.CheckBoltingSpeed()) return;
 
-			if (UserInteraction.MouseScrollWheel.Up) {
-				switch (toolInHand) {
+			if (UserInteraction.MouseScrollWheel.Up)
+			{
+				switch (toolInHand)
+				{
 					case Tool.ToolType.RatchetTighten:
 						screw.In();
 						break;
@@ -190,8 +202,10 @@ namespace MscModApi
 						break;
 				}
 			}
-			else if (UserInteraction.MouseScrollWheel.Down) {
-				switch (toolInHand) {
+			else if (UserInteraction.MouseScrollWheel.Down)
+			{
+				switch (toolInHand)
+				{
 					case Tool.ToolType.RatchetTighten:
 						screw.In();
 						break;
@@ -207,20 +221,27 @@ namespace MscModApi
 #if DEBUG
 		private void InstantInstallDebug()
 		{
-			if (!enableInstantInstall.GetValue()) {
+			if (
+				!enableInstantInstall.GetValue()
+				|| Camera.main == null
+				|| !UserInteraction.EmptyHand()
+				|| CarH.playerInCar
+			) {
 				return;
 			}
 
-			if (Camera.main == null || !UserInteraction.EmptyHand()) return;
 			Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out RaycastHit hit, 1f,
 				1 << LayerMask.NameToLayer("Parts"));
 			if (hit.collider == null) return;
 			var gameObject = hit.collider.gameObject;
 			Part part = null;
-			foreach (var modParts in modsParts) {
-				foreach (var partData in modParts.Value) {
+			foreach (var modParts in modsParts)
+			{
+				foreach (var partData in modParts.Value)
+				{
 					var partName = partData.Value.gameObject.name;
-					if (partName == gameObject.name) {
+					if (partName == gameObject.name)
+					{
 						part = partData.Value;
 						break;
 					}
@@ -229,59 +250,72 @@ namespace MscModApi
 				if (part != null) break;
 			}
 
-			if (part == null || !part.hasParent || part.screwPlacementMode) {
+			if (part == null || !part.hasParent || part.screwPlacementMode)
+			{
 				return;
 			}
 
-			if (part.installBlocked) {
+			if (part.installBlocked)
+			{
 				UserInteraction.GuiInteraction("Installation is blocked");
 				return;
 			}
 
 
-			if (!part.bolted || !part.hasBolts) {
-				if (part.installed && part.hasBolts) {
+			if (!part.bolted || !part.hasBolts)
+			{
+				if (part.installed && part.hasBolts)
+				{
 					UserInteraction.GuiInteraction("Tighten all screws");
-					if (instantInstallKeybind.GetKeybindDown()) {
-						part.partSave.screws.ForEach(delegate(Screw screw)
+					if (instantInstallKeybind.GetKeybindDown())
+					{
+						part.partSave.screws.ForEach(delegate (Screw screw)
 						{
 							screw.InBy(Screw.maxTightness - screw.tightness);
 						});
 					}
 				}
-				else if (!part.installed) {
+				else if (!part.installed)
+				{
 					UserInteraction.GuiInteraction("Fully install part");
-					if (instantInstallKeybind.GetKeybindDown()) {
+					if (instantInstallKeybind.GetKeybindDown())
+					{
 						part.Install();
-						part.partSave.screws.ForEach(delegate(Screw screw) { screw.InBy(Screw.maxTightness); });
+						part.partSave.screws.ForEach(delegate (Screw screw) { screw.InBy(Screw.maxTightness); });
 					}
 				}
 			}
-			else if(part.screws.Count > 0) {
+			else if (part.screws.Count > 0)
+			{
 				UserInteraction.GuiInteraction("Loosen all screws");
-				if (instantInstallKeybind.GetKeybindDown()) {
-					part.partSave.screws.ForEach(delegate(Screw screw) { screw.OutBy(Screw.maxTightness); });
+				if (instantInstallKeybind.GetKeybindDown())
+				{
+					part.partSave.screws.ForEach(delegate (Screw screw) { screw.OutBy(Screw.maxTightness); });
 				}
 			}
 		}
 #endif
 		private Screw DetectScrew()
 		{
-			if (previousScrew != null) {
+			if (previousScrew != null)
+			{
 				previousScrew.Highlight(false);
 				previousScrew = null;
 			}
 
-			if (Camera.main == null) {
+			if (Camera.main == null)
+			{
 				return null;
 			}
 
 			if (!Physics.Raycast(Camera.main.ScreenPointToRay(Input.mousePosition), out var hit, 1f,
-				    1 << LayerMask.NameToLayer("DontCollide"))) {
+					1 << LayerMask.NameToLayer("DontCollide")))
+			{
 				return null;
 			}
 
-			if (!hit.collider) {
+			if (!hit.collider)
+			{
 				return null;
 			}
 
