@@ -9,6 +9,11 @@ namespace MscModApi.Parts
 		protected Part part;
 
 		/// <summary>
+		/// The name of the PlayMakerFSM component which can be found on the part GameObject
+		/// </summary>
+		public const string FsmName = "MscModApi.Part.Data";
+
+		/// <summary>
 		/// The PlayMakerFSM component added to the parts GameObject
 		/// </summary>
 		protected PlayMakerFSM playMakerFsmPartData;
@@ -86,7 +91,7 @@ namespace MscModApi.Parts
 		{
 			this.part = part;
 			playMakerFsmPartData = part.gameObject.AddComponent<PlayMakerFSM>();
-			playMakerFsmPartData.FsmName = "MscModApi.Part.Data";
+			playMakerFsmPartData.FsmName = FsmName;
 
 			//"Constant" variables
 			cleanName = AddFsmVariable("cleanName", part.cleanName);
