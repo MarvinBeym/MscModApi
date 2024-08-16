@@ -210,46 +210,18 @@ namespace MscModApi.Parts.ReplacePart
 			StoreEventListenerReference(newPart, partEventListener);
 
 
-			partEventListener = newPart.AddEventListener(PartEvent.Time.Post, PartEvent.Type.Bolted, delegate
+			Action boltedAction = delegate
 			{
 				if (!replaced)
 				{
 					return;
 				}
+
 				GetEvents(ReplacedGamePartsEvent.Type.AllNewBolted).InvokeAll();
 				SetReplacedState(true);
-			});
-			StoreEventListenerReference(newPart, partEventListener);
+			};
 
-
-			partEventListener = newPart.AddEventListener(PartEvent.Time.Post, PartEvent.Type.Unbolted, delegate
-				{
-					GetEvents(ReplacedGamePartsEvent.Type.AnyNewUnbolted).InvokeAll();
-					if (!originalParts.AllHaveState(PartEvent.Type.InstallOnCar))
-					{
-						//Forcing because already checked
-						SetReplacedState(false, true);
-					}
-					else
-					{
-						foreach (var part in newParts)
-						{
-							part.installBlocked = true;
-						}
-					}
-				});
-			StoreEventListenerReference(newPart, partEventListener);
-		}
-
-
-		/// <summary>
-		/// Setups a new part that is required for the replacement but does not block original parts from being installed
-		/// (Adding listeners and such)
-		/// </summary>
-		/// <param name="requiredNonReplacingPart">The part to setup</param>
-		protected void SetupRequiredNonReplacingPart(Part requiredNonReplacingPart)
-		{
-			var partEventListener = requiredNonReplacingPart.AddEventListener(PartEvent.Time.Post, PartEvent.Type.Unbolted, delegate
+			Action unboltedAction = delegate
 			{
 				GetEvents(ReplacedGamePartsEvent.Type.AnyNewUnbolted).InvokeAll();
 				if (!originalParts.AllHaveState(PartEvent.Type.InstallOnCar))
@@ -264,16 +236,83 @@ namespace MscModApi.Parts.ReplacePart
 						part.installBlocked = true;
 					}
 				}
-			});
-			StoreEventListenerReference(requiredNonReplacingPart, partEventListener);
+			};
 
-			partEventListener = requiredNonReplacingPart.AddEventListener(PartEvent.Time.Post, PartEvent.Type.Bolted, delegate
+			if (newPart.hasBolts)
 			{
-				if (!replaced) {return;}
+				partEventListener = newPart.AddEventListener(PartEvent.Time.Post, PartEvent.Type.Bolted, boltedAction);
+				StoreEventListenerReference(newPart, partEventListener);
+
+				partEventListener = newPart.AddEventListener(PartEvent.Time.Post, PartEvent.Type.Unbolted, unboltedAction);
+				StoreEventListenerReference(newPart, partEventListener);
+			}
+			else
+			{
+				partEventListener = newPart.AddEventListener(PartEvent.Time.Post, PartEvent.Type.Install, boltedAction);
+				StoreEventListenerReference(newPart, partEventListener);
+
+				partEventListener = newPart.AddEventListener(PartEvent.Time.Post, PartEvent.Type.Uninstall, unboltedAction);
+				StoreEventListenerReference(newPart, partEventListener);
+			}
+
+
+
+		}
+
+
+		/// <summary>
+		/// Setups a new part that is required for the replacement but does not block original parts from being installed
+		/// (Adding listeners and such)
+		/// </summary>
+		/// <param name="requiredNonReplacingPart">The part to setup</param>
+		protected void SetupRequiredNonReplacingPart(Part requiredNonReplacingPart)
+		{
+			Action boltedAction = delegate
+			{
+				if (!replaced)
+				{
+					return;
+				}
+
 				GetEvents(ReplacedGamePartsEvent.Type.AllNewBolted).InvokeAll();
 				SetReplacedState(true);
-			});
-			StoreEventListenerReference(requiredNonReplacingPart, partEventListener);
+			};
+
+			Action unboltedAction = delegate
+			{
+				GetEvents(ReplacedGamePartsEvent.Type.AnyNewUnbolted).InvokeAll();
+				if (!originalParts.AllHaveState(PartEvent.Type.InstallOnCar))
+				{
+					//Forcing because already checked
+					SetReplacedState(false, true);
+				}
+				else
+				{
+					foreach (var part in newParts)
+					{
+						part.installBlocked = true;
+					}
+				}
+			};
+			
+			if (requiredNonReplacingPart.hasBolts)
+			{
+				var partEventListener = requiredNonReplacingPart.AddEventListener(PartEvent.Time.Post, PartEvent.Type.Bolted, boltedAction);
+				StoreEventListenerReference(requiredNonReplacingPart, partEventListener);
+
+				partEventListener = requiredNonReplacingPart.AddEventListener(PartEvent.Time.Post, PartEvent.Type.Unbolted, unboltedAction);
+				StoreEventListenerReference(requiredNonReplacingPart, partEventListener);
+			}
+			else
+			{
+				var partEventListener = requiredNonReplacingPart.AddEventListener(PartEvent.Time.Post, PartEvent.Type.Install, boltedAction);
+				StoreEventListenerReference(requiredNonReplacingPart, partEventListener);
+
+				partEventListener = requiredNonReplacingPart.AddEventListener(PartEvent.Time.Post, PartEvent.Type.Uninstall, unboltedAction);
+				StoreEventListenerReference(requiredNonReplacingPart, partEventListener);
+			}
+
+
 		}
 
 		/// <summary>
