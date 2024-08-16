@@ -12,8 +12,6 @@ namespace MscModApi.Caching
 	{
 		private static Dictionary<string, GameObject> cachedGameObjects;
 
-		private static GameObject[] globalCache;
-
 		/// <summary>
 		/// Works similar to GameObject.Find except that objects are cached once they are found, further "Cache.Find" calls will result in a quicker value return.
 		/// Also supports path search like 'Car/Engine/MyCoolPart/MyInnerPart/ThePart'
@@ -47,22 +45,28 @@ namespace MscModApi.Caching
 
 		private static GameObject FindInGlobal(string name)
 		{
-			if (globalCache == null) {
-				globalCache = Resources.FindObjectsOfTypeAll<GameObject>();
-			}
+			foreach (var gameObject in Resources.FindObjectsOfTypeAll<GameObject>()) {
+				try
+				{
+					string nameToCompareTo = gameObject.name;
 
-			foreach (var gameObject in globalCache) {
-				string nameToCompareTo = gameObject.name;
+					if (gameObject.name.Contains("OptionsMenu"))
+					{
+					}
 
-				if (gameObject.name.Contains("OptionsMenu")) {
+					if (name.Contains("/"))
+					{
+						nameToCompareTo = GetObjectPath(gameObject);
+					}
+
+					if (nameToCompareTo == name)
+					{
+						return gameObject;
+					}
 				}
-
-				if (name.Contains("/")) {
-					nameToCompareTo = GetObjectPath(gameObject);
-				}
-
-				if (nameToCompareTo == name) {
-					return gameObject;
+				catch
+				{
+					continue;
 				}
 			}
 
@@ -88,7 +92,6 @@ namespace MscModApi.Caching
 		public static void LoadCleanup()
 		{
 			cachedGameObjects = new Dictionary<string, GameObject>();
-			globalCache = null;
 		}
 	}
 }
