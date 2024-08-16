@@ -294,7 +294,7 @@ namespace MscModApi.Parts.ReplacePart
 					}
 				}
 			};
-			
+
 			if (requiredNonReplacingPart.hasBolts)
 			{
 				var partEventListener = requiredNonReplacingPart.AddEventListener(PartEvent.Time.Post, PartEvent.Type.Bolted, boltedAction);
