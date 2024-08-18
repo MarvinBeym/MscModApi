@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using HutongGames.PlayMaker;
 using MSCLoader;
 using MscModApi.Caching;
+using MscModApi.Saving;
 using MscModApi.Tools;
 using UnityEngine;
 
@@ -19,6 +20,9 @@ namespace MscModApi.Parts.ReplacePart
 		/// ID of the GamePart used for saving, the mainFsmPartName string from constructor is used to define this id.
 		/// </summary>
 		public readonly string id;
+
+		public GamePartSave saveData => new GamePartSave(installed, position, Quaternion.Euler(rotation));
+
 		/// <summary>
 		/// Stores all events that a developer may have added to this GamePart object
 		/// </summary>
@@ -49,7 +53,6 @@ namespace MscModApi.Parts.ReplacePart
 		/// Flag that defines if the part should be setup with simple or advanced bolted state detection
 		/// </summary>
 		protected readonly bool simpleBoltedStateDetection;
-
 
 		/// <summary>
 		/// Creates a new GamePart wrapper object
