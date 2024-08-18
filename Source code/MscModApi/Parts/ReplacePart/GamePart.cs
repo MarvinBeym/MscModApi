@@ -439,7 +439,12 @@ namespace MscModApi.Parts.ReplacePart
 		/// </summary>
 		public override void Uninstall()
 		{
+			if (!removalFsm.enabled)
+			{
+				removalFsm.enabled = true;
+			}
 			removalFsm.SendEvent("REMOVE");
+
 		}
 
 		public override void ResetToDefault(bool uninstall = false)
