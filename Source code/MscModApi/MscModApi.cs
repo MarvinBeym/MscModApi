@@ -141,6 +141,8 @@ namespace MscModApi
 
 				SaveLoad.SerializeSaveFile<Dictionary<string, PartSave>>(mod, modPartSaves, saveFileName);
 			}
+
+			ReplacedGameParts.Save();
 		}
 
 		private new void Update()

@@ -566,6 +566,37 @@ namespace MscModApi.Parts.ReplacePart
 			}
 			partEventListeners.Clear();
 		}
+		public static void Save()
+		{
+			foreach (var modParts in modsParts)
+			{
+				var mod = ModLoader.GetMod(modParts.Key);
+
+				// Dictionary<replacedGameParts-id, Dictionary<gamePart-id, GamePartSave>>
+				var modPartSaves = new Dictionary<string, Dictionary<string, GamePartSave>>();
+
+				foreach (ReplacedGameParts replacedGameParts in modParts.Value)
+				{
+					foreach (var originalPart in replacedGameParts.originalParts)
+					{
+						if (modPartSaves.TryGetValue(replacedGameParts.id, out var gamePartSaves))
+						{
+							gamePartSaves.Add(originalPart.id, originalPart.saveData);
+						}
+						else
+						{
+							modPartSaves.Add(replacedGameParts.id, new Dictionary<string, GamePartSave>
+							{
+								{originalPart.id, originalPart.saveData}
+							});
+						}
+					}
+				}
+
+				SaveLoad.SerializeSaveFile<Dictionary<string, Dictionary<string, GamePartSave>>>(mod, modPartSaves, saveFileName);
+			}
+		}
+
 		public static void LoadCleanup()
 		{
 			modsParts = new Dictionary<string, List<ReplacedGameParts>>();
