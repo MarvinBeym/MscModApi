@@ -84,6 +84,22 @@ namespace MscModApi.Parts.ReplacePart
 			this.newParts = newParts.ToList();
 			this.requiredNonReplacingParts = requiredNonReplacingParts.ToList();
 
+			//Fallback if save loading does not return original GameParts to their "correct" install state and they are saved as installed in the games save data.
+			//Happens when no ReplacedGameParts save data was found so the original part is installed together with NewPart's.
+			if (newParts.Any(part => part.installedOnCar))
+			{
+				foreach (var originalPart in originalParts)
+				{
+					originalPart.Uninstall();
+					originalPart.position = CarH.satsuma.transform.position + CarH.satsuma.transform.up * 2f;
+				}
+
+				foreach (var originalPartOnlyBlockInstall in originalPartsOnlyBlockInstall)
+				{
+					originalPartOnlyBlockInstall.Uninstall();
+					originalPartOnlyBlockInstall.position = CarH.satsuma.transform.position + CarH.satsuma.transform.up * 2f;
+				}
+			}
 
 			foreach (var originalPart in this.originalParts)
 			{
