@@ -30,6 +30,16 @@ namespace MscModApi.Parts.ReplacePart
 		protected Dictionary<ReplacedGamePartsEvent.Type, List<Action>> events = new Dictionary<ReplacedGamePartsEvent.Type, List<Action>>();
 
 		/// <summary>
+		/// The unique id of this replaced game parts "collection" used eg. for saving
+		/// </summary>
+		public string id { get; protected set; }
+
+		/// <summary>
+		/// Instance of the mod this ReplacedGameParts belongs to
+		/// </summary>
+		public Mod mod { get; protected set; }
+        
+		/// <summary>
 		/// List of all the original parts
 		/// </summary>
 		protected List<GamePart> originalParts { get; }
@@ -55,12 +65,16 @@ namespace MscModApi.Parts.ReplacePart
 		/// Replaces a number of original game parts with new custom parts
 		/// All *newParts* have to be installed in order to replace the originalParts and make them "fake" installed, even though the physical object is not on the car
 		/// </summary>
+		/// <param name="id">Unique id for this ReplacedGameParts "collection" (used for saving)</param>
+		/// <param name="mod">Your mod instance used for handling saving</param>
 		/// <param name="originalParts">A list of original parts that get replaced</param>
 		/// <param name="newParts">A list of new parts that replace the original parts</param>
 		/// <param name="requiredNonReplacingParts">A list of new parts that are required for the replacement functionality but don't block original parts from being installed</param>
-		public ReplacedGameParts(IEnumerable<GamePart> originalParts, IEnumerable<Part> newParts, IEnumerable<Part> requiredNonReplacingParts)
+		public ReplacedGameParts(string id, Mod mod, IEnumerable<GamePart> originalParts, IEnumerable<Part> newParts, IEnumerable<Part> requiredNonReplacingParts)
 		{
 			InitEventStorage();
+			this.id = id;
+			this.mod = mod;
 			this.originalParts = originalParts.ToList();
 			this.newParts = newParts.ToList();
 			this.requiredNonReplacingParts = requiredNonReplacingParts.ToList();
