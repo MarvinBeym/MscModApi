@@ -16,6 +16,10 @@ namespace MscModApi.Parts.ReplacePart
 	public class GamePart : BasicPart, SupportsPartEvents
 	{
 		/// <summary>
+		/// ID of the GamePart used for saving, the mainFsmPartName string from constructor is used to define this id.
+		/// </summary>
+		public readonly string id;
+		/// <summary>
 		/// Stores all events that a developer may have added to this GamePart object
 		/// </summary>
 		protected Dictionary<PartEvent.Time, Dictionary<PartEvent.Type, List<Action>>> events =
@@ -55,6 +59,7 @@ namespace MscModApi.Parts.ReplacePart
 		public GamePart(string mainFsmPartName, bool simpleBoltedStateDetection = true)
 		{
 			InitEventStorage();
+			id = mainFsmPartName;
 			this.simpleBoltedStateDetection = simpleBoltedStateDetection;
 			mainFsmGameObject = Cache.Find(mainFsmPartName);
 			if (!mainFsmGameObject) {
