@@ -173,6 +173,11 @@ namespace MscModApi.Parts.ReplacePart
 
 			partEventListener = originalPart.AddEventListener(PartEvent.Time.Post, PartEvent.Type.Uninstall, delegate
 			{
+				if (originalPart.installed)
+				{
+					//Part still considered installed, don't do anything.
+					return;
+				}
 				if (originalParts.AllHaveState(PartEvent.Type.Install))
 				{
 					return;
@@ -220,7 +225,10 @@ namespace MscModApi.Parts.ReplacePart
 							originalPart.installBlocked = false;
 						}
 
-					}
+						foreach (var originalPartOnlyBlockInstall in originalPartsOnlyBlockInstall)
+						{
+							originalPartOnlyBlockInstall.installBlocked = false;
+						}
 					}
 					
 				});
