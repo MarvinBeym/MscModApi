@@ -4,6 +4,7 @@ using System.Linq;
 using MSCLoader;
 using MscModApi.Caching;
 using MscModApi.Saving;
+using MscModApi.Tools;
 using UnityEngine;
 using static MscModApi.Tools.Extensions;
 
@@ -64,7 +65,7 @@ namespace MscModApi.Parts.ReplacePart
 		/// Stores a reference to the PartEventListeners added to the individual parts,
 		/// used for being able to remove a part again and remove any event added to it for this functionality.
 		/// </summary>
-		protected Dictionary<SupportsPartEvents, List<PartEventListener>> partEventListenerReferences = new Dictionary<SupportsPartEvents, List<PartEventListener>>(); 
+		protected Dictionary<SupportsPartEvents, List<PartEventListener>> partEventListenerReferences = new Dictionary<SupportsPartEvents, List<PartEventListener>>();
 
 		/// <summary>
 		/// Replaces a number of original game parts with new custom parts
@@ -99,22 +100,7 @@ namespace MscModApi.Parts.ReplacePart
 				});
 			}
 
-			//Fallback if save loading does not return original GameParts to their "correct" install state and they are saved as installed in the games save data.
-			//Happens when no ReplacedGameParts save data was found so the original part is installed together with NewPart's.
-			if (newParts.Any(part => part.installedOnCar))
-			{
-				foreach (var originalPart in originalParts)
-				{
-					originalPart.Uninstall();
-					originalPart.position = CarH.satsuma.transform.position + CarH.satsuma.transform.up * 2f;
-				}
-
-				foreach (var originalPartOnlyBlockInstall in originalPartsOnlyBlockInstall)
-				{
-					originalPartOnlyBlockInstall.Uninstall();
-					originalPartOnlyBlockInstall.position = CarH.satsuma.transform.position + CarH.satsuma.transform.up * 2f;
-				}
-			}
+			Load();
 
 			foreach (var originalPart in this.originalParts)
 			{
@@ -566,6 +552,56 @@ namespace MscModApi.Parts.ReplacePart
 			}
 			partEventListeners.Clear();
 		}
+
+		public void Load()
+		{
+			var modPartSaves = Helper.LoadSaveOrReturnNew<Dictionary<string, Dictionary<string, GamePartSave>>>(mod, saveFileName);
+
+			if (!modPartSaves.TryGetValue(id, out var gamePartSaves))
+			{
+				gamePartSaves = new Dictionary<string, GamePartSave>();
+				modPartSaves.Add(id, gamePartSaves);
+			}
+
+			bool anyNewPartInstalled = newParts.AnyHaveState(PartEvent.Type.InstallOnCar);
+
+			foreach (var originalPart in originalParts)
+			{
+				if (gamePartSaves.TryGetValue(originalPart.id, out var gamePartSave))
+				{
+					if (anyNewPartInstalled)
+					{
+						originalPart.Uninstall();
+						originalPart.position = gamePartSave.position;
+						originalPart.rotation = ((Quaternion)gamePartSave.rotation).eulerAngles;
+					}
+				}
+				else
+				{
+					//Fallback if save loading does not return original GameParts to their "correct" install state and they are saved as installed in the games save data.
+					//Happens when no ReplacedGameParts save data was found so the original part is installed together with NewPart's.
+					if (anyNewPartInstalled)
+					{
+						originalPart.Uninstall();
+						originalPart.position = CarH.satsuma.transform.position + CarH.satsuma.transform.up * 2f;
+					}
+				}
+			}
+
+			if (anyNewPartInstalled)
+			{
+				foreach (var originalPartOnlyBlockInstall in originalPartsOnlyBlockInstall)
+				{
+					if (!originalPartOnlyBlockInstall.installed)
+					{
+						continue;
+					}
+					originalPartOnlyBlockInstall.Uninstall();
+					originalPartOnlyBlockInstall.position = CarH.satsuma.transform.position + CarH.satsuma.transform.up * 2f;
+				}
+			}
+		}
+
 		public static void Save()
 		{
 			foreach (var modParts in modsParts)
