@@ -15,6 +15,10 @@ namespace MscModApi.Parts.ReplacePart
 	public class ReplacedGameParts: SupportsReplacedGamePartsEvent
 	{
 		/// <summary>
+		/// The name of the save file that will be created in the mods folder
+		/// </summary>
+		protected const string saveFileName = "replacedGameParts_saveFile.json";
+		/// <summary>
 		/// Storage for the event actions
 		/// </summary>
 		protected Dictionary<ReplacedGamePartsEvent.Type, List<Action>> events = new Dictionary<ReplacedGamePartsEvent.Type, List<Action>>();
