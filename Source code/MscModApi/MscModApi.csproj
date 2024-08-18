@@ -97,6 +97,8 @@
     <Compile Include="Parts\SupportsPartBehaviourEvents.cs" />
     <Compile Include="Parts\ReplacePart\SupportsReplacedGamePartsEvent.cs" />
     <Compile Include="Parts\SupportsPartEvents.cs" />
+    <Compile Include="Saving\SerializableQuaternion.cs" />
+    <Compile Include="Saving\SerializableVector3.cs" />
     <Compile Include="Shopping\ModItem.cs" />
     <Compile Include="Parts\PartBox.cs" />
     <Compile Include="Shopping\ShopBaseInfo.cs" />
