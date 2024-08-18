@@ -44,6 +44,8 @@ namespace MscModApi.Parts.ReplacePart
 		/// </summary>
 		protected List<GamePart> originalParts { get; }
 
+		protected List<GamePart> originalPartsOnlyBlockInstall { get; }
+
 		/// <summary>
 		/// List of all the new parts, all required to be installed to replace all the originalParts
 		/// </summary>
@@ -68,14 +70,17 @@ namespace MscModApi.Parts.ReplacePart
 		/// <param name="id">Unique id for this ReplacedGameParts "collection" (used for saving)</param>
 		/// <param name="mod">Your mod instance used for handling saving</param>
 		/// <param name="originalParts">A list of original parts that get replaced</param>
+		/// <param name="originalPartsOnlyBlockInstall">A list of original parts that only get blocked from being installed (example: the different carburetors, you only want to replace one but block all)</param>
 		/// <param name="newParts">A list of new parts that replace the original parts</param>
 		/// <param name="requiredNonReplacingParts">A list of new parts that are required for the replacement functionality but don't block original parts from being installed</param>
-		public ReplacedGameParts(string id, Mod mod, IEnumerable<GamePart> originalParts, IEnumerable<Part> newParts, IEnumerable<Part> requiredNonReplacingParts)
+		public ReplacedGameParts(string id, Mod mod, IEnumerable<GamePart> originalParts, IEnumerable<GamePart> originalPartsOnlyBlockInstall, IEnumerable<Part> newParts, IEnumerable<Part> requiredNonReplacingParts)
 		{
 			InitEventStorage();
 			this.id = id;
 			this.mod = mod;
 			this.originalParts = originalParts.ToList();
+			this.originalPartsOnlyBlockInstall = originalPartsOnlyBlockInstall.ToList();
+
 			this.newParts = newParts.ToList();
 			this.requiredNonReplacingParts = requiredNonReplacingParts.ToList();
 
@@ -83,6 +88,11 @@ namespace MscModApi.Parts.ReplacePart
 			foreach (var originalPart in this.originalParts)
 			{
 				SetupOriginalPart(originalPart);
+			}
+
+			foreach (var originalPartOnlyBlockInstall in originalPartsOnlyBlockInstall)
+			{
+				SetupOriginalPartOnlyBlockInstall(originalPartOnlyBlockInstall);
 			}
 
 			foreach (var newPart in this.newParts)
@@ -204,6 +214,37 @@ namespace MscModApi.Parts.ReplacePart
 			StoreEventListenerReference(originalPart, partEventListener);
 		}
 
+		protected void SetupOriginalPartOnlyBlockInstall(GamePart originalPartOnlyBlockInstall)
+		{
+			var partEventListener = originalPartOnlyBlockInstall.AddEventListener(PartEvent.Time.Post, PartEvent.Type.Install, delegate
+			{
+				foreach (var newPart in newParts)
+				{
+					newPart.installBlocked = true;
+				}
+			});
+			StoreEventListenerReference(originalPartOnlyBlockInstall, partEventListener);
+
+
+			partEventListener = originalPartOnlyBlockInstall.AddEventListener(PartEvent.Time.Post, PartEvent.Type.Uninstall, delegate
+			{
+				if (originalPartOnlyBlockInstall.installed)
+				{
+					//Part still considered installed, don't do anything.
+					return;
+				}
+				if (originalPartsOnlyBlockInstall.AnyHaveState(PartEvent.Type.Install))
+				{
+					return;
+				}
+				foreach (var newPart in newParts)
+				{
+					newPart.installBlocked = false;
+				}
+			});
+			StoreEventListenerReference(originalPartOnlyBlockInstall, partEventListener);
+		}
+
 		/// <summary>
 		/// Setup a new part
 		/// (Adding listeners and such)
@@ -220,6 +261,11 @@ namespace MscModApi.Parts.ReplacePart
 					foreach (var originalPart in originalParts)
 					{
 						originalPart.installBlocked = true;
+					}
+
+					foreach (var originalPartOnlyBlockInstall in originalPartsOnlyBlockInstall)
+					{
+						originalPartOnlyBlockInstall.installBlocked = true;
 					}
 				});
 			StoreEventListenerReference(newPart, partEventListener);
