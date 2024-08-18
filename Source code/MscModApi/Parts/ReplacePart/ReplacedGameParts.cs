@@ -18,6 +18,12 @@ namespace MscModApi.Parts.ReplacePart
 		/// The name of the save file that will be created in the mods folder
 		/// </summary>
 		protected const string saveFileName = "replacedGameParts_saveFile.json";
+
+		/// <summary>
+		/// Dictionary(Mod-ID => Dictionary(ReplacedGameParts-ID => ReplacedGameParts))
+		/// </summary>
+		protected static Dictionary<string, List<ReplacedGameParts>> modsParts;
+
 		/// <summary>
 		/// Storage for the event actions
 		/// </summary>
@@ -206,10 +212,17 @@ namespace MscModApi.Parts.ReplacePart
 					{
 						return;
 					}
-					foreach (var originalPart in originalParts)
+
+					if (newParts.AllHaveState(PartEvent.Type.UninstallFromCar))
 					{
-						originalPart.installBlocked = false;
+						foreach (var originalPart in originalParts)
+						{
+							originalPart.installBlocked = false;
+						}
+
 					}
+					}
+					
 				});
 			StoreEventListenerReference(newPart, partEventListener);
 
