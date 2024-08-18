@@ -21,7 +21,7 @@ namespace MscModApi.Parts.ReplacePart
 		/// </summary>
 		public readonly string id;
 
-		public GamePartSave saveData => new GamePartSave(installed, position, Quaternion.Euler(rotation));
+		public GamePartSave saveData => new GamePartSave(installedOnCar, position, Quaternion.Euler(rotation));
 
 		/// <summary>
 		/// Stores all events that a developer may have added to this GamePart object

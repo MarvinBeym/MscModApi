@@ -4,7 +4,7 @@ namespace MscModApi.Saving
 {
 	public class GamePartSave
 	{
-		public bool installed = false;
+		public bool installedOnCar = false;
 		public SerializableVector3 position = new SerializableVector3();
 		public SerializableQuaternion rotation = new SerializableQuaternion();
 
@@ -13,9 +13,9 @@ namespace MscModApi.Saving
 
 		}
 
-		public GamePartSave(bool installed, Vector3 position, Quaternion rotation)
+		public GamePartSave(bool installedOnCar, Vector3 position, Quaternion rotation)
 		{
-			this.installed = installed;
+			this.installedOnCar = installedOnCar;
 			this.position = position;
 			this.rotation = rotation;
 		}
