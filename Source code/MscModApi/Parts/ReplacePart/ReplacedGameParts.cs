@@ -1,6 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using MSCLoader;
+using MscModApi.Caching;
+using MscModApi.Saving;
 using UnityEngine;
 using static MscModApi.Tools.Extensions;
 
@@ -83,6 +86,18 @@ namespace MscModApi.Parts.ReplacePart
 
 			this.newParts = newParts.ToList();
 			this.requiredNonReplacingParts = requiredNonReplacingParts.ToList();
+
+			if (modsParts.TryGetValue(mod.ID, out var modParts))
+			{
+				modParts.Add(this);
+			}
+			else
+			{
+				modsParts.Add(mod.ID, new List<ReplacedGameParts>
+				{
+					this
+				});
+			}
 
 			//Fallback if save loading does not return original GameParts to their "correct" install state and they are saved as installed in the games save data.
 			//Happens when no ReplacedGameParts save data was found so the original part is installed together with NewPart's.
