@@ -359,6 +359,7 @@ namespace MscModApi
 			modSaveFileMapping = new Dictionary<string, string>();
 			modsParts = new Dictionary<string, Dictionary<string, Part>>();
 			screws = new Dictionary<string, Screw>();
+			ReplacedGameParts.LoadCleanup();
 		}
 	}
 }

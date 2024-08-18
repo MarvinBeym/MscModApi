@@ -535,5 +535,9 @@ namespace MscModApi.Parts.ReplacePart
 			}
 			partEventListeners.Clear();
 		}
+		public static void LoadCleanup()
+		{
+			modsParts = new Dictionary<string, List<ReplacedGameParts>>();
+		}
 	}
 }
