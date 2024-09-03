@@ -26,8 +26,8 @@ namespace MscModApi.Parts.ReplacePart
 		/// <summary>
 		/// Stores all events that a developer may have added to this GamePart object
 		/// </summary>
-		protected Dictionary<PartEvent.Time, Dictionary<PartEvent.Type, List<Action>>> events =
-			new Dictionary<PartEvent.Time, Dictionary<PartEvent.Type, List<Action>>>();
+		protected Dictionary<PartEvent.Time, Dictionary<PartEvent.Type, PartEventListenerCollection>> events =
+			new Dictionary<PartEvent.Time, Dictionary<PartEvent.Type, PartEventListenerCollection>>();
 
 		/// <summary>
 		/// Flag used to avoid calling the pre bolted event multiple times
@@ -111,24 +111,24 @@ namespace MscModApi.Parts.ReplacePart
 			tightness = boltCheckFsm.FsmVariables.FindFsmFloat("Tightness");
 
 			AddActionAsFirst(assemblyFsm.FindState("Assemble"),
-				() => { GetEvents(PartEvent.Time.Pre, PartEvent.Type.Install).InvokeAll(); });
+				() => { GetEventListeners(PartEvent.Time.Pre, PartEvent.Type.Install).InvokeAll(); });
 
 			AddActionAsLast(assemblyFsm.FindState("End"), () =>
 			{
-				GetEvents(PartEvent.Time.Post, PartEvent.Type.Install).InvokeAll();
+				GetEventListeners(PartEvent.Time.Post, PartEvent.Type.Install).InvokeAll();
 				if (installedOnCar) {
-					GetEvents(PartEvent.Time.Post, PartEvent.Type.InstallOnCar).InvokeAll();
+					GetEventListeners(PartEvent.Time.Post, PartEvent.Type.InstallOnCar).InvokeAll();
 				}
 			});
 
 			AddActionAsFirst(removalFsm.FindState("Remove part"),
-				() => { GetEvents(PartEvent.Time.Pre, PartEvent.Type.Uninstall).InvokeAll(); });
+				() => { GetEventListeners(PartEvent.Time.Pre, PartEvent.Type.Uninstall).InvokeAll(); });
 			AddActionAsLast(removalFsm.FindState("Remove part"), () =>
 			{
-				GetEvents(PartEvent.Time.Post, PartEvent.Type.Uninstall).InvokeAll();
+				GetEventListeners(PartEvent.Time.Post, PartEvent.Type.Uninstall).InvokeAll();
 				if (!installedOnCar) {
 					//Check probably not needed, likely already not on car because part can't be connected to something else after being uninstalled
-					GetEvents(PartEvent.Time.Post, PartEvent.Type.UninstallFromCar).InvokeAll();
+					GetEventListeners(PartEvent.Time.Post, PartEvent.Type.UninstallFromCar).InvokeAll();
 				}
 			});
 
@@ -221,9 +221,9 @@ namespace MscModApi.Parts.ReplacePart
 					return;
 				}
 
-				GetEvents(PartEvent.Time.Pre, PartEvent.Type.Unbolted).InvokeAll();
+				GetEventListeners(PartEvent.Time.Pre, PartEvent.Type.Unbolted).InvokeAll();
 				if (installedOnCar) {
-					GetEvents(PartEvent.Time.Pre, PartEvent.Type.UnboltedOnCar).InvokeAll();
+					GetEventListeners(PartEvent.Time.Pre, PartEvent.Type.UnboltedOnCar).InvokeAll();
 				}
 			});
 			AddActionAsLast(boltCheckFsm.FindState("Bolts OFF"), () =>
@@ -235,9 +235,9 @@ namespace MscModApi.Parts.ReplacePart
 					return;
 				}
 
-				GetEvents(PartEvent.Time.Post, PartEvent.Type.Unbolted).InvokeAll();
+				GetEventListeners(PartEvent.Time.Post, PartEvent.Type.Unbolted).InvokeAll();
 				if (installedOnCar) {
-					GetEvents(PartEvent.Time.Post, PartEvent.Type.UnboltedOnCar).InvokeAll();
+					GetEventListeners(PartEvent.Time.Post, PartEvent.Type.UnboltedOnCar).InvokeAll();
 				}
 			});
 
@@ -250,9 +250,9 @@ namespace MscModApi.Parts.ReplacePart
 					return;
 				}
 
-				GetEvents(PartEvent.Time.Pre, PartEvent.Type.Bolted).InvokeAll();
+				GetEventListeners(PartEvent.Time.Pre, PartEvent.Type.Bolted).InvokeAll();
 				if (installedOnCar) {
-					GetEvents(PartEvent.Time.Pre, PartEvent.Type.BoltedOnCar).InvokeAll();
+					GetEventListeners(PartEvent.Time.Pre, PartEvent.Type.BoltedOnCar).InvokeAll();
 				}
 			});
 			AddActionAsLast(boltCheckFsm.FindState("Bolts ON"), () =>
@@ -264,9 +264,9 @@ namespace MscModApi.Parts.ReplacePart
 					return;
 				}
 
-				GetEvents(PartEvent.Time.Post, PartEvent.Type.Bolted).InvokeAll();
+				GetEventListeners(PartEvent.Time.Post, PartEvent.Type.Bolted).InvokeAll();
 				if (installedOnCar) {
-					GetEvents(PartEvent.Time.Post, PartEvent.Type.BoltedOnCar).InvokeAll();
+					GetEventListeners(PartEvent.Time.Post, PartEvent.Type.BoltedOnCar).InvokeAll();
 				}
 			});
 		}
@@ -277,10 +277,10 @@ namespace MscModApi.Parts.ReplacePart
 		protected void InitEventStorage()
 		{
 			foreach (PartEvent.Time eventTime in Enum.GetValues(typeof(PartEvent.Time))) {
-				Dictionary<PartEvent.Type, List<Action>> TypeDict = new Dictionary<PartEvent.Type, List<Action>>();
+				Dictionary<PartEvent.Type, PartEventListenerCollection> TypeDict = new Dictionary<PartEvent.Type, PartEventListenerCollection>();
 
 				foreach (PartEvent.Type Type in Enum.GetValues(typeof(PartEvent.Type))) {
-					TypeDict.Add(Type, new List<Action>());
+					TypeDict.Add(Type, new PartEventListenerCollection());
 				}
 
 				events.Add(eventTime, TypeDict);
@@ -508,9 +508,9 @@ namespace MscModApi.Parts.ReplacePart
 					}
 
 					alreadyCalledPreUnbolted = true;
-					GetEvents(PartEvent.Time.Pre, PartEvent.Type.Unbolted).InvokeAll();
+					GetEventListeners(PartEvent.Time.Pre, PartEvent.Type.Unbolted).InvokeAll();
 					if (installedOnCar) {
-						GetEvents(PartEvent.Time.Pre, PartEvent.Type.UnboltedOnCar).InvokeAll();
+						GetEventListeners(PartEvent.Time.Pre, PartEvent.Type.UnboltedOnCar).InvokeAll();
 					}
 
 					break;
@@ -520,9 +520,9 @@ namespace MscModApi.Parts.ReplacePart
 					}
 
 					alreadyCalledPostUnbolted = true;
-					GetEvents(PartEvent.Time.Post, PartEvent.Type.Unbolted).InvokeAll();
+					GetEventListeners(PartEvent.Time.Post, PartEvent.Type.Unbolted).InvokeAll();
 					if (installedOnCar) {
-						GetEvents(PartEvent.Time.Post, PartEvent.Type.UnboltedOnCar).InvokeAll();
+						GetEventListeners(PartEvent.Time.Post, PartEvent.Type.UnboltedOnCar).InvokeAll();
 					}
 
 					break;
@@ -550,9 +550,9 @@ namespace MscModApi.Parts.ReplacePart
 					}
 
 					alreadyCalledPreBolted = true;
-					GetEvents(PartEvent.Time.Pre, PartEvent.Type.Bolted).InvokeAll();
+					GetEventListeners(PartEvent.Time.Pre, PartEvent.Type.Bolted).InvokeAll();
 					if (installedOnCar) {
-						GetEvents(PartEvent.Time.Pre, PartEvent.Type.BoltedOnCar).InvokeAll();
+						GetEventListeners(PartEvent.Time.Pre, PartEvent.Type.BoltedOnCar).InvokeAll();
 					}
 
 					break;
@@ -562,9 +562,9 @@ namespace MscModApi.Parts.ReplacePart
 					}
 
 					alreadyCalledPostBolted = true;
-					GetEvents(PartEvent.Time.Post, PartEvent.Type.Bolted).InvokeAll();
+					GetEventListeners(PartEvent.Time.Post, PartEvent.Type.Bolted).InvokeAll();
 					if (installedOnCar) {
-						GetEvents(PartEvent.Time.Post, PartEvent.Type.BoltedOnCar).InvokeAll();
+						GetEventListeners(PartEvent.Time.Post, PartEvent.Type.BoltedOnCar).InvokeAll();
 					}
 
 					break;
@@ -577,7 +577,7 @@ namespace MscModApi.Parts.ReplacePart
 		/// <param name="eventTime"></param>
 		/// <param name="Type"></param>
 		/// <returns></returns>
-		public List<Action> GetEvents(PartEvent.Time eventTime, PartEvent.Type Type)
+		public PartEventListenerCollection GetEventListeners(PartEvent.Time eventTime, PartEvent.Type Type)
 		{
 			return events[eventTime][Type];
 		}
@@ -586,6 +586,8 @@ namespace MscModApi.Parts.ReplacePart
 		public PartEventListener AddEventListener(PartEvent.Time eventTime, PartEvent.Type Type, Action action,
 			bool invokeActionIfConditionMet = true)
 		{
+			PartEventListener partEventListener = new PartEventListener(eventTime, Type, action);
+
 			if (
 				eventTime == PartEvent.Time.Pre
 				&& (Type == PartEvent.Type.InstallOnCar || Type == PartEvent.Type.UninstallFromCar)
@@ -593,7 +595,7 @@ namespace MscModApi.Parts.ReplacePart
 				throw new Exception($"Event {Type} can't be detected at '{eventTime}'. Unsupported!");
 			}
 
-			events[eventTime][Type].Add(action);
+			events[eventTime][Type].Add(partEventListener);
 
 			if (invokeActionIfConditionMet && eventTime == PartEvent.Time.Post) {
 				switch (Type) {
@@ -651,14 +653,14 @@ namespace MscModApi.Parts.ReplacePart
 				}
 			}
 
-			return new PartEventListener(eventTime, Type, action);
+			return partEventListener;
 		}
 
 		/// <inheritdoc />
 		public bool RemoveEventListener(PartEventListener partEventListener)
 		{
-			var actions = GetEvents(partEventListener.eventTime, partEventListener.type);
-			return actions.Contains(partEventListener.action) && actions.Remove(partEventListener.action);
+			var collection = GetEventListeners(partEventListener.eventTime, partEventListener.type);
+			return collection.Contains(partEventListener) && collection.Remove(partEventListener);
 		}
 
 		/// <summary>

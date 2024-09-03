@@ -82,6 +82,7 @@
     <Compile Include="Parts\DerivablePart.cs" />
     <Compile Include="Parts\FsmPartData.cs" />
     <Compile Include="Parts\PartEvent.cs" />
+    <Compile Include="Parts\PartEventListenerCollection.cs" />
     <Compile Include="Parts\ReplacePart\GamePart.cs" />
     <Compile Include="Parts\ReplacePart\NewPart.cs" />
     <Compile Include="Parts\ReplacePart\OldPart.cs" />

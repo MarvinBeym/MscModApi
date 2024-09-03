@@ -88,10 +88,9 @@ namespace MscModApi.Parts.ReplacePart
 			//Not possible on car
 		}
 
-
-		public new List<Action> GetEvents(PartEvent.Time eventTime, PartEvent.Type Type)
+		public PartEventListenerCollection GetEventListeners(PartEvent.Time eventTime, PartEvent.Type Type)
 		{
-			return new List<Action>();
+			return new PartEventListenerCollection();
 		}
 
 		public new void AddEventListener(PartEvent.Time eventTime, PartEvent.Type Type, Action action)

@@ -28,11 +28,11 @@ namespace MscModApi.Parts
 		bool RemoveEventListener(PartEventListener partEventListener);
 
 		/// <summary>
-		/// Returns all actions added to a part
+		/// Returns a collection containing all the actions
 		/// </summary>
 		/// <param name="eventTime">When the event occurs</param>
 		/// <param name="Type">The type of event</param>
-		/// <returns>A list object of all actions (in order of added)</returns>
-		List<Action> GetEvents(PartEvent.Time eventTime, PartEvent.Type Type);
+		/// <returns>A PartEventListener collection (in order of added)</returns>
+		PartEventListenerCollection GetEventListeners(PartEvent.Time eventTime, PartEvent.Type Type);
 	}
 }

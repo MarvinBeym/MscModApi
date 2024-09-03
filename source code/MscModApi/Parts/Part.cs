@@ -46,8 +46,8 @@ namespace MscModApi.Parts
 		/// <summary>
 		/// Stores all events that a developer may have added to this part object
 		/// </summary>
-		protected Dictionary<PartEvent.Time, Dictionary<PartEvent.Type, List<Action>>> events =
-			new Dictionary<PartEvent.Time, Dictionary<PartEvent.Type, List<Action>>>();
+		protected Dictionary<PartEvent.Time, Dictionary<PartEvent.Type, PartEventListenerCollection>> events =
+			new Dictionary<PartEvent.Time, Dictionary<PartEvent.Type, PartEventListenerCollection>>();
 
 		/// <inheritdoc />
 		protected Part()
@@ -358,10 +358,10 @@ namespace MscModApi.Parts
 		protected void InitEventStorage()
 		{
 			foreach (PartEvent.Time eventTime in Enum.GetValues(typeof(PartEvent.Time))) {
-				Dictionary<PartEvent.Type, List<Action>> TypeDict = new Dictionary<PartEvent.Type, List<Action>>();
+				Dictionary<PartEvent.Type, PartEventListenerCollection> TypeDict = new Dictionary<PartEvent.Type, PartEventListenerCollection>();
 
 				foreach (PartEvent.Type Type in Enum.GetValues(typeof(PartEvent.Type))) {
-					TypeDict.Add(Type, new List<Action>());
+					TypeDict.Add(Type, new PartEventListenerCollection());
 				}
 
 				events.Add(eventTime, TypeDict);
@@ -528,7 +528,8 @@ namespace MscModApi.Parts
 		public PartEventListener AddEventListener(PartEvent.Time eventTime, PartEvent.Type Type, Action action,
 			bool invokeActionIfConditionMet = true)
 		{
-			events[eventTime][Type].Add(action);
+			PartEventListener partEventListener = new PartEventListener(eventTime, Type, action);
+			events[eventTime][Type].Add(partEventListener);
 
 			if (invokeActionIfConditionMet && eventTime == PartEvent.Time.Post) {
 				switch (Type) {
@@ -584,17 +585,18 @@ namespace MscModApi.Parts
 				}
 			}
 
-			return new PartEventListener(eventTime, Type, action);
+			return partEventListener;
 		}
 
 		/// <inheritdoc />
 		public bool RemoveEventListener(PartEventListener partEventListener)
 		{
-			var actions = GetEvents(partEventListener.eventTime, partEventListener.type);
-			return actions.Contains(partEventListener.action) && actions.Remove(partEventListener.action);
+			var collection = GetEventListeners(partEventListener.eventTime, partEventListener.type);
+			return collection.Contains(partEventListener) && collection.Remove(partEventListener);
 		}
 
-		public List<Action> GetEvents(PartEvent.Time eventTime, PartEvent.Type Type)
+		/// <inheritdoc />
+		public PartEventListenerCollection GetEventListeners(PartEvent.Time eventTime, PartEvent.Type Type)
 		{
 			return events[eventTime][Type];
 		}

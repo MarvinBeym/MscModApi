@@ -21,6 +21,12 @@ namespace MscModApi.Parts
 		public Action action { get; protected set; }
 
 		/// <summary>
+		/// Marks the PartEventListener to be deleted from the EventListener list
+		/// (When being deleted/removed while in an Event)
+		/// </summary>
+		public bool delete { internal set; get; } = false;
+
+		/// <summary>
 		/// 
 		/// </summary>
 		/// <param name="eventTime">When this event triggers</param>
