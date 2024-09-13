@@ -1,8 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using static MscModApi.Parts.PartEvent;
 
-namespace MscModApi.Parts
+namespace MscModApi.Parts.EventSystem
 {
 	/// <summary>
 	/// Classes implementing this interface support handling events on a part.

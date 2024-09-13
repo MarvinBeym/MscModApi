@@ -4,11 +4,12 @@ using System.Linq;
 using HutongGames.PlayMaker;
 using MSCLoader;
 using MscModApi.Caching;
+using MscModApi.Parts.EventSystem;
 using MscModApi.Parts.ReplacePart;
+using MscModApi.Parts.Trigger;
 using MscModApi.Tools;
-using MscModApi.Trigger;
 using UnityEngine;
-using static MscModApi.Parts.PartEvent;
+using static MscModApi.Parts.EventSystem.PartEvent;
 
 namespace MscModApi.Parts
 {

@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Collections.ObjectModel;
 
-namespace MscModApi.Parts
+namespace MscModApi.Parts.EventSystem
 {
 	/// <summary>
 	/// Collection of PartEventListener objects

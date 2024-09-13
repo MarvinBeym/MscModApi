@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace MscModApi.Parts.ReplacePart
+namespace MscModApi.Parts.ReplacePart.EventSystem
 {
 	/// <summary>
 	/// Classes implementing this interface support handling events on a part.

@@ -1,11 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System.Collections.Generic;
 using System.Linq;
 using MscModApi.Tools;
 using UnityEngine;
 
-namespace MscModApi.Parts
+namespace MscModApi.Parts.PartBox
 {
 	/// <summary>
 	/// The base class for every object acting as a "box" (objects that contain Part objects)

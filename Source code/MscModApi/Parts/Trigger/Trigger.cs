@@ -1,15 +1,11 @@
-﻿using MscModApi.Tools;
-using System;
-using System.Collections;
+﻿using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using MSCLoader;
-using MscModApi.Caching;
-using MscModApi.Parts;
+using MscModApi.Parts.EventSystem;
+using MscModApi.Tools;
 using UnityEngine;
 
-
-namespace MscModApi.Trigger
+namespace MscModApi.Parts.Trigger
 {
 	/// <summary>
 	/// The trigger logic dealing with installing & uninstalling parts

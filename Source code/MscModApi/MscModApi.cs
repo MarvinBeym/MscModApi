@@ -7,6 +7,8 @@ using System.Collections.Generic;
 using MscModApi.Caching;
 using MscModApi.Commands;
 using MscModApi.PaintingSystem;
+using MscModApi.Parts.EventSystem;
+using MscModApi.Parts.PartBox;
 using MscModApi.Parts.ReplacePart;
 using UnityEngine;
 

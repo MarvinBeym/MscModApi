@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace MscModApi.Parts
+﻿namespace MscModApi.Parts.ReplacePart.EventSystem
 {
 	public static class ReplacedGamePartsEvent
 	{

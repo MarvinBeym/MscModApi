@@ -1,8 +1,7 @@
-﻿using MscModApi.Shopping;
-using MscModApi.Tools;
+﻿using MscModApi.Tools;
 using UnityEngine;
 
-namespace MscModApi.Parts
+namespace MscModApi.Parts.PartBox
 {
 	public class Kit : PartBox
 	{

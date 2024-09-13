@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace MscModApi.Parts
+namespace MscModApi.Parts.ReplacePart.EventSystem
 {
 	public class ReplacedPartEventListener
 	{

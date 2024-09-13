@@ -1,5 +1,6 @@
 ﻿using HutongGames.PlayMaker;
 using MSCLoader;
+using MscModApi.Parts.EventSystem;
 using UnityEngine;
 
 namespace MscModApi.Parts

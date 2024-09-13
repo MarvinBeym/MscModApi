@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using MSCLoader;
 using MscModApi.Caching;
+using MscModApi.Parts.EventSystem;
+using MscModApi.Parts.ReplacePart.EventSystem;
 using MscModApi.Saving;
 using MscModApi.Tools;
 using UnityEngine;
