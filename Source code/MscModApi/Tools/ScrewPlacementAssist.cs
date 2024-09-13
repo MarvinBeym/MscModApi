@@ -7,7 +7,7 @@ using UnityEngine;
 
 namespace MscModApi.Tools
 {
-	internal static class ScrewPlacementAssist
+	public static class ScrewPlacementAssist
 	{
 		internal static Keybind keySelectPart;
 
@@ -114,7 +114,7 @@ namespace MscModApi.Tools
 			screws = selectedPart.partSave.screws.OrderBy(screw => screw.gameObject.name).ToArray();
 		}
 
-		public static void HidePartInteraction()
+		internal static void HidePartInteraction()
 		{
 			selectedPart = null;
 			screws = new Screw[0];
@@ -163,7 +163,7 @@ namespace MscModApi.Tools
 			return screwPlacementEnabledMods.TryGetValue(mod.ID, out var enabled) && enabled;
 		}
 
-		public static void LoadCleanup()
+		internal static void LoadCleanup()
 		{
 			keySelectPart = null;
 
