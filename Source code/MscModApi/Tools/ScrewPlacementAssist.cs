@@ -160,7 +160,7 @@ namespace MscModApi.Tools
 
 		public static bool IsScrewPlacementModeEnabled(Mod mod)
 		{
-			return screwPlacementEnabledMods.TryGetValue(mod.ID, out var enabled) && enabled;
+			return IsScrewPlacementModeEnabled(mod.ID);
 		}
 
 		internal static void LoadCleanup()
