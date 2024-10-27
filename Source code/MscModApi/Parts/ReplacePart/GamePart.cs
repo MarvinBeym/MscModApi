@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using HutongGames.PlayMaker;
 using MSCLoader;
 using MscModApi.Caching;
+using MscModApi.Parts.EventSystem;
+using MscModApi.Saving;
 using MscModApi.Tools;
 using UnityEngine;
 
@@ -16,10 +18,17 @@ namespace MscModApi.Parts.ReplacePart
 	public class GamePart : BasicPart, SupportsPartEvents
 	{
 		/// <summary>
+		/// ID of the GamePart used for saving, the mainFsmPartName string from constructor is used to define this id.
+		/// </summary>
+		public readonly string id;
+
+		public GamePartSave saveData => new GamePartSave(installedOnCar, position, Quaternion.Euler(rotation));
+
+		/// <summary>
 		/// Stores all events that a developer may have added to this GamePart object
 		/// </summary>
-		protected Dictionary<PartEvent.Time, Dictionary<PartEvent.Type, List<Action>>> events =
-			new Dictionary<PartEvent.Time, Dictionary<PartEvent.Type, List<Action>>>();
+		protected Dictionary<PartEvent.Time, Dictionary<PartEvent.Type, PartEventListenerCollection>> events =
+			new Dictionary<PartEvent.Time, Dictionary<PartEvent.Type, PartEventListenerCollection>>();
 
 		/// <summary>
 		/// Flag used to avoid calling the pre bolted event multiple times
@@ -46,7 +55,6 @@ namespace MscModApi.Parts.ReplacePart
 		/// </summary>
 		protected readonly bool simpleBoltedStateDetection;
 
-
 		/// <summary>
 		/// Creates a new GamePart wrapper object
 		/// </summary>
@@ -55,6 +63,7 @@ namespace MscModApi.Parts.ReplacePart
 		public GamePart(string mainFsmPartName, bool simpleBoltedStateDetection = true)
 		{
 			InitEventStorage();
+			id = mainFsmPartName;
 			this.simpleBoltedStateDetection = simpleBoltedStateDetection;
 			mainFsmGameObject = Cache.Find(mainFsmPartName);
 			if (!mainFsmGameObject) {
@@ -71,6 +80,7 @@ namespace MscModApi.Parts.ReplacePart
 				throw new Exception(
 					$"Unable to find trigger GameObject on GameObject with name '{mainFsmGameObject.name}'");
 			}
+			triggerFsmGameObjectCollider = triggerFsmGameObject.GetComponent<Collider>();
 
 			gameObject = dataFsm.FsmVariables.FindFsmGameObject("ThisPart").Value;
 			if (!gameObject) {
@@ -102,24 +112,24 @@ namespace MscModApi.Parts.ReplacePart
 			tightness = boltCheckFsm.FsmVariables.FindFsmFloat("Tightness");
 
 			AddActionAsFirst(assemblyFsm.FindState("Assemble"),
-				() => { GetEvents(PartEvent.Time.Pre, PartEvent.Type.Install).InvokeAll(); });
+				() => { GetEventListeners(PartEvent.Time.Pre, PartEvent.Type.Install).InvokeAll(); });
 
 			AddActionAsLast(assemblyFsm.FindState("End"), () =>
 			{
-				GetEvents(PartEvent.Time.Post, PartEvent.Type.Install).InvokeAll();
+				GetEventListeners(PartEvent.Time.Post, PartEvent.Type.Install).InvokeAll();
 				if (installedOnCar) {
-					GetEvents(PartEvent.Time.Post, PartEvent.Type.InstallOnCar).InvokeAll();
+					GetEventListeners(PartEvent.Time.Post, PartEvent.Type.InstallOnCar).InvokeAll();
 				}
 			});
 
 			AddActionAsFirst(removalFsm.FindState("Remove part"),
-				() => { GetEvents(PartEvent.Time.Pre, PartEvent.Type.Uninstall).InvokeAll(); });
+				() => { GetEventListeners(PartEvent.Time.Pre, PartEvent.Type.Uninstall).InvokeAll(); });
 			AddActionAsLast(removalFsm.FindState("Remove part"), () =>
 			{
-				GetEvents(PartEvent.Time.Post, PartEvent.Type.Uninstall).InvokeAll();
+				GetEventListeners(PartEvent.Time.Post, PartEvent.Type.Uninstall).InvokeAll();
 				if (!installedOnCar) {
 					//Check probably not needed, likely already not on car because part can't be connected to something else after being uninstalled
-					GetEvents(PartEvent.Time.Post, PartEvent.Type.UninstallFromCar).InvokeAll();
+					GetEventListeners(PartEvent.Time.Post, PartEvent.Type.UninstallFromCar).InvokeAll();
 				}
 			});
 
@@ -212,9 +222,9 @@ namespace MscModApi.Parts.ReplacePart
 					return;
 				}
 
-				GetEvents(PartEvent.Time.Pre, PartEvent.Type.Unbolted).InvokeAll();
+				GetEventListeners(PartEvent.Time.Pre, PartEvent.Type.Unbolted).InvokeAll();
 				if (installedOnCar) {
-					GetEvents(PartEvent.Time.Pre, PartEvent.Type.UnboltedOnCar).InvokeAll();
+					GetEventListeners(PartEvent.Time.Pre, PartEvent.Type.UnboltedOnCar).InvokeAll();
 				}
 			});
 			AddActionAsLast(boltCheckFsm.FindState("Bolts OFF"), () =>
@@ -226,9 +236,9 @@ namespace MscModApi.Parts.ReplacePart
 					return;
 				}
 
-				GetEvents(PartEvent.Time.Post, PartEvent.Type.Unbolted).InvokeAll();
+				GetEventListeners(PartEvent.Time.Post, PartEvent.Type.Unbolted).InvokeAll();
 				if (installedOnCar) {
-					GetEvents(PartEvent.Time.Post, PartEvent.Type.UnboltedOnCar).InvokeAll();
+					GetEventListeners(PartEvent.Time.Post, PartEvent.Type.UnboltedOnCar).InvokeAll();
 				}
 			});
 
@@ -241,9 +251,9 @@ namespace MscModApi.Parts.ReplacePart
 					return;
 				}
 
-				GetEvents(PartEvent.Time.Pre, PartEvent.Type.Bolted).InvokeAll();
+				GetEventListeners(PartEvent.Time.Pre, PartEvent.Type.Bolted).InvokeAll();
 				if (installedOnCar) {
-					GetEvents(PartEvent.Time.Pre, PartEvent.Type.BoltedOnCar).InvokeAll();
+					GetEventListeners(PartEvent.Time.Pre, PartEvent.Type.BoltedOnCar).InvokeAll();
 				}
 			});
 			AddActionAsLast(boltCheckFsm.FindState("Bolts ON"), () =>
@@ -255,9 +265,9 @@ namespace MscModApi.Parts.ReplacePart
 					return;
 				}
 
-				GetEvents(PartEvent.Time.Post, PartEvent.Type.Bolted).InvokeAll();
+				GetEventListeners(PartEvent.Time.Post, PartEvent.Type.Bolted).InvokeAll();
 				if (installedOnCar) {
-					GetEvents(PartEvent.Time.Post, PartEvent.Type.BoltedOnCar).InvokeAll();
+					GetEventListeners(PartEvent.Time.Post, PartEvent.Type.BoltedOnCar).InvokeAll();
 				}
 			});
 		}
@@ -268,10 +278,10 @@ namespace MscModApi.Parts.ReplacePart
 		protected void InitEventStorage()
 		{
 			foreach (PartEvent.Time eventTime in Enum.GetValues(typeof(PartEvent.Time))) {
-				Dictionary<PartEvent.Type, List<Action>> TypeDict = new Dictionary<PartEvent.Type, List<Action>>();
+				Dictionary<PartEvent.Type, PartEventListenerCollection> TypeDict = new Dictionary<PartEvent.Type, PartEventListenerCollection>();
 
 				foreach (PartEvent.Type Type in Enum.GetValues(typeof(PartEvent.Type))) {
-					TypeDict.Add(Type, new List<Action>());
+					TypeDict.Add(Type, new PartEventListenerCollection());
 				}
 
 				events.Add(eventTime, TypeDict);
@@ -283,8 +293,8 @@ namespace MscModApi.Parts.ReplacePart
 		/// </summary>
 		public override bool installBlocked
 		{
-			get => triggerFsmGameObject.activeSelf;
-			set => triggerFsmGameObject.SetActive(!value);
+			get => triggerFsmGameObjectCollider.enabled;
+			set => triggerFsmGameObjectCollider.enabled = !value;
 		}
 
 		/// <summary>
@@ -298,7 +308,7 @@ namespace MscModApi.Parts.ReplacePart
 		/// (only set when using advanced bolted state detection)
 		/// 
 		/// </summary>
-		protected float maxTightness { get; set; }
+		public float maxTightness { get; protected set; }
 
 		/// <summary>
 		/// The main Fsm GameObject
@@ -358,6 +368,7 @@ namespace MscModApi.Parts.ReplacePart
 		/// The trigger fsm gameObject (deals with installing the part onto the car)
 		/// </summary>
 		public GameObject triggerFsmGameObject { get; protected set; }
+		protected Collider triggerFsmGameObjectCollider { get; set; }
 
 		/// <inheritdoc />
 		public override bool bought
@@ -411,6 +422,9 @@ namespace MscModApi.Parts.ReplacePart
 		}
 
 		/// <inheritdoc />
+		public override bool hasBolts => dataFsm.FsmVariables.FindFsmBool("Bolted") != null;
+
+		/// <inheritdoc />
 		public override bool installedOnCar => gameObject.transform.root == CarH.satsuma.transform;
 
 		/// <inheritdoc />
@@ -434,7 +448,12 @@ namespace MscModApi.Parts.ReplacePart
 		/// </summary>
 		public override void Uninstall()
 		{
+			if (!removalFsm.enabled)
+			{
+				removalFsm.enabled = true;
+			}
 			removalFsm.SendEvent("REMOVE");
+
 		}
 
 		public override void ResetToDefault(bool uninstall = false)
@@ -490,9 +509,9 @@ namespace MscModApi.Parts.ReplacePart
 					}
 
 					alreadyCalledPreUnbolted = true;
-					GetEvents(PartEvent.Time.Pre, PartEvent.Type.Unbolted).InvokeAll();
+					GetEventListeners(PartEvent.Time.Pre, PartEvent.Type.Unbolted).InvokeAll();
 					if (installedOnCar) {
-						GetEvents(PartEvent.Time.Pre, PartEvent.Type.UnboltedOnCar).InvokeAll();
+						GetEventListeners(PartEvent.Time.Pre, PartEvent.Type.UnboltedOnCar).InvokeAll();
 					}
 
 					break;
@@ -502,9 +521,9 @@ namespace MscModApi.Parts.ReplacePart
 					}
 
 					alreadyCalledPostUnbolted = true;
-					GetEvents(PartEvent.Time.Post, PartEvent.Type.Unbolted).InvokeAll();
+					GetEventListeners(PartEvent.Time.Post, PartEvent.Type.Unbolted).InvokeAll();
 					if (installedOnCar) {
-						GetEvents(PartEvent.Time.Post, PartEvent.Type.UnboltedOnCar).InvokeAll();
+						GetEventListeners(PartEvent.Time.Post, PartEvent.Type.UnboltedOnCar).InvokeAll();
 					}
 
 					break;
@@ -532,9 +551,9 @@ namespace MscModApi.Parts.ReplacePart
 					}
 
 					alreadyCalledPreBolted = true;
-					GetEvents(PartEvent.Time.Pre, PartEvent.Type.Bolted).InvokeAll();
+					GetEventListeners(PartEvent.Time.Pre, PartEvent.Type.Bolted).InvokeAll();
 					if (installedOnCar) {
-						GetEvents(PartEvent.Time.Pre, PartEvent.Type.BoltedOnCar).InvokeAll();
+						GetEventListeners(PartEvent.Time.Pre, PartEvent.Type.BoltedOnCar).InvokeAll();
 					}
 
 					break;
@@ -544,9 +563,9 @@ namespace MscModApi.Parts.ReplacePart
 					}
 
 					alreadyCalledPostBolted = true;
-					GetEvents(PartEvent.Time.Post, PartEvent.Type.Bolted).InvokeAll();
+					GetEventListeners(PartEvent.Time.Post, PartEvent.Type.Bolted).InvokeAll();
 					if (installedOnCar) {
-						GetEvents(PartEvent.Time.Post, PartEvent.Type.BoltedOnCar).InvokeAll();
+						GetEventListeners(PartEvent.Time.Post, PartEvent.Type.BoltedOnCar).InvokeAll();
 					}
 
 					break;
@@ -559,15 +578,17 @@ namespace MscModApi.Parts.ReplacePart
 		/// <param name="eventTime"></param>
 		/// <param name="Type"></param>
 		/// <returns></returns>
-		public List<Action> GetEvents(PartEvent.Time eventTime, PartEvent.Type Type)
+		public PartEventListenerCollection GetEventListeners(PartEvent.Time eventTime, PartEvent.Type Type)
 		{
 			return events[eventTime][Type];
 		}
 
 		/// <inheritdoc />
-		public void AddEventListener(PartEvent.Time eventTime, PartEvent.Type Type, Action action,
+		public PartEventListener AddEventListener(PartEvent.Time eventTime, PartEvent.Type Type, Action action,
 			bool invokeActionIfConditionMet = true)
 		{
+			PartEventListener partEventListener = new PartEventListener(eventTime, Type, action);
+
 			if (
 				eventTime == PartEvent.Time.Pre
 				&& (Type == PartEvent.Type.InstallOnCar || Type == PartEvent.Type.UninstallFromCar)
@@ -575,7 +596,7 @@ namespace MscModApi.Parts.ReplacePart
 				throw new Exception($"Event {Type} can't be detected at '{eventTime}'. Unsupported!");
 			}
 
-			events[eventTime][Type].Add(action);
+			events[eventTime][Type].Add(partEventListener);
 
 			if (invokeActionIfConditionMet && eventTime == PartEvent.Time.Post) {
 				switch (Type) {
@@ -632,6 +653,15 @@ namespace MscModApi.Parts.ReplacePart
 						break;
 				}
 			}
+
+			return partEventListener;
+		}
+
+		/// <inheritdoc />
+		public bool RemoveEventListener(PartEventListener partEventListener)
+		{
+			var collection = GetEventListeners(partEventListener.eventTime, partEventListener.type);
+			return collection.Contains(partEventListener) && collection.Remove(partEventListener);
 		}
 
 		/// <summary>

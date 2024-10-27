@@ -84,6 +84,7 @@ namespace MscModApi.Parts.ReplacePart
 		}
 
 		public override bool bolted => part.bolted;
+		public override bool hasBolts => part.hasBolts;
 
 		/// <inheritdoc />
 		public override bool installedOnCar => part.installedOnCar;

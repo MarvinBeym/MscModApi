@@ -75,6 +75,7 @@ namespace MscModApi.Parts.ReplacePart
 			}
 		}
 
+		public override bool hasBolts => true;
 		public override bool installedOnCar => gameObject.transform.root == CarH.satsuma;
 
 		public void Install(bool install)

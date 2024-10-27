@@ -1,8 +1,7 @@
-﻿using MscModApi.Shopping;
-using MscModApi.Tools;
+﻿using MscModApi.Tools;
 using UnityEngine;
 
-namespace MscModApi.Parts
+namespace MscModApi.Parts.PartBox
 {
 	/// <summary>
 	/// A box that contains multiple parts that are the same. Adds a numeric index to the part name and automatically creates the parts

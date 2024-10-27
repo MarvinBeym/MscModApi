@@ -1,8 +1,7 @@
-﻿using MscModApi.Parts;
-using System;
+﻿using MscModApi.Parts.EventSystem;
 using UnityEngine;
 
-namespace MscModApi.Trigger
+namespace MscModApi.Parts.Trigger
 {
 	/// <summary>
 	/// Wrapper around trigger logic of parts

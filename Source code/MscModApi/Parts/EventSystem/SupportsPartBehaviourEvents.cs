@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using UnityEngine;
+﻿using UnityEngine;
 
-namespace MscModApi.Parts
+namespace MscModApi.Parts.EventSystem
 {
 	/// <summary>
 	/// Classes implementing this interface can add Unity Behaviors that will be enabled/disabled when the used PartEvent.Type gets triggered

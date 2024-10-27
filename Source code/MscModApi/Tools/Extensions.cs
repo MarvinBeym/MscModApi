@@ -4,6 +4,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text.RegularExpressions;
 using HutongGames.PlayMaker;
+using MscModApi.Parts.EventSystem;
+using MscModApi.Parts.ReplacePart;
 using UnityEngine;
 
 namespace MscModApi.Tools
@@ -106,6 +108,186 @@ namespace MscModApi.Tools
 		public static string ToStringOrEmpty(this object value)
 		{
 			return value == null ? "" : value.ToString();
+		}
+
+		/// <summary>
+		/// Returns if all parts in the list have the event type fulfilled
+		/// </summary>
+		/// <param name="parts">The list of parts</param>
+		/// <param name="type">The PartEvent.Type to check all parts against</param>
+		/// <returns>True if all parts in the list fulfill the type</returns>
+		public static bool AllHaveState(this List<BasicPart> parts, PartEvent.Type type)
+		{
+			switch (type)
+			{
+				case PartEvent.Type.Install:
+					return parts.All(part => part.installed);
+				case PartEvent.Type.Uninstall:
+					return parts.All(part => !part.installed);
+				case PartEvent.Type.Bolted:
+					return parts.All(part => part.bolted);
+				case PartEvent.Type.Unbolted:
+					return parts.All(part => !part.bolted);
+				case PartEvent.Type.InstallOnCar:
+					return parts.All(part => part.installedOnCar);
+				case PartEvent.Type.UninstallFromCar:
+					return parts.All(part => !part.installedOnCar);
+				case PartEvent.Type.BoltedOnCar:
+					return parts.All(part => part.bolted && part.installedOnCar);
+				case PartEvent.Type.UnboltedOnCar:
+					return parts.All(part => !part.bolted && part.installedOnCar);
+			}
+			throw new Exception($"Unsupported PartEvent.Type '{type}' used");
+		}
+
+		/// <summary>
+		/// Returns if all parts in the list have the event type fulfilled
+		/// </summary>
+		/// <param name="parts">The list of parts</param>
+		/// <param name="type">The PartEvent.Type to check all parts against</param>
+		/// <returns>True if all parts in the list fulfill the type</returns>
+		public static bool AllHaveState(this List<Part> parts, PartEvent.Type type)
+		{
+			switch (type)
+			{
+				case PartEvent.Type.Install:
+					return parts.All(part => part.installed);
+				case PartEvent.Type.Uninstall:
+					return parts.All(part => !part.installed);
+				case PartEvent.Type.Bolted:
+					return parts.All(part => part.bolted);
+				case PartEvent.Type.Unbolted:
+					return parts.All(part => !part.bolted);
+				case PartEvent.Type.InstallOnCar:
+					return parts.All(part => part.installedOnCar);
+				case PartEvent.Type.UninstallFromCar:
+					return parts.All(part => !part.installedOnCar);
+				case PartEvent.Type.BoltedOnCar:
+					return parts.All(part => part.bolted && part.installedOnCar);
+				case PartEvent.Type.UnboltedOnCar:
+					return parts.All(part => !part.bolted && part.installedOnCar);
+			}
+			throw new Exception($"Unsupported PartEvent.Type '{type}' used");
+		}
+
+		/// <summary>
+		/// Returns if all parts in the list have the event type fulfilled
+		/// </summary>
+		/// <param name="parts">The list of parts</param>
+		/// <param name="type">The PartEvent.Type to check all parts against</param>
+		/// <returns>True if all parts in the list fulfill the type</returns>
+		public static bool AllHaveState(this IEnumerable<GamePart> parts, PartEvent.Type type)
+		{
+			switch (type)
+			{
+				case PartEvent.Type.Install:
+					return parts.All(part => part.installed);
+				case PartEvent.Type.Uninstall:
+					return parts.All(part => !part.installed);
+				case PartEvent.Type.Bolted:
+					return parts.All(part => part.bolted);
+				case PartEvent.Type.Unbolted:
+					return parts.All(part => !part.bolted);
+				case PartEvent.Type.InstallOnCar:
+					return parts.All(part => part.installedOnCar);
+				case PartEvent.Type.UninstallFromCar:
+					return parts.All(part => !part.installedOnCar);
+				case PartEvent.Type.BoltedOnCar:
+					return parts.All(part => part.bolted && part.installedOnCar);
+				case PartEvent.Type.UnboltedOnCar:
+					return parts.All(part => !part.bolted && part.installedOnCar);
+			}
+			throw new Exception($"Unsupported PartEvent.Type '{type}' used");
+		}
+
+		/// <summary>
+		/// Returns if any parts in the list have the event type fulfilled
+		/// </summary>
+		/// <param name="parts">The list of parts</param>
+		/// <param name="type">The PartEvent.Type to check all parts against</param>
+		/// <returns>True if any part fulfills  the type</returns>
+		public static bool AnyHaveState(this IEnumerable<BasicPart> parts, PartEvent.Type type)
+		{
+			switch (type)
+			{
+				case PartEvent.Type.Install:
+					return parts.Any(part => part.installed);
+				case PartEvent.Type.Uninstall:
+					return parts.Any(part => !part.installed);
+				case PartEvent.Type.Bolted:
+					return parts.Any(part => part.bolted);
+				case PartEvent.Type.Unbolted:
+					return parts.Any(part => !part.bolted);
+				case PartEvent.Type.InstallOnCar:
+					return parts.Any(part => part.installedOnCar);
+				case PartEvent.Type.UninstallFromCar:
+					return parts.Any(part => !part.installedOnCar);
+				case PartEvent.Type.BoltedOnCar:
+					return parts.Any(part => part.bolted && part.installedOnCar);
+				case PartEvent.Type.UnboltedOnCar:
+					return parts.Any(part => !part.bolted && part.installedOnCar);
+			}
+			throw new Exception($"Unsupported PartEvent.Type '{type}' used");
+		}
+
+		/// <summary>
+		/// Returns if any parts in the list have the event type fulfilled
+		/// </summary>
+		/// <param name="parts">The list of parts</param>
+		/// <param name="type">The PartEvent.Type to check all parts against</param>
+		/// <returns>True if any part fulfills  the type</returns>
+		public static bool AnyHaveState(this List<Part> parts, PartEvent.Type type)
+		{
+			switch (type)
+			{
+				case PartEvent.Type.Install:
+					return parts.Any(part => part.installed);
+				case PartEvent.Type.Uninstall:
+					return parts.Any(part => !part.installed);
+				case PartEvent.Type.Bolted:
+					return parts.Any(part => part.bolted);
+				case PartEvent.Type.Unbolted:
+					return parts.Any(part => !part.bolted);
+				case PartEvent.Type.InstallOnCar:
+					return parts.Any(part => part.installedOnCar);
+				case PartEvent.Type.UninstallFromCar:
+					return parts.Any(part => !part.installedOnCar);
+				case PartEvent.Type.BoltedOnCar:
+					return parts.Any(part => part.bolted && part.installedOnCar);
+				case PartEvent.Type.UnboltedOnCar:
+					return parts.Any(part => !part.bolted && part.installedOnCar);
+			}
+			throw new Exception($"Unsupported PartEvent.Type '{type}' used");
+		}
+
+		/// <summary>
+		/// Returns if any parts in the list have the event type fulfilled
+		/// </summary>
+		/// <param name="parts">The list of parts</param>
+		/// <param name="type">The PartEvent.Type to check all parts against</param>
+		/// <returns>True if any part fulfills  the type</returns>
+		public static bool AnyHaveState(this List<GamePart> parts, PartEvent.Type type)
+		{
+			switch (type)
+			{
+				case PartEvent.Type.Install:
+					return parts.Any(part => part.installed);
+				case PartEvent.Type.Uninstall:
+					return parts.Any(part => !part.installed);
+				case PartEvent.Type.Bolted:
+					return parts.Any(part => part.bolted);
+				case PartEvent.Type.Unbolted:
+					return parts.Any(part => !part.bolted);
+				case PartEvent.Type.InstallOnCar:
+					return parts.Any(part => part.installedOnCar);
+				case PartEvent.Type.UninstallFromCar:
+					return parts.Any(part => !part.installedOnCar);
+				case PartEvent.Type.BoltedOnCar:
+					return parts.Any(part => part.bolted && part.installedOnCar);
+				case PartEvent.Type.UnboltedOnCar:
+					return parts.Any(part => !part.bolted && part.installedOnCar);
+			}
+			throw new Exception($"Unsupported PartEvent.Type '{type}' used");
 		}
 	}
 }

@@ -1,7 +1,7 @@
 ﻿using MscModApi.Tools;
 using UnityEngine;
 
-namespace MscModApi.Parts
+namespace MscModApi.Parts.PartBox
 {
 	/// <summary>
 	/// Logic handling unpacking a Part from a PartBox object

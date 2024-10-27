@@ -89,6 +89,12 @@ namespace MscModApi.Parts
 		public abstract bool bolted { get; }
 
 		/// <summary>
+		/// Returns if the part uses any bolts
+		/// </summary>
+		public abstract bool hasBolts { get; }
+
+
+		/// <summary>
 		/// Returns if the part is currently installed on the car
 		/// </summary>
 		public abstract bool installedOnCar { get; }

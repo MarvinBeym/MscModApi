@@ -1,13 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using HutongGames.PlayMaker;
 using MSCLoader;
 using MscModApi.Caching;
+using MscModApi.Parts.EventSystem;
 using MscModApi.Parts.ReplacePart;
+using MscModApi.Parts.Trigger;
 using MscModApi.Tools;
-using MscModApi.Trigger;
 using UnityEngine;
-using static MscModApi.Parts.PartEvent;
+using static MscModApi.Parts.EventSystem.PartEvent;
 
 namespace MscModApi.Parts
 {
@@ -45,8 +47,8 @@ namespace MscModApi.Parts
 		/// <summary>
 		/// Stores all events that a developer may have added to this part object
 		/// </summary>
-		protected Dictionary<PartEvent.Time, Dictionary<PartEvent.Type, List<Action>>> events =
-			new Dictionary<PartEvent.Time, Dictionary<PartEvent.Type, List<Action>>>();
+		protected Dictionary<PartEvent.Time, Dictionary<PartEvent.Type, PartEventListenerCollection>> events =
+			new Dictionary<PartEvent.Time, Dictionary<PartEvent.Type, PartEventListenerCollection>>();
 
 		/// <inheritdoc />
 		protected Part()
@@ -146,6 +148,11 @@ namespace MscModApi.Parts
 		
 		protected List<Screw> savedScrews;
 
+		/// <summary>
+		/// Class for accessing with the PlayMakerFSM component added to every part
+		/// </summary>
+		public  FsmPartData fsmPartData;
+
 		public Collider collider { get; protected set; }
 
 		public TriggerWrapper trigger { get; protected set; }
@@ -156,7 +163,16 @@ namespace MscModApi.Parts
 
 		public bool hasParent => parent != null;
 
-		public override bool installBlocked { get; set; }
+		private bool _installBlocked = false;
+		public override bool installBlocked
+		{
+			get => _installBlocked;
+			set
+			{
+				_installBlocked = value;
+				fsmPartData.installBlocked = value;
+			}
+		}
 
 		public List<Screw> screws => partSave.screws;
 
@@ -222,7 +238,11 @@ namespace MscModApi.Parts
 		public override bool bought
 		{
 			get => partSave.bought == PartSave.BoughtState.Yes || partSave.bought == PartSave.BoughtState.NotConfigured;
-			set => partSave.bought = value ? PartSave.BoughtState.Yes : PartSave.BoughtState.No;
+			set
+			{
+				partSave.bought = value ? PartSave.BoughtState.Yes : PartSave.BoughtState.No;
+				fsmPartData.bought = value;
+			}
 		}
 
 		/// <inheritdoc />
@@ -258,10 +278,16 @@ namespace MscModApi.Parts
 
 		public override bool bolted
 		{
-			get { return screws.Count > 0 && screws.All(screw => screw.tightness == Screw.maxTightness) && installed; }
+			get
+			{
+				return (!hasBolts || screws.All(screw => screw.tightness == Screw.maxTightness)) && installed;
+			}
 		}
 
-		public override bool installedOnCar => installed && gameObject.transform.root == CarH.satsuma.transform;
+		/// <inheritdoc />
+		public override bool hasBolts => screws.Count > 0;
+
+	public override bool installedOnCar => installed && gameObject.transform.root == CarH.satsuma.transform;
 
 		protected void Setup(string id, string name, BasicPart parent, Vector3 installPosition,
 			Vector3 installRotation, PartBaseInfo partBaseInfo, bool uninstallWhenParentUninstalls,
@@ -327,15 +353,16 @@ namespace MscModApi.Parts
 			}
 
 			partBaseInfo.AddToPartsList(this);
+			fsmPartData = new FsmPartData(this);
 		}
 
 		protected void InitEventStorage()
 		{
 			foreach (PartEvent.Time eventTime in Enum.GetValues(typeof(PartEvent.Time))) {
-				Dictionary<PartEvent.Type, List<Action>> TypeDict = new Dictionary<PartEvent.Type, List<Action>>();
+				Dictionary<PartEvent.Type, PartEventListenerCollection> TypeDict = new Dictionary<PartEvent.Type, PartEventListenerCollection>();
 
 				foreach (PartEvent.Type Type in Enum.GetValues(typeof(PartEvent.Type))) {
-					TypeDict.Add(Type, new List<Action>());
+					TypeDict.Add(Type, new PartEventListenerCollection());
 				}
 
 				events.Add(eventTime, TypeDict);
@@ -377,6 +404,7 @@ namespace MscModApi.Parts
 			screw.SetPart(this);
 			screw.parentCollider = gameObject.GetComponent<Collider>();
 			partSave.screws.Add(screw);
+			fsmPartData.hasBolts.Value = true;
 
 			var index = partSave.screws.IndexOf(screw);
 
@@ -497,10 +525,12 @@ namespace MscModApi.Parts
 				() => { partToBlock.installBlocked = false; });
 		}
 
-		public void AddEventListener(PartEvent.Time eventTime, PartEvent.Type Type, Action action,
+		/// <inheritdoc />
+		public PartEventListener AddEventListener(PartEvent.Time eventTime, PartEvent.Type Type, Action action,
 			bool invokeActionIfConditionMet = true)
 		{
-			events[eventTime][Type].Add(action);
+			PartEventListener partEventListener = new PartEventListener(eventTime, Type, action);
+			events[eventTime][Type].Add(partEventListener);
 
 			if (invokeActionIfConditionMet && eventTime == PartEvent.Time.Post) {
 				switch (Type) {
@@ -555,9 +585,19 @@ namespace MscModApi.Parts
 						break;
 				}
 			}
+
+			return partEventListener;
 		}
 
-		public List<Action> GetEvents(PartEvent.Time eventTime, PartEvent.Type Type)
+		/// <inheritdoc />
+		public bool RemoveEventListener(PartEventListener partEventListener)
+		{
+			var collection = GetEventListeners(partEventListener.eventTime, partEventListener.type);
+			return collection.Contains(partEventListener) && collection.Remove(partEventListener);
+		}
+
+		/// <inheritdoc />
+		public PartEventListenerCollection GetEventListeners(PartEvent.Time eventTime, PartEvent.Type Type)
 		{
 			return events[eventTime][Type];
 		}
