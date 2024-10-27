@@ -24,11 +24,11 @@ namespace MscModApi
 		public override string ID => "MscModApi";
 		public override string Name => "MscModApi";
 		public override string Author => "DonnerPlays";
-		public override string Version => "1.4.0";
+		public override string Version => "1.4.1";
 
 		public override string Description =>
 			"A general modding 'help' featuring things like installable/boltable parts, shop, part boxing, utility tools & more.";
-
+		
 		public override bool UseAssetsFolder => true;
 		private static SettingsCheckBox showBoltSizeSetting;
 
