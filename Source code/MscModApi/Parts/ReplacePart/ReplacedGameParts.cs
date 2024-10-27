@@ -23,7 +23,7 @@ namespace MscModApi.Parts.ReplacePart
 		/// <summary>
 		/// The name of the save file that will be created in the mods folder
 		/// </summary>
-		protected const string saveFileName = "replacedGameParts_saveFile.json";
+		public const string saveFileName = "replacedGameParts_saveFile.json";
 
 		/// <summary>
 		/// Dictionary(Mod-ID => Dictionary(ReplacedGameParts-ID => ReplacedGameParts))

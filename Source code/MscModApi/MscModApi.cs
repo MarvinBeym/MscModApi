@@ -10,6 +10,7 @@ using MscModApi.PaintingSystem;
 using MscModApi.Parts.EventSystem;
 using MscModApi.Parts.PartBox;
 using MscModApi.Parts.ReplacePart;
+using MscModApi.Saving;
 using UnityEngine;
 
 namespace MscModApi
@@ -79,6 +80,7 @@ namespace MscModApi
 			SaveLoad.SerializeSaveFile(mod, new Dictionary<string, PartSave>(), saveFileName);
 			SaveLoad.SerializeSaveFile(mod, new Dictionary<string, SerializableColor>(),
 				"paintingSystem_saveFile.json");
+			SaveLoad.SerializeSaveFile(mod, new Dictionary<string, Dictionary<string, GamePartSave>>(), ReplacedGameParts.saveFileName);
 		}
 
 		private void MenuLoad()
