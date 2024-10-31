@@ -347,7 +347,7 @@ namespace MscModApi.Parts.ReplacePart
 				partEventListener = newPart.AddEventListener(PartEvent.Time.Post, PartEvent.Type.Bolted, boltedAction);
 				StoreEventListenerReference(newPart, partEventListener);
 
-				partEventListener = newPart.AddEventListener(PartEvent.Time.Post, PartEvent.Type.Unbolted, unboltedAction);
+				partEventListener = newPart.AddEventListener(PartEvent.Time.Post, PartEvent.Type.Unbolted, unboltedAction, false);
 				StoreEventListenerReference(newPart, partEventListener);
 			}
 			else
@@ -355,7 +355,7 @@ namespace MscModApi.Parts.ReplacePart
 				partEventListener = newPart.AddEventListener(PartEvent.Time.Post, PartEvent.Type.Install, boltedAction);
 				StoreEventListenerReference(newPart, partEventListener);
 
-				partEventListener = newPart.AddEventListener(PartEvent.Time.Post, PartEvent.Type.Uninstall, unboltedAction);
+				partEventListener = newPart.AddEventListener(PartEvent.Time.Post, PartEvent.Type.Uninstall, unboltedAction, false);
 				StoreEventListenerReference(newPart, partEventListener);
 			}
 
@@ -445,6 +445,10 @@ namespace MscModApi.Parts.ReplacePart
 			{
 				foreach (var originalPart in originalParts)
 				{
+					if (originalPart.installedOnCar)
+					{
+						continue;
+					}
 					originalPart.installedState.Value = state;
 					originalPart.boltedState.Value = state;
 					originalPart.tightness.Value = state ? originalPart.maxTightness : 0;
