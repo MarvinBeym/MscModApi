@@ -111,10 +111,9 @@ namespace MscModApi.Parts.ReplacePart
 
 			tightness = boltCheckFsm.FsmVariables.FindFsmFloat("Tightness");
 
-			AddActionAsFirst(assemblyFsm.FindState("Assemble"),
-				() => { GetEventListeners(PartEvent.Time.Pre, PartEvent.Type.Install).InvokeAll(); });
+			assemblyFsm.FindState("Assemble").AddActionAsFirst(() => { GetEventListeners(PartEvent.Time.Pre, PartEvent.Type.Install).InvokeAll(); });
 
-			AddActionAsLast(assemblyFsm.FindState("End"), () =>
+			assemblyFsm.FindState("End").AddActionAsLast(() =>
 			{
 				GetEventListeners(PartEvent.Time.Post, PartEvent.Type.Install).InvokeAll();
 				if (installedOnCar) {
@@ -122,9 +121,8 @@ namespace MscModApi.Parts.ReplacePart
 				}
 			});
 
-			AddActionAsFirst(removalFsm.FindState("Remove part"),
-				() => { GetEventListeners(PartEvent.Time.Pre, PartEvent.Type.Uninstall).InvokeAll(); });
-			AddActionAsLast(removalFsm.FindState("Remove part"), () =>
+			removalFsm.FindState("Remove part").AddActionAsFirst(() => { GetEventListeners(PartEvent.Time.Pre, PartEvent.Type.Uninstall).InvokeAll(); });
+			removalFsm.FindState("Remove part").AddActionAsLast(() =>
 			{
 				GetEventListeners(PartEvent.Time.Post, PartEvent.Type.Uninstall).InvokeAll();
 				if (!installedOnCar) {
@@ -199,11 +197,11 @@ namespace MscModApi.Parts.ReplacePart
 					boltFsm.InitializeFSM();
 				}
 
-				AddActionAsFirst(tightState, () => OnTight(PartEvent.Time.Pre));
-				AddActionAsLast(tightState, () => OnTight(PartEvent.Time.Post));
+				tightState.AddActionAsFirst(() => OnTight(PartEvent.Time.Pre));
+				tightState.AddActionAsLast(() => OnTight(PartEvent.Time.Post));
 
-				AddActionAsFirst(unscrewPreState, () => OnUnscrew(PartEvent.Time.Pre));
-				AddActionAsLast(unscrewPostState, () => OnUnscrew(PartEvent.Time.Post));
+				unscrewPreState.AddActionAsFirst(() => OnUnscrew(PartEvent.Time.Pre));
+				unscrewPostState.AddActionAsLast(() => OnUnscrew(PartEvent.Time.Post));
 				maxTightness += 8;
 			}
 		}
@@ -214,7 +212,7 @@ namespace MscModApi.Parts.ReplacePart
 		/// </summary>
 		protected void SetupSimpleBoltedStateDetection()
 		{
-			AddActionAsFirst(boltCheckFsm.FindState("Bolts OFF"), () =>
+			boltCheckFsm.FindState("Bolts OFF").AddActionAsFirst(() =>
 			{
 				alreadyCalledPreBolted = false;
 
@@ -227,7 +225,7 @@ namespace MscModApi.Parts.ReplacePart
 					GetEventListeners(PartEvent.Time.Pre, PartEvent.Type.UnboltedOnCar).InvokeAll();
 				}
 			});
-			AddActionAsLast(boltCheckFsm.FindState("Bolts OFF"), () =>
+			boltCheckFsm.FindState("Bolts OFF").AddActionAsLast(() =>
 			{
 				alreadyCalledPostBolted = false;
 
@@ -243,7 +241,7 @@ namespace MscModApi.Parts.ReplacePart
 			});
 
 
-			AddActionAsFirst(boltCheckFsm.FindState("Bolts ON"), () =>
+			boltCheckFsm.FindState("Bolts ON").AddActionAsFirst(() =>
 			{
 				alreadyCalledPreUnbolted = false;
 
@@ -256,7 +254,7 @@ namespace MscModApi.Parts.ReplacePart
 					GetEventListeners(PartEvent.Time.Pre, PartEvent.Type.BoltedOnCar).InvokeAll();
 				}
 			});
-			AddActionAsLast(boltCheckFsm.FindState("Bolts ON"), () =>
+			boltCheckFsm.FindState("Bolts ON").AddActionAsLast(() =>
 			{
 				alreadyCalledPostUnbolted = false;
 
@@ -464,33 +462,6 @@ namespace MscModApi.Parts.ReplacePart
 
 			position = defaultPosition;
 			rotation = defaultRotation;
-		}
-
-		/// <summary>
-		/// Helper method for adding an Action to an fsmState as the first item in the actions list
-		/// </summary>
-		protected void AddActionAsFirst(FsmState fsmState, Action action)
-		{
-			if (fsmState == null) {
-				return;
-			}
-
-			var actions = new List<FsmStateAction>(fsmState.Actions);
-			actions.Insert(0, new FsmAction(action));
-			fsmState.Actions = actions.ToArray();
-		}
-
-		/// <summary>
-		/// Helper method for adding an Action to an fsmState as the last item in the actions list
-		/// </summary>
-		protected void AddActionAsLast(FsmState fsmState, Action action)
-		{
-			if (fsmState == null) {
-				return;
-			}
-
-			var actions = new List<FsmStateAction>(fsmState.Actions) { new FsmAction(action) };
-			fsmState.Actions = actions.ToArray();
 		}
 
 		/// <summary>
