@@ -28,7 +28,7 @@ namespace MscModApi.Parts.ReplacePart
 		/// <summary>
 		/// Dictionary(Mod-ID => Dictionary(ReplacedGameParts-ID => ReplacedGameParts))
 		/// </summary>
-		protected static Dictionary<string, List<ReplacedGameParts>> modsParts;
+		internal static Dictionary<string, List<ReplacedGameParts>> modsParts;
 
 		/// <summary>
 		/// Storage for the event actions
@@ -519,12 +519,12 @@ namespace MscModApi.Parts.ReplacePart
 								action.Invoke();
 							}
 
-						break;
-					case ReplacedGamePartsEvent.Type.AllNewBolted:
-						if (newParts.AllHaveState(PartEvent.Type.Bolted) && requiredNonReplacingParts.AllHaveState(PartEvent.Type.Bolted))
-						{
-							action.Invoke();
-						}
+							break;
+						case ReplacedGamePartsEvent.Type.AllNewBolted:
+							if (newParts.AllHaveState(PartEvent.Type.Bolted) &&requiredNonReplacingParts.AllHaveState(PartEvent.Type.Bolted))
+							{
+								action.Invoke();
+							}
 
 							break;
 						case ReplacedGamePartsEvent.Type.AnyNewUnbolted:
