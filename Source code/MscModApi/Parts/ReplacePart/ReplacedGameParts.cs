@@ -489,24 +489,35 @@ namespace MscModApi.Parts.ReplacePart
 		/// <inheritdoc />
 		public ReplacedPartEventListener AddEventListener(ReplacedGamePartsEvent.Type type, Action action, bool invokeActionIfConditionMet = true)
 		{
-			events[type].Add(action);
-
-			if (invokeActionIfConditionMet)
+			if (type == ReplacedGamePartsEvent.Type.Initialized)
 			{
-				switch (type)
+				events[type].Add(action);
+			}
+
+			Action wrapperAction = () =>
+			{
+				//Already added, do not add twice
+				if (type != ReplacedGamePartsEvent.Type.Initialized)
 				{
-					//ToDo: check if invoking just the newly added action is enough of if all have to be invoked
-					case ReplacedGamePartsEvent.Type.AllNewInstalled:
-						if (newParts.AllHaveState(PartEvent.Type.Install) && requiredNonReplacingParts.AllHaveState(PartEvent.Type.Install))
-						{
-							action.Invoke();
-						}
-						break;
-					case ReplacedGamePartsEvent.Type.AnyNewUninstalled:
-						if (newParts.AnyHaveState(PartEvent.Type.Uninstall) || requiredNonReplacingParts.AnyHaveState(PartEvent.Type.Uninstall))
-						{
-							action.Invoke();
-						}
+					events[type].Add(action);
+				}
+
+				if (invokeActionIfConditionMet)
+				{
+					switch (type)
+					{
+						//ToDo: check if invoking just the newly added action is enough of if all have to be invoked
+						case ReplacedGamePartsEvent.Type.AllNewInstalled:
+							if (newParts.AllHaveState(PartEvent.Type.Install) &&requiredNonReplacingParts.AllHaveState(PartEvent.Type.Install))
+							{
+								action.Invoke();
+							}
+							break;
+						case ReplacedGamePartsEvent.Type.AnyNewUninstalled:
+							if (newParts.AnyHaveState(PartEvent.Type.Uninstall) ||requiredNonReplacingParts.AnyHaveState(PartEvent.Type.Uninstall))
+							{
+								action.Invoke();
+							}
 
 						break;
 					case ReplacedGamePartsEvent.Type.AllNewBolted:
@@ -531,6 +542,17 @@ namespace MscModApi.Parts.ReplacePart
 					}
 				}
 			};
+
+			if (initialized)
+			{
+				wrapperAction.Invoke();
+			}
+			else if (type != ReplacedGamePartsEvent.Type.Initialized)
+			{
+				AddEventListener(ReplacedGamePartsEvent.Type.Initialized, () =>
+				{
+					wrapperAction.Invoke();
+				});
 			}
 
 			return new ReplacedPartEventListener(type, action);
