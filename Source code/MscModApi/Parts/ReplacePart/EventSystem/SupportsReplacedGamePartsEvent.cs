@@ -10,6 +10,8 @@ namespace MscModApi.Parts.ReplacePart.EventSystem
 	{
 		/// <summary>
 		/// Adds an action to the part that get's triggered on different events (eg when part is installed or bolted).
+		/// If the ReplacedGameParts hasn't been initialized yet, events are wrapped into an ReplacedGamePartsEvent.Type.Initialized and added after the object was initialized.
+		/// ReplacedGamePartsEvent.Type.Initialized events are always added even when not yet initialized (obviously)
 		/// </summary>
 		/// <param name="Type">The type of event to listen to</param>
 		/// <param name="action">The action to execute when the event occurs</param>
@@ -19,7 +21,8 @@ namespace MscModApi.Parts.ReplacePart.EventSystem
 			bool invokeActionIfConditionMet = true);
 
 		/// <summary>
-		/// Remove an event listener from the part
+		/// Remove an event listener from the part (only when the ReplacedGameParts was initialized, before that no events are stored)
+		/// (Excluding ReplacedGamePartsEvent.Type.Initialized which is available and can be removed)
 		/// </summary>
 		/// <param name="Type">The type of event the action was added to</param>
 		/// <param name="action">The action to remove</param>
@@ -27,7 +30,7 @@ namespace MscModApi.Parts.ReplacePart.EventSystem
 		bool RemoveEventListener(ReplacedPartEventListener partEventListener);
 
 		/// <summary>
-		/// Returns all actions added to a part
+		/// Returns all Events added (May differ depending on if the ReplacedGameParts has been initialized or not)
 		/// </summary>
 		/// <param name="Type">The type of event</param>
 		/// <returns>A list object of all actions (in order of added)</returns>

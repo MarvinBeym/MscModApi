@@ -26,6 +26,11 @@
 			/// Any new part unbolted
 			/// </summary>
 			AnyNewUnbolted,
+
+			/// <summary>
+			/// Triggered when the ReplaceGameParts is initialized after the game & satsuma are fully loaded
+			/// </summary>
+			Initialized,
 		}
 	}
 }
