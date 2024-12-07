@@ -35,6 +35,11 @@ namespace MscModApi.Parts.ReplacePart
 				yield return null;
 			}
 
+			if (ReplacedGameParts.modsParts.Count == 0)
+			{
+				yield break;
+			}
+
 			float currentTime = 0;
 			FsmBool playerStop = FsmVariables.GlobalVariables.FindFsmBool("PlayerStop");
 			playerStop.Value = true;
