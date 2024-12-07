@@ -1,6 +1,8 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using HutongGames.PlayMaker.Actions;
 using MSCLoader;
 using MscModApi.Caching;
 using MscModApi.Parts.EventSystem;
@@ -24,6 +26,8 @@ namespace MscModApi.Parts.ReplacePart
 		/// The name of the save file that will be created in the mods folder
 		/// </summary>
 		public const string saveFileName = "replacedGameParts_saveFile.json";
+
+		private ReplacedGamePartsLogic replacedGamePartsLogic;
 
 		/// <summary>
 		/// Dictionary(Mod-ID => Dictionary(ReplacedGameParts-ID => ReplacedGameParts))
@@ -107,6 +111,9 @@ namespace MscModApi.Parts.ReplacePart
 				});
 			}
 
+			GameObject replacedGamePartsLogicGameObject = new GameObject($"ReplacedGameParts-{id}");
+			replacedGamePartsLogic = replacedGamePartsLogicGameObject.AddComponent<ReplacedGamePartsLogic>();
+
 			AddEventListener(ReplacedGamePartsEvent.Type.Initialized, InitEvent);
 		}
 
@@ -119,33 +126,44 @@ namespace MscModApi.Parts.ReplacePart
 		/// <returns></returns>
 		public bool AddNewPart(Part newPart, bool requiredNonReplacing)
 		{
-			if (!initialized)
-			{
-				throw new ReplacedGamePartsNotInitializedException();
+			if (
+				(requiredNonReplacing && requiredNonReplacingParts.Contains(newPart)) 
+				|| (!requiredNonReplacing && newParts.Contains(newPart))
+			) {
+				return false;
 			}
 
-			if (requiredNonReplacing)
+			Action wrapperAction = () =>
 			{
-				if (requiredNonReplacingParts.Contains(newPart))
+				if (requiredNonReplacing)
 				{
-					return false;
+					if (!requiredNonReplacingParts.Contains(newPart))
+					{
+						SetupRequiredNonReplacingPart(newPart);
+						requiredNonReplacingParts.Add(newPart);
+					}
+				}
+				else
+				{
+					if (!newParts.Contains(newPart))
+					{
+						SetupNewPart(newPart);
+						newParts.Add(newPart);
+					}
 				}
 
-				SetupRequiredNonReplacingPart(newPart);
-				requiredNonReplacingParts.Add(newPart);
+				SetReplacedState(replaced);
+			};
+
+
+			if (initialized)
+			{
+				wrapperAction.Invoke();
 			}
 			else
 			{
-				if (newParts.Contains(newPart))
-				{
-					return false;
-				}
-
-				SetupNewPart(newPart);
-				newParts.Add(newPart);
+				AddEventListener(ReplacedGamePartsEvent.Type.Initialized, wrapperAction);
 			}
-
-			SetReplacedState(replaced);
 
 			return true;
 		}
@@ -160,32 +178,42 @@ namespace MscModApi.Parts.ReplacePart
 		/// <returns></returns>
 		public bool RemoveNewPart(Part newPart, bool requiredNonReplacing = false)
 		{
-			if (!initialized)
-			{
-				throw new ReplacedGamePartsNotInitializedException();
+			if (
+				(requiredNonReplacing && !requiredNonReplacingParts.Contains(newPart))
+				|| (!requiredNonReplacing && !newParts.Contains(newPart))
+			) {
+				return false;
 			}
 
-			if (requiredNonReplacing)
+			Action wrapperAction = () =>
 			{
-				if (!requiredNonReplacingParts.Contains(newPart))
+				if (requiredNonReplacing)
 				{
-					return false;
+					if (requiredNonReplacingParts.Contains(newPart))
+					{
+						requiredNonReplacingParts.Remove(newPart);
+					}
+				}
+				else
+				{
+					if (newParts.Contains(newPart))
+					{
+						newParts.Remove(newPart);
+					}
+
 				}
 
-				
-				requiredNonReplacingParts.Remove(newPart);
+				ClearEventListenersFromPart(newPart);
+			};
+
+			if (initialized)
+			{
+				wrapperAction.Invoke();
 			}
 			else
 			{
-				if (!newParts.Contains(newPart))
-				{
-					return false;
-				}
-
-				newParts.Remove(newPart);
+				AddEventListener(ReplacedGamePartsEvent.Type.Initialized, wrapperAction);
 			}
-
-			ClearEventListenersFromPart(newPart);
 
 			return true;
 		}
@@ -466,12 +494,35 @@ namespace MscModApi.Parts.ReplacePart
 		/// <param name="force">If set to true, will even set the replaced state if the originalPart is installed on car (root parent is satsuma) (DANGER)</param>
 		public void SetReplacedState(bool state, bool force = false)
 		{
-			if (!initialized)
+			Action wrapperAction = () =>
 			{
-				throw new ReplacedGamePartsNotInitializedException();
-			}
+				if (force || !originalParts.AllHaveState(PartEvent.Type.InstallOnCar))
+				{
+					/*
+					 * Since the introduction of the initializing requirement to fix part disassembling, the bolted state refuses to stick on initial load.
+					 * A fix/solution is setting making sure the tightness is set to at least 1 prior to setting the bolted state
+					 * This however results in the parts falling through the floor
+					 * Alternative solution: Start a Coroutine to keep trying to set the state until it sticks
+					 */
+					replacedGamePartsLogic.StartCoroutine(AwaitReplacedStateSet(state));
+				}
+			};
 
-			if (force || !originalParts.AllHaveState(PartEvent.Type.InstallOnCar))
+			if (initialized)
+			{
+				wrapperAction.Invoke();
+			}
+			else
+			{
+				AddEventListener(ReplacedGamePartsEvent.Type.Initialized, wrapperAction);
+			}
+		}
+
+		private IEnumerator AwaitReplacedStateSet(bool stateToSet)
+		{
+			while (!originalParts.All((originalPart =>
+				       originalPart.installedState.Value == stateToSet &&
+				       originalPart.boltedState.Value == stateToSet)))
 			{
 				foreach (var originalPart in originalParts)
 				{
@@ -479,10 +530,12 @@ namespace MscModApi.Parts.ReplacePart
 					{
 						continue;
 					}
-					originalPart.installedState.Value = state;
-					originalPart.boltedState.Value = state;
-					originalPart.tightness.Value = state ? originalPart.maxTightness : 0;
+					originalPart.installedState.Value = stateToSet;
+					//originalPart.tightness.Value = stateToSet ? originalPart.maxTightness : 0; // Do not set tightness value. Anything above 0 will cause parts to fall through floor.
+					originalPart.boltedState.Value = stateToSet;
 				}
+
+				yield return null;
 			}
 		}
 
@@ -549,10 +602,7 @@ namespace MscModApi.Parts.ReplacePart
 			}
 			else if (type != ReplacedGamePartsEvent.Type.Initialized)
 			{
-				AddEventListener(ReplacedGamePartsEvent.Type.Initialized, () =>
-				{
-					wrapperAction.Invoke();
-				});
+				AddEventListener(ReplacedGamePartsEvent.Type.Initialized, wrapperAction);
 			}
 
 			return new ReplacedPartEventListener(type, action);
