@@ -289,5 +289,34 @@ namespace MscModApi.Tools
 			}
 			throw new Exception($"Unsupported PartEvent.Type '{type}' used");
 		}
+
+		/// <summary>
+		/// Helper method for adding an Action to an fsmState as the first item in the actions list
+		/// </summary>
+		public static void AddActionAsFirst(this FsmState fsmState, Action action)
+		{
+			if (fsmState == null)
+			{
+				return;
+			}
+
+			var actions = new List<FsmStateAction>(fsmState.Actions);
+			actions.Insert(0, new FsmAction(action));
+			fsmState.Actions = actions.ToArray();
+		}
+
+		/// <summary>
+		/// Helper method for adding an Action to an fsmState as the last item in the actions list
+		/// </summary>
+		public static void AddActionAsLast(this FsmState fsmState, Action action)
+		{
+			if (fsmState == null)
+			{
+				return;
+			}
+
+			var actions = new List<FsmStateAction>(fsmState.Actions) { new FsmAction(action) };
+			fsmState.Actions = actions.ToArray();
+		}
 	}
 }

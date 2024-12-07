@@ -84,13 +84,13 @@
     <Compile Include="Parts\EventSystem\PartEvent.cs" />
     <Compile Include="Parts\EventSystem\PartEventListenerCollection.cs" />
     <Compile Include="Parts\ReplacePart\GamePart.cs" />
-    <Compile Include="Parts\ReplacePart\NewPart.cs" />
-    <Compile Include="Parts\ReplacePart\OldPart.cs" />
     <Compile Include="Parts\EventSystem\PartEventListener.cs" />
     <Compile Include="Parts\ReplacePart\EventSystem\ReplacedPartEventListener.cs" />
     <Compile Include="Parts\ReplacePart\EventSystem\ReplacedGamePartsEvent.cs" />
     <Compile Include="Parts\ReplacePart\ReplacedGameParts.cs" />
-    <Compile Include="Parts\ReplacePart\ReplacementPart.cs" />
+    <Compile Include="Parts\ReplacePart\ReplacedGamePartsDelayedInitializer.cs" />
+    <Compile Include="Parts\ReplacePart\ReplacedGamePartsLogic.cs" />
+    <Compile Include="Parts\ReplacePart\ReplacedGamePartsNotInitializedException.cs" />
     <Compile Include="Parts\PartBox\Box.cs" />
     <Compile Include="Parts\PartBox\BoxLogic.cs" />
     <Compile Include="Parts\PartBox\Kit.cs" />
