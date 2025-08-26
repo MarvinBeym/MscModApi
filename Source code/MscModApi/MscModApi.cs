@@ -24,12 +24,11 @@ namespace MscModApi
 		public override string ID => "MscModApi";
 		public override string Name => "MscModApi";
 		public override string Author => "DonnerPlays";
-		public override string Version => "1.4.2";
+		public override string Version => "1.4.3";
 
 		public override string Description =>
 			"A general modding 'help' featuring things like installable/boltable parts, shop, part boxing, utility tools & more.";
 		
-		public override bool UseAssetsFolder => true;
 		private static SettingsCheckBox showBoltSizeSetting;
 
 		private static SettingsCheckBox enableInstantInstall;
@@ -47,7 +46,7 @@ namespace MscModApi
 		private Screw previousScrew;
 
 #if DEBUG
-		private Keybind instantInstallKeybind;
+		private SettingsKeybind instantInstallKeybind;
 #endif
 
 		private bool updateLocked = true;
@@ -56,6 +55,8 @@ namespace MscModApi
 
 		public override void ModSetup()
 		{
+			SetupFunction(Setup.ModSettings, ModSettings);
+
 			SetupFunction(Setup.OnGUI, OnGui);
 			SetupFunction(Setup.PreLoad, PreLoad);
 			SetupFunction(Setup.OnLoad, Load);
@@ -66,7 +67,7 @@ namespace MscModApi
 			SetupFunction(Setup.Update, Update);
 		}
 
-		public override void ModSettings()
+		public void ModSettings()
 		{
 			showBoltSizeSetting = Settings.AddCheckBox(this, "showBoltSizeSetting", "Show screw size", false);
 			disableLoadingMovementLock = Settings.AddCheckBox(
@@ -78,8 +79,8 @@ namespace MscModApi
 
 
 #if DEBUG
-			Keybind.AddHeader(this, "Developer Area");
-			instantInstallKeybind = Keybind.Add(this, "instant-install", "Instant install part looking at", KeyCode.UpArrow);
+			Keybind.AddHeader( "Developer Area");
+			instantInstallKeybind = Keybind.Add(this.ID + "_instant-install", "Instant install part looking at", KeyCode.UpArrow);
 			enableInstantInstall = Settings.AddCheckBox(this, "enableInstantInstall", "Enable Instant Part install", false);
 #endif
 			ScrewPlacementAssist.ModSettings(this);
@@ -112,19 +113,23 @@ namespace MscModApi
 			ConsoleCommand.Add(new ScrewPlacementModCommand(this, modsParts));
 		}
 
-		private void Load()
+		private void PreLoad()
 		{
-			
-			updateLocked = false;
-			tool = new Tool();
 			PaintingSystem.PaintingSystem.Init();
 			Shop.Init();
 			
 			mscModApiGameObject = new GameObject(ID);
 			replacedGamePartsDelayedInitializer = mscModApiGameObject.AddComponent<ReplacedGamePartsDelayedInitializer>();
 		}
-		
-		private new void PostLoad()
+
+		private void Load()
+		{
+			updateLocked = false;
+			tool = new Tool();
+		}
+
+
+		private void PostLoad()
 		{
 			replacedGamePartsDelayedInitializer.InitOnceByUpdateFrame();
 		}
@@ -136,7 +141,7 @@ namespace MscModApi
 
 			foreach (var modParts in modsParts)
 			{
-				var mod = ModLoader.GetMod(modParts.Key);
+				var mod = Helper.GetMod(modParts.Key);
 
 				if (!modSaveFileMapping.TryGetValue(mod.ID, out var saveFileName))
 				{
@@ -174,7 +179,7 @@ namespace MscModApi
 			ReplacedGameParts.Save();
 		}
         
-		private new void Update()
+		private void Update()
 		{
 			if (updateLocked)
 			{

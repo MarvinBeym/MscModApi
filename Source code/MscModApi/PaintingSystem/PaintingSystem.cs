@@ -148,8 +148,8 @@ namespace MscModApi.PaintingSystem
 
 			sprayCanFsm.InitializeFSM();
 
-			FsmHook.FsmInject(sprayCan, "Stage 1", delegate() { state = State.NotPainting; });
-			FsmHook.FsmInject(sprayCan, "Painting", delegate() { state = State.Painting; });
+			sprayCan.FsmInject("Paint", "Stage 1", delegate() { state = State.NotPainting; });
+			sprayCan.FsmInject("Paint", "Painting", delegate() { state = State.Painting; });
 
 			availableMaterials = Resources.FindObjectsOfTypeAll<Material>();
 		}

@@ -9,7 +9,7 @@ namespace MscModApi.Tools
 {
 	public static class ScrewPlacementAssist
 	{
-		internal static Keybind keySelectPart;
+		internal static SettingsKeybind keySelectPart;
 
 		internal static Part selectedPart;
 		internal static Screw[] screws;
@@ -20,7 +20,7 @@ namespace MscModApi.Tools
 
 		internal static void ModSettings(Mod mod)
 		{
-			keySelectPart = Keybind.Add(mod, "screw-placement-select-part", "Select part", KeyCode.RightArrow);
+			keySelectPart = Keybind.Add("screw-placement-select-part", "Select part", KeyCode.RightArrow);
 		}
 
 		private static void CreateWindow(int windowID)
@@ -92,7 +92,7 @@ namespace MscModApi.Tools
 		internal static void HandlePartInteraction(Part part)
 		{
 			UserInteraction.GuiInteraction(
-				$"Press [{keySelectPart.Key}] to {(selectedPart == null ? "select" : "deselect")} part"
+				$"Press [{KeyCode.RightArrow}] to {(selectedPart == null ? "select" : "deselect")} part"
 			);
 
 			if (keySelectPart.GetKeybindDown()) {

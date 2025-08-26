@@ -728,7 +728,7 @@ namespace MscModApi.Parts.ReplacePart
 		{
 			foreach (var modParts in modsParts)
 			{
-				var mod = ModLoader.GetMod(modParts.Key);
+				var mod = Helper.GetMod(modParts.Key);
 
 				// Dictionary<replacedGameParts-id, Dictionary<gamePart-id, GamePartSave>>
 				var modPartSaves = new Dictionary<string, Dictionary<string, GamePartSave>>();

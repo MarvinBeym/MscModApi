@@ -143,5 +143,19 @@ namespace MscModApi.Tools
 
 			return null;
 		}
+
+		/// <summary>
+		/// Alternative to the now deprecated ModLoader.GetMod() function
+		/// </summary>
+		/// <param name="modId">ID of the mod</param>
+		/// <returns>Mod or null</returns>
+		public static Mod GetMod(string modId, bool ignoreEnabled = false)
+		{
+			if (ModLoader.IsModPresent(modId))
+			{
+				return ModLoader.LoadedMods.FirstOrDefault(mod => mod.ID.Equals(modId) && !mod.isDisabled);
+			}
+			return ignoreEnabled ? ModLoader.LoadedMods.FirstOrDefault(mod => mod.ID.Equals(modId)) : null;
+		}
 	}
 }

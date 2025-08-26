@@ -70,8 +70,8 @@ namespace MscModApi
 			selectItem = Cache.Find("PLAYER/Pivot/AnimPivot/Camera/FPSCamera/SelectItem").gameObject;
 			if (selectItem == null) return hasToolInHand;
 
-			FsmHook.FsmInject(selectItem, "Hand", delegate { hasToolInHand = false; });
-			FsmHook.FsmInject(selectItem, "Tools", delegate { hasToolInHand = true; });
+			selectItem.FsmInject("Selection", "Hand", delegate { hasToolInHand = false; });
+			selectItem.FsmInject("Selection", "Tools", delegate { hasToolInHand = true; });
 
 			return hasToolInHand;
 		}
