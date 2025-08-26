@@ -46,7 +46,7 @@ namespace MscModApi
 		private Screw previousScrew;
 
 #if DEBUG
-		private Keybind instantInstallKeybind;
+		private SettingsKeybind instantInstallKeybind;
 #endif
 
 		private bool updateLocked = true;
@@ -79,8 +79,8 @@ namespace MscModApi
 
 
 #if DEBUG
-			Keybind.AddHeader(this, "Developer Area");
-			instantInstallKeybind = Keybind.Add(this, "instant-install", "Instant install part looking at", KeyCode.UpArrow);
+			Keybind.AddHeader( "Developer Area");
+			instantInstallKeybind = Keybind.Add(this.ID + "_instant-install", "Instant install part looking at", KeyCode.UpArrow);
 			enableInstantInstall = Settings.AddCheckBox(this, "enableInstantInstall", "Enable Instant Part install", false);
 #endif
 			ScrewPlacementAssist.ModSettings(this);
