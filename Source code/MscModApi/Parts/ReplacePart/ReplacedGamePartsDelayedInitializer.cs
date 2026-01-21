@@ -21,7 +21,23 @@ namespace MscModApi.Parts.ReplacePart
 		private const int SECONDS_TO_WAIT = 6;
 
 		private bool initialized;
-		private bool initializingRequired => ReplacedGameParts.modsParts.Any(keyValuePair => keyValuePair.Value.Count > 0);
+		
+		/// <summary>
+		/// Checks if any ReplacedGameParts need to be initialized.
+		/// Returns false if modsParts is null or empty.
+		/// </summary>
+		private bool initializingRequired
+		{
+			get
+			{
+				// FIX: Added null check for modsParts to prevent NullReferenceException
+				if (ReplacedGameParts.modsParts == null)
+				{
+					return false;
+				}
+				return ReplacedGameParts.modsParts.Any(keyValuePair => keyValuePair.Value != null && keyValuePair.Value.Count > 0);
+			}
+		}
 
 		private IEnumerator AwaitGameProperlyInitialized()
 		{
@@ -35,19 +51,43 @@ namespace MscModApi.Parts.ReplacePart
 				yield return null;
 			}
 
-			if (ReplacedGameParts.modsParts.Count == 0)
+			// FIX: Added null check for modsParts
+			if (ReplacedGameParts.modsParts == null || ReplacedGameParts.modsParts.Count == 0)
 			{
 				yield break;
 			}
 
 			float currentTime = 0;
-			FsmBool playerStop = FsmVariables.GlobalVariables.FindFsmBool("PlayerStop");
-			playerStop.Value = true;
+			
+			// FIX: Added null checks for FsmVariables.GlobalVariables and playerStop
+			FsmBool playerStop = null;
+			try
+			{
+				if (FsmVariables.GlobalVariables != null)
+				{
+					playerStop = FsmVariables.GlobalVariables.FindFsmBool("PlayerStop");
+				}
+			}
+			catch (Exception ex)
+			{
+				ModConsole.Error($"[MscModApi] Failed to find PlayerStop FsmBool: {ex.Message}");
+			}
+			
+			// Only set playerStop if it was found successfully
+			if (playerStop != null)
+			{
+				playerStop.Value = true;
+			}
+			else
+			{
+				ModConsole.Warning("[MscModApi] PlayerStop FsmBool not found, skipping movement lock during initialization");
+			}
 
 			while (currentTime < SECONDS_TO_WAIT)
 			{
 				currentTime += Time.deltaTime;
-				if (playerStop.Value)
+				// FIX: Added null check before accessing playerStop.Value
+				if (playerStop != null && playerStop.Value)
 				{
 					int secondsLeft = (int) Math.Floor(SECONDS_TO_WAIT - currentTime);
 					if (secondsLeft <= 0)
@@ -55,31 +95,60 @@ namespace MscModApi.Parts.ReplacePart
 						secondsLeft = 0;
 					}
 					UserInteraction.GuiInteraction(UserInteraction.Type.None, $"MscModApi waiting for game finished loading ~{secondsLeft} seconds. Press [{cInput.GetText("Use")}] to force unlock movement");
-					if (UserInteraction.UseButtonDown || MscModApi.disableLoadingMovementLock.GetValue())
+					// FIX: Added null check for MscModApi.disableLoadingMovementLock
+					bool disableMovementLock = MscModApi.disableLoadingMovementLock != null && MscModApi.disableLoadingMovementLock.GetValue();
+					if (UserInteraction.UseButtonDown || disableMovementLock)
 					{
 						playerStop.Value = false;
 					}
 				}
 				yield return null;
 			}
-			playerStop.Value = false;
+			// FIX: Added null check before setting playerStop.Value
+			if (playerStop != null)
+			{
+				playerStop.Value = false;
+			}
+
+			// FIX: Added null check for modsParts before iterating
+			if (ReplacedGameParts.modsParts == null)
+			{
+				yield break;
+			}
 
 			foreach (KeyValuePair<string, List<ReplacedGameParts>> keyValuePair in ReplacedGameParts.modsParts)
 			{
+				// FIX: Skip if value is null
+				if (keyValuePair.Value == null)
+				{
+					continue;
+				}
+				
 				int modInitializedCounter = 0;
 				int modInitializedFailureCounter = 0;
 				foreach (ReplacedGameParts replacedGameParts in keyValuePair.Value)
 				{
+					// FIX: Skip if replacedGameParts is null
+					if (replacedGameParts == null)
+					{
+						continue;
+					}
+					
 					if (!replacedGameParts.initialized)
 					{
 						try
 						{
-							replacedGameParts.GetEvents(ReplacedGamePartsEvent.Type.Initialized).InvokeAll();
+							var events = replacedGameParts.GetEvents(ReplacedGamePartsEvent.Type.Initialized);
+							// FIX: Added null check for events
+							if (events != null)
+							{
+								events.InvokeAll();
+							}
 							modInitializedCounter++;
 						}
 						catch (Exception ex)
 						{
-							ModConsole.Print($"Executing Initializing events for ReplacedGamePart with id '{replacedGameParts.id} failed. Check your Events'");
+							ModConsole.Print($"Executing Initializing events for ReplacedGamePart with id '{replacedGameParts.id}' failed. Check your Events");
 							ModConsole.Error(ex.Message);
 							modInitializedFailureCounter++;
 						}
@@ -105,7 +174,15 @@ namespace MscModApi.Parts.ReplacePart
 			}
 
 			initialized = true;
-			StartCoroutine(AwaitGameProperlyInitialized());
+			
+			try
+			{
+				StartCoroutine(AwaitGameProperlyInitialized());
+			}
+			catch (Exception ex)
+			{
+				ModConsole.Error($"[MscModApi] Failed to start initialization coroutine: {ex.Message}");
+			}
 		}
 	}
 }

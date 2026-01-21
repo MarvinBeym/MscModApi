@@ -726,17 +726,47 @@ namespace MscModApi.Parts.ReplacePart
 
 		public static void Save()
 		{
+			// FIX: Added null check for modsParts
+			if (modsParts == null)
+			{
+				return;
+			}
+			
 			foreach (var modParts in modsParts)
 			{
+				// FIX: Skip if value is null
+				if (modParts.Value == null)
+				{
+					continue;
+				}
+				
 				var mod = Helper.GetMod(modParts.Key);
+				
+				// FIX: Skip if mod is null
+				if (mod == null)
+				{
+					continue;
+				}
 
 				// Dictionary<replacedGameParts-id, Dictionary<gamePart-id, GamePartSave>>
 				var modPartSaves = new Dictionary<string, Dictionary<string, GamePartSave>>();
 
 				foreach (ReplacedGameParts replacedGameParts in modParts.Value)
 				{
+					// FIX: Skip if replacedGameParts or originalParts is null
+					if (replacedGameParts?.originalParts == null)
+					{
+						continue;
+					}
+					
 					foreach (var originalPart in replacedGameParts.originalParts)
 					{
+						// FIX: Skip if originalPart is null
+						if (originalPart == null)
+						{
+							continue;
+						}
+						
 						if (modPartSaves.TryGetValue(replacedGameParts.id, out var gamePartSaves))
 						{
 							gamePartSaves.Add(originalPart.id, originalPart.saveData);
