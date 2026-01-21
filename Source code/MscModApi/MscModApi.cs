@@ -131,7 +131,15 @@ namespace MscModApi
 
 		private void PostLoad()
 		{
-			replacedGamePartsDelayedInitializer.InitOnceByUpdateFrame();
+			// FIX: Added null check for replacedGamePartsDelayedInitializer
+			if (replacedGamePartsDelayedInitializer != null)
+			{
+				replacedGamePartsDelayedInitializer.InitOnceByUpdateFrame();
+			}
+			else
+			{
+				ModConsole.Warning("[MscModApi] ReplacedGamePartsDelayedInitializer is null in PostLoad. This may indicate PreLoad was not executed properly.");
+			}
 		}
 
 		private void Save()

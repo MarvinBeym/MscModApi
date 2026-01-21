@@ -21,9 +21,14 @@ namespace MscModApi.Caching
 		/// <returns></returns>
 		public static GameObject Find(string name, bool findEvenIfInactive = true)
 		{
+			// FIX: Initialize cachedGameObjects if null (defensive programming)
+			if (cachedGameObjects == null)
+			{
+				cachedGameObjects = new Dictionary<string, GameObject>();
+			}
+			
 			try {
-				GameObject gameObject = cachedGameObjects[name];
-				if (gameObject != null) {
+				if (cachedGameObjects.TryGetValue(name, out GameObject gameObject) && gameObject != null) {
 					return gameObject;
 				}
 			}
