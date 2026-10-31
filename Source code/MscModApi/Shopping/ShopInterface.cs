@@ -68,7 +68,7 @@ namespace MscModApi.Shopping
 
 			modsPanel.SetActive(true);
 			partsPanel.SetActive(false);
-			moneyComp.text = Game.money.ToString();
+			moneyComp.text = Caching.Game.money.ToString();
 			gameObject.SetActive(true);
 
 			EmptyShoppingCart();
@@ -138,7 +138,7 @@ namespace MscModApi.Shopping
 			totalCost += shopItem.baseItemPrize;
 			totalCostComp.text = totalCost.ToString();
 
-			SetBuyPossible(totalCost < Game.money);
+			SetBuyPossible(totalCost < Caching.Game.money);
 		}
 
 		internal void SetBuyPossible(bool possible)
@@ -184,10 +184,10 @@ namespace MscModApi.Shopping
 				}
 			}
 		}
-
+		
 		internal void OnCheckout()
 		{
-			Game.money -= totalCost;
+			Caching.Game.money -= totalCost;
 			totalCost = 0;
 			totalCostComp.text = totalCost.ToString();
 			foreach (var shopItem in shoppingCart) {

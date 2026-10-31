@@ -69,9 +69,8 @@ namespace MscModApi
 
 		public void ModSettings()
 		{
-			showBoltSizeSetting = Settings.AddCheckBox(this, "showBoltSizeSetting", "Show screw size", false);
+			showBoltSizeSetting = Settings.AddCheckBox("showBoltSizeSetting", "Show screw size", false);
 			disableLoadingMovementLock = Settings.AddCheckBox(
-				this, 
 				"disableLoadingMovementLock",
 				"Disable movement lock while loading", 
 				false
@@ -382,7 +381,7 @@ namespace MscModApi
 		{
 			Cache.LoadCleanup();
 			CarH.LoadCleanup();
-			Game.LoadCleanup();
+			Caching.Game.LoadCleanup();
 			PaintingSystem.PaintingSystem.LoadCleanup();
 			Screw.LoadCleanup();
 			Shop.LoadCleanup();
