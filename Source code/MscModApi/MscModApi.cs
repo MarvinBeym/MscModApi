@@ -24,7 +24,7 @@ namespace MscModApi
 		public override string ID => "MscModApi";
 		public override string Name => "MscModApi";
 		public override string Author => "DonnerPlays";
-		public override string Version => "1.4.3";
+		public override string Version => "1.4.4";
 
 		public override string Description =>
 			"A general modding 'help' featuring things like installable/boltable parts, shop, part boxing, utility tools & more.";
@@ -69,9 +69,8 @@ namespace MscModApi
 
 		public void ModSettings()
 		{
-			showBoltSizeSetting = Settings.AddCheckBox(this, "showBoltSizeSetting", "Show screw size", false);
+			showBoltSizeSetting = Settings.AddCheckBox("showBoltSizeSetting", "Show screw size", false);
 			disableLoadingMovementLock = Settings.AddCheckBox(
-				this, 
 				"disableLoadingMovementLock",
 				"Disable movement lock while loading", 
 				false
@@ -382,7 +381,7 @@ namespace MscModApi
 		{
 			Cache.LoadCleanup();
 			CarH.LoadCleanup();
-			Game.LoadCleanup();
+			Caching.Game.LoadCleanup();
 			PaintingSystem.PaintingSystem.LoadCleanup();
 			Screw.LoadCleanup();
 			Shop.LoadCleanup();
